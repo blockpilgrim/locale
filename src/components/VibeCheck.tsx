@@ -11,6 +11,7 @@
 import { motion } from "framer-motion";
 import { SectionHeader } from "@/components/SectionHeader";
 import { Skeleton } from "@/components/Skeleton";
+import { fadeUp } from "@/lib/motion";
 
 interface VibeCheckProps {
   /** The full narrative text (for completed reports). */
@@ -22,11 +23,6 @@ interface VibeCheckProps {
   /** Additional CSS classes. */
   className?: string;
 }
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
 
 export function VibeCheck({
   narrative,

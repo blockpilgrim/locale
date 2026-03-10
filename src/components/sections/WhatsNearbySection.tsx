@@ -8,42 +8,23 @@ import { motion } from "framer-motion";
 import type { PoiResult, PoiCategory } from "@/lib/poi";
 import { SectionHeader } from "@/components/SectionHeader";
 import { Badge } from "@/components/Badge";
+import { fadeUp } from "@/lib/motion";
 
 interface WhatsNearbySectionProps {
   poi: PoiResult | null;
   className?: string;
 }
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
-
-/** Category labels and icons (emoji as lightweight icons). */
-const CATEGORY_META: Record<
-  PoiCategory,
-  { label: string; icon: string }
-> = {
-  dining: { label: "Dining", icon: "fork.and.knife" },
-  groceries: { label: "Groceries", icon: "cart" },
-  parks: { label: "Parks", icon: "leaf" },
-  fitness: { label: "Fitness", icon: "dumbbell" },
-  nightlife: { label: "Nightlife", icon: "moon" },
-  healthcare: { label: "Healthcare", icon: "cross" },
-  shopping: { label: "Shopping", icon: "bag" },
-  education: { label: "Education", icon: "book" },
-};
-
-/** Simple text-based category icon. */
-const CATEGORY_ICONS: Record<PoiCategory, string> = {
-  dining: "Dining",
-  groceries: "Grocery",
-  parks: "Parks",
-  fitness: "Fitness",
-  nightlife: "Nightlife",
-  healthcare: "Health",
-  shopping: "Shopping",
-  education: "Education",
+/** Category display labels. */
+const CATEGORY_META: Record<PoiCategory, { label: string }> = {
+  dining: { label: "Dining" },
+  groceries: { label: "Groceries" },
+  parks: { label: "Parks" },
+  fitness: { label: "Fitness" },
+  nightlife: { label: "Nightlife" },
+  healthcare: { label: "Healthcare" },
+  shopping: { label: "Shopping" },
+  education: { label: "Education" },
 };
 
 export function WhatsNearbySection({
@@ -170,7 +151,7 @@ export function WhatsNearbySection({
       <div className="mt-8 flex flex-wrap gap-2">
         {categoriesWithItems.map((cat) => (
           <Badge key={cat.category} variant="muted">
-            {CATEGORY_ICONS[cat.category]} ({cat.count})
+            {CATEGORY_META[cat.category].label} ({cat.count})
           </Badge>
         ))}
       </div>

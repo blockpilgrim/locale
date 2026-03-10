@@ -11,6 +11,7 @@ import type { EconomicData } from "@/lib/census";
 import type { PoiResult } from "@/lib/poi";
 import { SectionHeader } from "@/components/SectionHeader";
 import { StatCard } from "@/components/StatCard";
+import { fadeUp } from "@/lib/motion";
 
 interface GettingAroundSectionProps {
   isochrone: IsochroneResult | null;
@@ -18,11 +19,6 @@ interface GettingAroundSectionProps {
   poi: PoiResult | null;
   className?: string;
 }
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
 
 /**
  * Estimate walkability based on isochrone area coverage and nearby POI count.
@@ -82,13 +78,6 @@ export function GettingAroundSection({
 
   const walkability = estimateWalkability(isochrone, poi);
 
-  // Isochrone area metrics.
-  const isochroneMetrics = isochrone?.features
-    .map((f) => ({
-      minutes: f.properties.contour,
-    }))
-    .sort((a, b) => a.minutes - b.minutes);
-
   // Commute stats.
   const commute = economic?.commuteMeans;
   const totalCommuters = commute
@@ -147,27 +136,11 @@ export function GettingAroundSection({
         </div>
       )}
 
-      {/* Isochrone info */}
-      {isochroneMetrics && isochroneMetrics.length > 0 && (
-        <div className="mb-8">
-          <h4 className="mb-4 font-serif text-lg">Walking Reach</h4>
-          <div className="grid grid-cols-3 gap-3">
-            {isochroneMetrics.map((metric) => (
-              <div
-                key={metric.minutes}
-                className="rounded-lg border border-border-light bg-surface p-4 text-center"
-              >
-                <p className="text-2xl font-serif text-accent">
-                  {metric.minutes}
-                </p>
-                <p className="text-xs text-ink-muted mt-1">min walk</p>
-              </div>
-            ))}
-          </div>
-          <p className="mt-2 text-xs text-ink-muted">
-            See the map above for walking isochrone coverage areas
-          </p>
-        </div>
+      {/* Isochrone reference (map shows the visual; section references it) */}
+      {isochrone && (
+        <p className="mb-8 text-sm text-ink-muted">
+          The map above shows 5, 10, and 15-minute walking coverage areas from this address.
+        </p>
       )}
 
       {/* Commute pattern highlights */}

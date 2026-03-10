@@ -9,20 +9,13 @@ import type { HousingData, NationalAverages } from "@/lib/census";
 import { SectionHeader } from "@/components/SectionHeader";
 import { StatCard } from "@/components/StatCard";
 import { ComparisonBar } from "@/components/ComparisonBar";
+import { fadeUp } from "@/lib/motion";
+import { formatCurrency } from "@/lib/format";
 
 interface HousingSectionProps {
   housing: HousingData | null;
   nationalAverages: NationalAverages | null;
   className?: string;
-}
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
-
-function formatCurrency(value: number): string {
-  return `$${value.toLocaleString()}`;
 }
 
 export function HousingSection({
@@ -136,7 +129,11 @@ export function HousingSection({
       {ownerPct !== null && renterPct !== null && (
         <div className="mt-8">
           <h4 className="mb-4 font-serif text-lg">Owner vs. Renter</h4>
-          <div className="flex h-5 w-full overflow-hidden rounded-full">
+          <div
+            className="flex h-5 w-full overflow-hidden rounded-full"
+            role="img"
+            aria-label={`Owner-occupied: ${ownerPct}%, Renter-occupied: ${renterPct}%`}
+          >
             <div
               className="bg-accent transition-all duration-500"
               style={{ width: `${ownerPct}%` }}

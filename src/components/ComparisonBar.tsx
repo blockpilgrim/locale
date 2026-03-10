@@ -37,7 +37,11 @@ export function ComparisonBar({
     max > 0 ? Math.min((nationalValue / max) * 100, 100) : 0;
 
   return (
-    <div className={`space-y-1.5 ${className}`}>
+    <div
+      className={`space-y-1.5 ${className}`}
+      role="img"
+      aria-label={`${label}: ${format(localValue)} (national average: ${format(nationalValue)})`}
+    >
       <div className="flex items-baseline justify-between text-sm">
         <span className="font-medium text-ink">{label}</span>
         <span className="text-ink-muted">{format(localValue)}</span>
@@ -49,17 +53,15 @@ export function ComparisonBar({
           style={{ width: `${localPct}%` }}
         />
       </div>
-      {/* National average marker */}
+      {/* National average indicator — text only, avoids misleading dual-scale bars */}
       <div className="flex items-center gap-2 text-xs text-ink-muted">
         <div className="h-1.5 w-1.5 rounded-full bg-warm-400" />
         <span>National avg: {format(nationalValue)}</span>
+        {/* Position marker on the main bar scale */}
         <div className="h-px flex-1 bg-warm-200" />
-        <div className="relative h-2.5 w-full max-w-[200px] rounded-full bg-warm-100">
-          <div
-            className="h-full rounded-full bg-warm-400 transition-all duration-500"
-            style={{ width: `${nationalPct}%` }}
-          />
-        </div>
+        <span className="font-medium text-ink-muted">
+          {nationalPct > 0 ? `${Math.round(nationalPct)}%` : ""}
+        </span>
       </div>
     </div>
   );

@@ -10,17 +10,13 @@ import type { DemographicsData, NationalAverages } from "@/lib/census";
 import { SectionHeader } from "@/components/SectionHeader";
 import { StatCard } from "@/components/StatCard";
 import { ComparisonBar } from "@/components/ComparisonBar";
+import { fadeUp } from "@/lib/motion";
 
 interface DemographicsSectionProps {
   demographics: DemographicsData | null;
   nationalAverages: NationalAverages | null;
   className?: string;
 }
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
 
 /** Format a count as a percentage of a total. Returns null if data is missing. */
 function pctOf(value: number | null, total: number | null): string | null {
@@ -190,7 +186,11 @@ export function DemographicsSection({
         <div className="mt-8">
           <h4 className="mb-4 font-serif text-lg">Race & Ethnicity</h4>
           {/* Stacked bar */}
-          <div className="flex h-4 w-full overflow-hidden rounded-full">
+          <div
+            className="flex h-4 w-full overflow-hidden rounded-full"
+            role="img"
+            aria-label={`Race and ethnicity breakdown: ${raceEntries.map((e) => `${e.label} ${Math.round((e.value! / totalForRace) * 100)}%`).join(", ")}`}
+          >
             {raceEntries.map((entry) => (
               <div
                 key={entry.label}

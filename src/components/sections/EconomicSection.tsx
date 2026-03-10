@@ -9,20 +9,13 @@ import type { EconomicData, NationalAverages } from "@/lib/census";
 import { SectionHeader } from "@/components/SectionHeader";
 import { StatCard } from "@/components/StatCard";
 import { ComparisonBar } from "@/components/ComparisonBar";
+import { fadeUp } from "@/lib/motion";
+import { formatCurrency } from "@/lib/format";
 
 interface EconomicSectionProps {
   economic: EconomicData | null;
   nationalAverages: NationalAverages | null;
   className?: string;
-}
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
-
-function formatCurrency(value: number): string {
-  return `$${value.toLocaleString()}`;
 }
 
 export function EconomicSection({

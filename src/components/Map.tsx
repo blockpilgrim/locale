@@ -14,6 +14,16 @@ import type { IsochroneResult } from "@/lib/mapbox/isochrone";
 import type { PoiResult, PoiCategory } from "@/lib/poi";
 import { Skeleton } from "@/components/Skeleton";
 
+/** Escape HTML special characters to prevent XSS via OSM data. */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 interface MapProps {
   /** Center coordinates for the map. */
   coordinates: { latitude: number; longitude: number };
@@ -25,23 +35,28 @@ interface MapProps {
   className?: string;
 }
 
-// Isochrone layer colors using design tokens (graduated opacity).
+// Isochrone layer colors — hardcoded hex required by Mapbox GL JS paint API.
+// These mirror the design tokens in globals.css. Update both if tokens change:
+//   accent (#2D5A3D), accent-light (#3D7A52), accent-muted (#9DBFAA)
 const ISOCHRONE_STYLES: Record<number, { color: string; opacity: number }> = {
-  5: { color: "#2D5A3D", opacity: 0.3 },   // accent — darkest
-  10: { color: "#3D7A52", opacity: 0.2 },   // accent-light
-  15: { color: "#9DBFAA", opacity: 0.15 },  // accent-muted
+  5: { color: "#2D5A3D", opacity: 0.3 },
+  10: { color: "#3D7A52", opacity: 0.2 },
+  15: { color: "#9DBFAA", opacity: 0.15 },
 };
 
-// Category marker colors (matching design tokens data-1 through data-6).
+// Category marker colors — hardcoded hex required by Mapbox GL JS marker API.
+// These mirror the data visualization tokens in globals.css:
+//   data-1 (#5B8C6E), data-2 (#7BA3C4), data-3 (#D4A574),
+//   data-4 (#C48B8B), data-5 (#A38DC4), data-6 (#8CB4B4)
 const CATEGORY_COLORS: Record<PoiCategory, string> = {
-  dining: "#D4A574",     // data-3
-  groceries: "#5B8C6E",  // data-1
-  parks: "#8CB4B4",      // data-6
-  fitness: "#A38DC4",    // data-5
-  nightlife: "#C48B8B",  // data-4
-  healthcare: "#7BA3C4", // data-2
-  shopping: "#D4A574",   // data-3
-  education: "#5B8C6E",  // data-1
+  dining: "#D4A574",
+  groceries: "#5B8C6E",
+  parks: "#8CB4B4",
+  fitness: "#A38DC4",
+  nightlife: "#C48B8B",
+  healthcare: "#7BA3C4",
+  shopping: "#D4A574",
+  education: "#5B8C6E",
 };
 
 export function Map({
@@ -76,7 +91,7 @@ export function Map({
 
     map.addControl(new mapboxgl.NavigationControl(), "top-right");
 
-    // Add address marker.
+    // Add address marker. Hex mirrors --color-accent token.
     new mapboxgl.Marker({ color: "#2D5A3D" })
       .setLngLat([coordinates.longitude, coordinates.latitude])
       .addTo(map);
@@ -88,7 +103,9 @@ export function Map({
     mapRef.current = map;
 
     return () => {
-      // Clean up markers.
+      // Clean up markers and reset state so isochrone/POI effects
+      // don't fire against a stale map during reinit.
+      setIsLoaded(false);
       markersRef.current.forEach((m) => m.remove());
       markersRef.current = [];
       map.remove();
@@ -179,13 +196,17 @@ export function Map({
       el.style.border = "1.5px solid white";
       el.style.boxShadow = "0 1px 3px rgba(0,0,0,0.2)";
 
+      // Escape POI data (from OpenStreetMap, user-contributed) to prevent XSS.
+      const safeName = escapeHtml(poi.name || "Unnamed");
+      const safeCategory = escapeHtml(poi.category);
+
       const marker = new mapboxgl.Marker({ element: el })
         .setLngLat([poi.longitude, poi.latitude])
         .setPopup(
           new mapboxgl.Popup({ offset: 10, closeButton: false }).setHTML(
             `<div style="font-family: Inter, sans-serif; font-size: 13px;">
-              <strong>${poi.name || "Unnamed"}</strong>
-              <br/><span style="color: #78716C; font-size: 12px;">${poi.category} &middot; ${poi.walkingMinutes} min walk</span>
+              <strong>${safeName}</strong>
+              <br/><span style="color: #78716C; font-size: 12px;">${safeCategory} &middot; ${poi.walkingMinutes} min walk</span>
             </div>`,
           ),
         )

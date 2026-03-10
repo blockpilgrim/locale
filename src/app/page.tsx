@@ -10,7 +10,7 @@ export default function Home() {
     useReportStream();
 
   const handleSelect = (suggestion: GeocodeSuggestion) => {
-    generate({
+    void generate({
       address: suggestion.fullAddress,
       latitude: suggestion.latitude,
       longitude: suggestion.longitude,
