@@ -121,9 +121,19 @@ docs/               → Product docs, build strategy, implementation plan, revie
 - **`src/lib/motion.ts`:** Shared Framer Motion animation variants. Currently exports `fadeUp`. Add new variants here rather than defining inline in components.
 - **`src/lib/format.ts`:** Shared formatting functions. Currently exports `formatCurrency`. Add number/date/string formatters here rather than duplicating across components.
 
+## Page Architecture (`src/app/`)
+
+- **SSR/client split:** Pages are server components by default. Interactive features are extracted into client components ("client islands") imported by the server component. This ensures SEO-critical content (headings, featured cards, metadata) is server-rendered while interactive parts (AddressInput, Mapbox, Framer Motion) run on the client.
+- **Report page pattern:** `app/report/[slug]/page.tsx` is a server component that fetches directly from the DB (not through the API route) using the same Drizzle join pattern as the API route. Data is passed as props to the `ReportContent` client component.
+- **`generateMetadata`:** Used on the report page for dynamic OG tags. Shares the `fetchReport()` helper with the page component to avoid duplicate DB calls (Next.js deduplicates within a single render).
+- **Report status handling:** The report page handles three statuses: `complete` (render full report), `generating` (loading state with auto-refresh), `failed` (error state with retry CTA). Use `notFound()` for unknown slugs.
+- **Auto-refresh for generating state:** Use the `AutoRefresh` client component (calls `router.refresh()` on an interval) rather than `<meta http-equiv="refresh">` or bare `<head>` elements, which don't work correctly in Next.js App Router.
+- **Generation flow:** Homepage POST to `/api/report/generate` -> read slug from response (JSON `slug` field for cached, `X-Report-Slug` header for streaming) -> `router.push(/report/[slug])`. The report page handles the "generating" state with polling.
+- **Featured report cards:** Hardcoded illustrative data on the homepage (no DB queries). These link to `/report/[slug]` and serve as social proof / discovery mechanism.
+
 ## Custom Hooks (`src/hooks/`)
 
-- **`useReportStream`:** Client-side hook for report generation. Detects cached (JSON) vs streaming (text) responses by inspecting `Content-Type` header. Reads `X-Report-Slug` header from streaming responses. Supports abort via `AbortController` for request cancellation.
+- **`useReportStream`:** Client-side hook for report generation. Detects cached (JSON) vs streaming (text) responses by inspecting `Content-Type` header. Reads `X-Report-Slug` header from streaming responses. Supports abort via `AbortController` for request cancellation. Note: the homepage now uses `HomepageClient` with direct fetch + redirect instead of this hook. The hook remains available for alternative streaming UIs.
 
 ## Documentation
 

@@ -91,16 +91,17 @@
 ## Phase 4: Pages + Integration
 > Wire everything together into the actual routes.
 
-- [ ] **T4.1 — Homepage**
+- [x] **T4.1 — Homepage**
   Build `app/page.tsx` — hero section with value proposition, prominent `AddressInput`, featured/example report cards linking to pre-generated reports. Responsive layout (375px+). This is the landing experience.
   - *Depends on:* T3.1, T3.2, T3.5
-  - *Note:* Hero section + AddressInput + streaming preview wired during Phase 3. Remaining: featured/example report cards, SSR split for SEO.
+  - *Note:* Reworked into server component with client island (HomepageClient). Featured report cards added with 4 iconic US addresses.
 
-- [ ] **T4.2 — Report page + progressive loading**
+- [x] **T4.2 — Report page + progressive loading**
   Build `app/report/[slug]/page.tsx` — the core report experience. Server-side: fetch report from DB by slug (for SSR + OG metadata). Client-side: if report is `generating`, show progressive loading (map first → data sections as they resolve → streaming narrative). If `complete`, render full report from cached data. Compose: Map, data sections, VibeCheck, share controls. Responsive layout.
   - *Depends on:* T2.3, T3.3, T3.4, T3.5
+  - *Note:* Includes generateMetadata for OG tags (partially covers T5.1). Auto-refresh via client component for "generating" state. notFound() for missing slugs.
 
-- [ ] **T4.3 — Report generation flow (client-side orchestration)**
+- [x] **T4.3 — Report generation flow (client-side orchestration)**
   Build the client-side flow: user selects address on homepage → POST to generate API → redirect to `/report/[slug]` → report page handles progressive rendering. Loading/transition states between homepage and report. Error handling for failed generation (retry CTA). This is the glue between the homepage and the report page.
   - *Depends on:* T4.1, T4.2
 
@@ -112,6 +113,7 @@
 - [ ] **T5.1 — Dynamic Open Graph metadata + social previews**
   Implement `generateMetadata` in the report page for dynamic OG tags (title: address/neighborhood name, description: first ~150 chars of narrative, image: static map thumbnail via Mapbox Static Images API). Add `app/api/og/route.tsx` if a custom OG image is needed (using `@vercel/og`). Test with social media debuggers.
   - *Depends on:* T4.2
+  - *Note:* `generateMetadata` with title/description/OG tags already implemented in T4.2. Remaining: OG image (static map thumbnail or @vercel/og).
 
 - [ ] **T5.2 — Share controls + copy link**
   Build `components/ShareControls.tsx` — copy-to-clipboard button, native share API on mobile, Twitter/Facebook share links with pre-filled text. Placed prominently on the report page. "Generate your own report" CTA for viewers of shared reports.
