@@ -37,7 +37,7 @@ Locale will utilize a **Serverless API Orchestration** pattern. Because the core
 
 The MVP requires a lightweight relational model, primarily focused on caching and retrieving generated reports.
 
-* **`Location`:** The core entity. Stores the resolved address, latitude, longitude, and standardized bounding box.
+* **`Location`:** The core entity. Stores the resolved address, latitude, longitude, city, state, and zip code.
 * **`Report`:** Belongs to a Location. Contains the unique slug (for the shareable URL), the generated AI narrative, and a `JSONB` column storing the exact snapshot of data (demographics, housing, amenities) used to generate it.
     * *Why JSONB?* Storing the raw data alongside the narrative ensures the data visualizations on a shared report perfectly match the narrative, even if the underlying public API data changes months later.
 * **`SearchQuery` (Optional but recommended):** Logs user inputs and autocomplete selections to analyze which neighborhoods are most requested and where the geocoder is failing.

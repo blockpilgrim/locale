@@ -4,6 +4,7 @@
 **Reviewer:** Claude Opus 4.6
 **Scope:** T0.1 (Next.js project init + core config) and T0.2 (Database setup + schema)
 **Commits reviewed:** a3fb2c6, dfd6ce4, f4a8879
+**Resolution commit:** 7cd5cef
 
 ---
 
@@ -11,7 +12,7 @@
 
 Phase 0 establishes a solid foundation. The Next.js App Router project is correctly configured with TypeScript, Tailwind CSS v4, and the editorial design system. The Drizzle ORM schema maps well to the data architecture described in BUILD-STRATEGY.md. TypeScript compilation and ESLint both pass cleanly. The design tokens are thoughtful and express the "magazine, not dashboard" principle effectively.
 
-There are a few issues worth addressing -- most notably a missing database index that will matter under load, a database connection pattern that could cause problems in serverless cold starts, and the `updatedAt` column not auto-updating. Nothing is a showstopper, but some items should be fixed before Phase 1 builds on top of this foundation.
+**Status: All findings resolved.** The Critical and Warning items identified below were addressed in commit 7cd5cef. The review text below describes the original findings for posterity.
 
 ---
 
@@ -27,7 +28,7 @@ There are a few issues worth addressing -- most notably a missing database index
 | `src/lib/db/schema.ts` | Has issues |
 | `src/lib/db/index.ts` | Has issues |
 | `drizzle.config.ts` | Minor issue |
-| `drizzle/0000_organic_phantom_reporter.sql` | Has issues (inherits from schema) |
+| `drizzle/0000_cute_scrambler.sql` | Has issues (inherits from schema) |
 | `.env.example` | Good |
 | `.gitignore` | Good |
 | `next.config.ts` | Good |
