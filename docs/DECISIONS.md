@@ -60,3 +60,11 @@ Record of significant architectural decisions that deviate from or extend the or
 **Decision:** Use SQL `lower()` for case-insensitive comparison in the cache lookup query.
 **Rationale:** Reduces unnecessary duplicate report generation and wasted API costs (each report triggers Mapbox, Census, and LLM calls). The `sql` tagged template from `drizzle-orm` provides escape-safe raw SQL for operations not expressible in the type-safe query builder.
 **Trade-off:** Cannot use a standard Postgres index on `address` for this query. For MVP traffic this is fine; at scale, add a functional index: `CREATE INDEX ON locations (lower(address))`.
+
+## D7. Custom walkability heuristic instead of third-party walk score
+
+**Date:** 2026-03-10
+**Context:** The GettingAroundSection needs to display a walkability assessment (A/B/C/D score). Third-party walk score services (Walk Score API) are paid and require API keys. We already have POI data from Overpass.
+**Decision:** Use a custom heuristic in `GettingAroundSection.tsx` based on POI count and category diversity to derive a qualitative walkability label (A: Very Walkable, B: Walkable, C: Somewhat Walkable, D: Car-Dependent).
+**Rationale:** The POI data from Overpass already captures what's within walking distance. A simple threshold (e.g., 40+ POIs across 6+ categories = "Very Walkable") provides a meaningful signal without adding another paid API dependency. The thresholds were chosen to roughly correspond to urban, suburban, and rural patterns.
+**Trade-off:** Less sophisticated than Walk Score's proprietary algorithm. May not capture transit infrastructure quality or street connectivity. Can be replaced with a third-party API post-MVP if the heuristic proves insufficient.

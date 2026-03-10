@@ -103,15 +103,21 @@ docs/               → Product docs, build strategy, implementation plan, revie
 
 ## Frontend Components (`src/components/`)
 
-- **`"use client"` directive:** Required for all interactive components (state, effects, event handlers). Non-interactive components (Container, SectionHeader, Badge, StatCard, Skeleton) omit it so they can be used in both server and client contexts.
-- **Design system components:** `Container`, `SectionHeader`, `Badge`, `StatCard`, `Skeleton` are the foundational building blocks. Use them consistently for editorial styling.
+- **`"use client"` directive:** Required for all interactive components (state, effects, event handlers) and for any component that imports `framer-motion` (even if otherwise non-interactive, since Framer Motion requires a client context). Non-interactive components (Container, SectionHeader, Badge, StatCard, Skeleton, ComparisonBar) omit it so they can be used in both server and client contexts.
+- **Design system components:** `Container`, `SectionHeader`, `Badge`, `StatCard`, `Skeleton` (+ `SkeletonText` for multi-line placeholders) are the foundational building blocks. Use them consistently for editorial styling.
 - **ComparisonBar:** CSS-based horizontal bar visualization for comparing local values to national averages. No chart library needed.
 - **Graceful hiding:** Data section components return `null` when their data prop is null/missing. Never show empty sections.
-- **Framer Motion animations:** Use `motion.div` (or `motion.section`) with `fadeUp` variant (`{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }`) and `whileInView` trigger with `viewport={{ once: true }}` for reveal animations on scroll.
+- **Framer Motion animations:** Import `fadeUp` from `@/lib/motion` — do not redefine per-component. Use `motion.div` (or `motion.section`) with the `fadeUp` variant and `whileInView` trigger with `viewport={{ once: true }}` for reveal animations on scroll.
 - **Section component structure:** Each section in `components/sections/` follows the pattern: accept typed data props, return null if no data, use SectionHeader for consistent heading, use StatCard for key metrics, include source attribution footer.
 - **Data section directory:** `src/components/sections/` for report data sections (Demographics, Housing, Economic, GettingAround, WhatsNearby).
 - **Map component:** Uses Mapbox GL JS via `mapbox-gl` package with `NEXT_PUBLIC_MAPBOX_TOKEN`. Imports `mapbox-gl/dist/mapbox-gl.css` directly. Guards against SSR via `"use client"`.
+- **Mapbox hex color mirroring:** Mapbox GL JS paint properties and DOM-style-based markers require hardcoded hex values (cannot use CSS custom properties). Any such value must include a comment citing the corresponding `--color-*` token name. If a token value changes in `globals.css`, the hardcoded hex must be updated manually in `Map.tsx`.
 - **Isochrone rendering:** Sorted largest-first (15 > 10 > 5) so smaller polygons render on top. Uses design token accent colors with graduated opacity.
+
+## Shared Utilities (`src/lib/`)
+
+- **`src/lib/motion.ts`:** Shared Framer Motion animation variants. Currently exports `fadeUp`. Add new variants here rather than defining inline in components.
+- **`src/lib/format.ts`:** Shared formatting functions. Currently exports `formatCurrency`. Add number/date/string formatters here rather than duplicating across components.
 
 ## Custom Hooks (`src/hooks/`)
 

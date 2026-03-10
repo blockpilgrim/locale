@@ -93,7 +93,8 @@
 
 - [ ] **T4.1 — Homepage**
   Build `app/page.tsx` — hero section with value proposition, prominent `AddressInput`, featured/example report cards linking to pre-generated reports. Responsive layout (375px+). This is the landing experience.
-  - *Depends on:* T3.1, T3.2
+  - *Depends on:* T3.1, T3.2, T3.5
+  - *Note:* Hero section + AddressInput + streaming preview wired during Phase 3. Remaining: featured/example report cards, SSR split for SEO.
 
 - [ ] **T4.2 — Report page + progressive loading**
   Build `app/report/[slug]/page.tsx` — the core report experience. Server-side: fetch report from DB by slug (for SSR + OG metadata). Client-side: if report is `generating`, show progressive loading (map first → data sections as they resolve → streaming narrative). If `complete`, render full report from cached data. Compose: Map, data sections, VibeCheck, share controls. Responsive layout.
