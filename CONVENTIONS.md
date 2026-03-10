@@ -87,6 +87,16 @@ docs/           → Product docs, build strategy, implementation plan, reviews
 - **Env var mocking:** `vi.stubEnv("VAR_NAME", "value")` in `beforeEach`, `vi.unstubAllEnvs()` in `afterEach`
 - **Imports:** Always explicitly import from `vitest` (`describe`, `it`, `expect`, `vi`, etc.) — do not rely on globals
 
+## Report Generation (`src/lib/report/`)
+
+- **Orchestrator pattern:** `generateReport()` fires all data-fetching API calls via `Promise.all` with `.catch()` wrappers so individual failures return `null` rather than rejecting the entire batch.
+- **Minimum viable report:** At least one data source (census, isochrone, or POI) must succeed. If ALL fail, the report status is set to `"failed"`. The `isViable` boolean on the result signals this.
+- **Slug generation:** Human-readable URL slugs derived from the address (lowercase, hyphens, max 60 chars). Uniqueness is enforced by checking the DB and appending a random suffix if needed.
+- **Narrative streaming:** Uses Vercel AI SDK (`streamText` from `"ai"` + `anthropic` provider from `"@ai-sdk/anthropic"`). The stream is returned to the caller for HTTP response piping, while a background task awaits the full text and persists it to the DB.
+- **AI SDK type note:** `StreamTextResult` requires two generic type parameters in v4+. Prefer using `Awaited<ReturnType<typeof streamText>>` over explicit generics. Use `maxOutputTokens` (not `maxTokens`) and `toTextStreamResponse()` (not `toDataStreamResponse()`).
+- **Prompt construction:** System prompt and user prompt are separate functions (`buildSystemPrompt`, `buildUserPrompt`) exported for testability. The user prompt serializes structured data into labeled text sections, only including sections where data is available.
+- **API route caching:** The POST generate route checks for an existing report by matching the address string in the `locations` table. If found, returns the slug immediately without re-generating.
+
 ## Documentation
 
 - Architectural deviations from BUILD-STRATEGY.md are recorded in `docs/DECISIONS.md`

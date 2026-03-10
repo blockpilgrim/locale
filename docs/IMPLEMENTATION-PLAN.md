@@ -45,15 +45,15 @@
 ## Phase 2: Report Generation Engine
 > The core orchestrator. Depends on all Phase 1 data clients.
 
-- [ ] **T2.1 — Report orchestrator + slug generation**
+- [x] **T2.1 — Report orchestrator + slug generation**
   Build `lib/report/generate.ts` — the orchestrator function. Takes geocoded coordinates, fires `Promise.all` for Census, isochrone, and POI data. Generates a URL slug from the address. Creates `location` + `report` (status: `generating`) rows in the DB. Returns structured data payload. Handle partial failures per BUILD-STRATEGY Decision 4 (minimum viable report: map + at least one data section).
   - *Depends on:* T0.2, T1.2, T1.3, T1.4
 
-- [ ] **T2.2 — AI narrative prompt + streaming**
+- [x] **T2.2 — AI narrative prompt + streaming**
   Build `lib/report/narrative.ts` — constructs the Claude prompt from structured data. Install `ai` + `@ai-sdk/anthropic`. The prompt must: synthesize all available data, maintain the "knowledgeable local friend" voice, acknowledge tradeoffs, explicitly handle missing data fields, be specific to the location. Build the streaming helper that pipes Claude's response. On stream completion, update the report row with the final narrative and `status: complete`.
   - *Depends on:* T2.1
 
-- [ ] **T2.3 — Report generation API route**
+- [x] **T2.3 — Report generation API route**
   Create `app/api/report/generate/route.ts`. Accepts address + coordinates from the client. Checks DB for existing report (cache hit → return immediately). Otherwise, runs the orchestrator (T2.1), starts narrative streaming (T2.2), returns a streaming response. Apply rate limiting (T1.5). Create `app/api/report/[slug]/route.ts` for fetching saved reports by slug.
   - *Depends on:* T2.1, T2.2, T1.5
 
