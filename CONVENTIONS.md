@@ -127,9 +127,14 @@ docs/               → Product docs, build strategy, implementation plan, revie
 - **Report page pattern:** `app/report/[slug]/page.tsx` is a server component that fetches directly from the DB (not through the API route) using the same Drizzle join pattern as the API route. Data is passed as props to the `ReportContent` client component.
 - **`generateMetadata`:** Used on the report page for dynamic OG tags. Shares the `fetchReport()` helper with the page component to avoid duplicate DB calls (Next.js deduplicates within a single render).
 - **Report status handling:** The report page handles three statuses: `complete` (render full report), `generating` (loading state with auto-refresh), `failed` (error state with retry CTA). Use `notFound()` for unknown slugs.
-- **Auto-refresh for generating state:** Use the `AutoRefresh` client component (calls `router.refresh()` on an interval) rather than `<meta http-equiv="refresh">` or bare `<head>` elements, which don't work correctly in Next.js App Router.
-- **Generation flow:** Homepage POST to `/api/report/generate` -> read slug from response (JSON `slug` field for cached, `X-Report-Slug` header for streaming) -> `router.push(/report/[slug])`. The report page handles the "generating" state with polling.
+- **Auto-refresh for generating state:** Use the `AutoRefresh` client component (calls `router.refresh()` on an interval) rather than `<meta http-equiv="refresh">`. Default: 3s interval, 60 max attempts (~3 min ceiling).
+- **Generation flow:** Homepage POST to `/api/report/generate` -> validate slug format -> `router.push(/report/[slug])`. The report page handles the "generating" state with polling.
+- **Slug validation:** Validate slugs with `/^[a-z0-9-]{1,80}$/` before using in `router.push()` to prevent path traversal. Applied in `HomepageClient`.
+- **`force-dynamic`:** Export `const dynamic = "force-dynamic"` on pages where server data changes between requests (e.g., report page during `generating` → `complete` transition). Prevents Next.js from caching stale status.
+- **JSONB null safety:** Always null-guard before casting JSONB columns to typed interfaces (`if (!row.data) notFound()`). The `as` cast bypasses TypeScript's null check.
+- **Route-segment UI files:** Add `not-found.tsx` and `loading.tsx` in route segments where custom 404/loading states improve UX. Use project design system components (Container, Skeleton) for consistency.
 - **Featured report cards:** Hardcoded illustrative data on the homepage (no DB queries). These link to `/report/[slug]` and serve as social proof / discovery mechanism.
+- **Client components:** `HomepageClient` (address input + generation + redirect), `ReportContent` (full report composition with Map + sections + VibeCheck), `AutoRefresh` (polling).
 
 ## Custom Hooks (`src/hooks/`)
 
