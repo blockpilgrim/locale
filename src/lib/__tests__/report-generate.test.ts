@@ -268,6 +268,31 @@ describe("generateReport", () => {
     expect(result.data.poi).toBeNull();
   });
 
+  it("retries with a suffix when slug unique constraint is violated", async () => {
+    // First insert returns the location row.
+    mockInsertReturning.mockResolvedValueOnce([{ id: 1 }]);
+    // Second insert (report with base slug) throws a unique constraint error.
+    mockInsertReturning.mockRejectedValueOnce(
+      new Error("duplicate key value violates unique constraint"),
+    );
+    // Third insert (report with suffixed slug) succeeds.
+    mockInsertReturning.mockResolvedValueOnce([{ id: 2 }]);
+
+    vi.mocked(fetchCensusData).mockResolvedValueOnce(mockCensusResult);
+    vi.mocked(fetchIsochrone).mockResolvedValueOnce(null);
+    vi.mocked(fetchPoi).mockResolvedValueOnce(null);
+
+    const result = await generateReport({
+      address: "123 Main St, Springfield, IL",
+      latitude: 39.78,
+      longitude: -89.65,
+    });
+
+    // Slug should NOT be the plain base slug; it should have a random suffix.
+    expect(result.slug).not.toBe("123-main-st-springfield-il");
+    expect(result.slug).toMatch(/^123-main-st-springfield-il-[a-z0-9]{5}$/);
+  });
+
   it("stores address metadata in the data payload", async () => {
     vi.mocked(fetchCensusData).mockResolvedValueOnce(mockCensusResult);
     vi.mocked(fetchIsochrone).mockResolvedValueOnce(null);

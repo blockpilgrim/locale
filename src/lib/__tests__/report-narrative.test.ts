@@ -235,7 +235,7 @@ describe("buildUserPrompt", () => {
     const prompt = buildUserPrompt(data);
 
     expect(prompt).toContain("WALKABILITY");
-    expect(prompt).toContain("5-minute walking isochrone");
+    expect(prompt).toContain("5-minute walking area");
   });
 
   it("includes POI data with named items", () => {
@@ -288,6 +288,34 @@ describe("buildUserPrompt", () => {
     expect(prompt).toContain("demographics/housing/economic");
     expect(prompt).toContain("walkability isochrone");
     expect(prompt).toContain("nearby amenities");
+  });
+
+  it("omits the location line when both city and state are missing", () => {
+    const data = makeReportData({
+      address: {
+        full: "123 Main St, Springfield, IL",
+        city: undefined,
+        state: undefined,
+        zip: "62701",
+      },
+    });
+    const prompt = buildUserPrompt(data);
+
+    // Should still have the address header
+    expect(prompt).toContain("123 Main St, Springfield, IL");
+    // Should NOT have a separate "Location:" line
+    expect(prompt).not.toMatch(/^Location:/m);
+  });
+
+  it("shows 'none found' for missing nearest essentials", () => {
+    const data = makeReportData();
+    // The default fixture has pharmacy: null and park: null
+    const prompt = buildUserPrompt(data);
+
+    expect(prompt).toContain("Nearest pharmacy: none found within search radius");
+    expect(prompt).toContain("Nearest park: none found within search radius");
+    // Grocery is present in the fixture
+    expect(prompt).toContain("Nearest grocery: Fresh Market");
   });
 
   it("does not include missing-data note when all sections are present", () => {

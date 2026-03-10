@@ -211,8 +211,14 @@ function buildUserPrompt(data: ReportData): string {
     parts.push("=== WALKABILITY (ISOCHRONE DATA) ===");
     for (const feature of data.isochrone.features) {
       const minutes = feature.properties.contour;
-      // We don't have area in sq km from the raw data, but the polygon exists
-      parts.push(`${minutes}-minute walking isochrone polygon available`);
+      const areaSqKm = computePolygonAreaSqKm(feature.geometry.coordinates);
+      if (areaSqKm !== null) {
+        parts.push(
+          `${minutes}-minute walking area: ~${areaSqKm.toFixed(2)} sq km`,
+        );
+      } else {
+        parts.push(`${minutes}-minute walking isochrone available`);
+      }
     }
     parts.push("");
   }
@@ -233,9 +239,9 @@ function buildUserPrompt(data: ReportData): string {
           `  - ${item.name} (${item.osmTag}, ${item.walkingMinutes} min walk)`,
         );
       }
-      const unnamed = cat.count - named.length;
-      if (unnamed > 0) {
-        parts.push(`  + ${unnamed} more`);
+      const remaining = cat.count - named.length;
+      if (remaining > 0) {
+        parts.push(`  + ${remaining} more`);
       }
     }
 
@@ -296,7 +302,8 @@ export async function generateNarrative(
   reportId: number,
   data: ReportData,
 ) {
-  // Validate API key eagerly.
+  // Fail fast if ANTHROPIC_API_KEY is missing. The Anthropic provider reads
+  // the key from the environment internally; this call is purely for validation.
   getApiKey();
 
   const result = streamText({
@@ -351,6 +358,39 @@ async function collectAndPersistNarrative(
       console.error("[narrative] Failed to mark report as failed:", dbError);
     }
   }
+}
+
+// --- Geometry helpers --------------------------------------------------------
+
+/**
+ * Compute the approximate area of a GeoJSON polygon in square kilometers
+ * using the Shoelace formula on projected coordinates.
+ * Returns null if the polygon has no valid rings.
+ */
+function computePolygonAreaSqKm(
+  coordinates: number[][][],
+): number | null {
+  if (!coordinates || coordinates.length === 0) return null;
+  const ring = coordinates[0]; // outer ring
+  if (!ring || ring.length < 4) return null;
+
+  // Use the Shoelace formula on lat/lng, then convert to approximate sq km.
+  // At moderate latitudes, 1° lat ≈ 111 km, 1° lng ≈ 111 km * cos(lat).
+  const centerLat =
+    ring.reduce((sum, p) => sum + p[1], 0) / ring.length;
+  const latToKm = 111.32;
+  const lngToKm = 111.32 * Math.cos((centerLat * Math.PI) / 180);
+
+  let area = 0;
+  for (let i = 0; i < ring.length - 1; i++) {
+    const x1 = ring[i][0] * lngToKm;
+    const y1 = ring[i][1] * latToKm;
+    const x2 = ring[i + 1][0] * lngToKm;
+    const y2 = ring[i + 1][1] * latToKm;
+    area += x1 * y2 - x2 * y1;
+  }
+
+  return Math.abs(area) / 2;
 }
 
 // --- Exports for testing -----------------------------------------------------

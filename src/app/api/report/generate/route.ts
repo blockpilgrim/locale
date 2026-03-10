@@ -7,7 +7,7 @@
 // ---------------------------------------------------------------------------
 
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { locations, reports } from "@/lib/db/schema";
 import { rateLimit } from "@/lib/rate-limit";
@@ -96,12 +96,13 @@ export async function POST(request: Request): Promise<Response> {
   const address = body.address.trim();
 
   // --- Check for existing report (cache hit) ---
+  // Uses case-insensitive comparison to avoid duplicate reports for the same address.
   try {
     const db = getDb();
     const existingLocations = await db
       .select({ id: locations.id })
       .from(locations)
-      .where(eq(locations.address, address))
+      .where(sql`lower(${locations.address}) = lower(${address})`)
       .limit(1);
 
     if (existingLocations.length > 0) {

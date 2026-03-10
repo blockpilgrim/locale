@@ -93,28 +93,54 @@ export function generateSlug(address: string): string {
     .slice(0, 60);
 }
 
+
+// --- Report insert with slug collision retry ---------------------------------
+
+const MAX_SLUG_RETRIES = 3;
+
 /**
- * Generate a unique slug, appending a random suffix if the base slug already
- * exists in the database.
+ * Insert a report row with a unique slug. Retries with a random suffix if the
+ * slug collides (unique constraint violation), avoiding the check-then-insert
+ * race condition.
  */
-async function generateUniqueSlug(address: string): Promise<string> {
+async function insertReportWithSlug(
+  address: string,
+  locationId: number,
+): Promise<{ slug: string; report: { id: number } }> {
   const db = getDb();
-  const base = generateSlug(address);
+  let slug = generateSlug(address);
 
-  // Check if the base slug is available.
-  const existing = await db
-    .select({ id: reports.id })
-    .from(reports)
-    .where(eq(reports.slug, base))
-    .limit(1);
+  for (let attempt = 0; attempt <= MAX_SLUG_RETRIES; attempt++) {
+    try {
+      const [report] = await db
+        .insert(reports)
+        .values({
+          locationId,
+          slug,
+          status: "generating",
+        })
+        .returning();
 
-  if (existing.length === 0) {
-    return base;
+      return { slug, report };
+    } catch (err: unknown) {
+      const isUniqueViolation =
+        err instanceof Error &&
+        (err.message.includes("unique") ||
+          err.message.includes("duplicate key") ||
+          err.message.includes("23505"));
+
+      if (isUniqueViolation && attempt < MAX_SLUG_RETRIES) {
+        // Append a random suffix and retry.
+        const suffix = Math.random().toString(36).substring(2, 7);
+        slug = `${generateSlug(address).slice(0, 53)}-${suffix}`;
+        continue;
+      }
+      throw err;
+    }
   }
 
-  // Append a short random suffix.
-  const suffix = Math.random().toString(36).substring(2, 7);
-  return `${base.slice(0, 53)}-${suffix}`;
+  // Unreachable, but TypeScript needs it.
+  throw new Error("[report] Exhausted slug retries");
 }
 
 // --- Orchestrator ------------------------------------------------------------
@@ -149,18 +175,12 @@ export async function generateReport(
     })
     .returning();
 
-  // Step 2: Generate unique slug.
-  const slug = await generateUniqueSlug(input.address);
-
-  // Step 3: Create report row with "generating" status.
-  const [report] = await db
-    .insert(reports)
-    .values({
-      locationId: location.id,
-      slug,
-      status: "generating",
-    })
-    .returning();
+  // Step 2: Generate unique slug and create report row.
+  // Uses retry to handle concurrent slug collisions (unique constraint).
+  const { slug, report } = await insertReportWithSlug(
+    input.address,
+    location.id,
+  );
 
   // Step 4: Fire parallel API calls.
   // Note parameter order differences:
