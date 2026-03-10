@@ -61,6 +61,7 @@ docs/           → Product docs, build strategy, implementation plan, reviews
 - **Env var validation:** Each client has a private `getAccessToken()` / `getApiKey()` helper that throws eagerly if the env var is missing. This is the one place throwing is acceptable.
 - **Types co-located with client:** Export TypeScript interfaces from the same file as the client function (e.g., `GeocodeSuggestion` from `geocoding.ts`). Move to `src/types/` only when types are shared across multiple modules.
 - **No external HTTP libraries:** Use the built-in `fetch` API for all HTTP calls.
+- **Fetch timeouts:** Always add `signal: AbortSignal.timeout(ms)` to fetch calls. Use 10s for managed APIs (Mapbox), 15s for government APIs (Census), 20s for community-run services (Overpass). The generic catch block in each client handles `AbortError` like any other network failure.
 
 ## API Routes (`src/app/api/`)
 
@@ -73,6 +74,16 @@ docs/           → Product docs, build strategy, implementation plan, reviews
 - **In-memory for MVP:** `src/lib/rate-limit.ts` uses a `Map` with periodic cleanup. Replace with Redis-backed limiter (e.g., `@upstash/ratelimit`) for multi-instance production.
 - **Factory pattern:** Use `createRateLimiter(config)` for custom limits; import the `rateLimit` singleton for the default 10 req/hour.
 - **IP extraction:** Uses `x-forwarded-for` header (standard behind Vercel / proxies).
+
+## Testing
+
+- **Runner:** Vitest (config at `vitest.config.ts`)
+- **Test location:** `src/lib/__tests__/<module>.test.ts`
+- **Scripts:** `npm run test` (single run), `npm run test:watch` (watch mode)
+- **HTTP mocking:** `vi.spyOn(globalThis, "fetch")` with `mockResolvedValueOnce` or `mockImplementation` — no external HTTP mock libraries
+- **Multi-API mocking:** For clients that call multiple APIs sequentially (e.g., Census: FCC geocoder → Census API), use a URL-matching `mockImplementation` that inspects the request URL
+- **Env var mocking:** `vi.stubEnv("VAR_NAME", "value")` in `beforeEach`, `vi.unstubAllEnvs()` in `afterEach`
+- **Imports:** Always explicitly import from `vitest` (`describe`, `it`, `expect`, `vi`, etc.) — do not rely on globals
 
 ## Documentation
 

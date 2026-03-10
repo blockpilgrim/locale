@@ -31,7 +31,7 @@
   - *Parallelizable with:* T1.1, T1.2, T1.4, T1.5
 
 - [x] **T1.4 — POI / amenities data client**
-  Build `lib/poi/index.ts` — fetches nearby points of interest via Mapbox POI API (or Overpass as fallback). Categorize results: dining, groceries, parks, fitness, nightlife, healthcare, shopping, education. Calculate walking time to nearest essentials. Return structured, typed data.
+  Build `lib/poi/index.ts` — fetches nearby points of interest via Overpass API (OpenStreetMap). See DECISIONS.md D4 for rationale. Categorize results: dining, groceries, parks, fitness, nightlife, healthcare, shopping, education. Calculate walking time to nearest essentials. Return structured, typed data.
   - *Depends on:* T0.1
   - *Parallelizable with:* T1.1, T1.2, T1.3, T1.5
 
