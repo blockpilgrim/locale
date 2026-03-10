@@ -82,7 +82,8 @@ docs/               → Product docs, build strategy, implementation plan, revie
 ## Testing
 
 - **Runner:** Vitest (config at `vitest.config.ts`)
-- **Test location:** `src/lib/__tests__/<module>.test.ts`
+- **Test location:** `src/lib/__tests__/<module>.test.ts` (also used for hook fetch-contract tests)
+- **Component testing:** No DOM environment configured yet (no `@testing-library/react`). Test hook logic by testing the underlying fetch/stream contract with mocked Web APIs (Response, ReadableStream, TextDecoder). Component rendering tests will require adding a DOM environment.
 - **Scripts:** `npm run test` (single run), `npm run test:watch` (watch mode)
 - **HTTP mocking:** `vi.spyOn(globalThis, "fetch")` with `mockResolvedValueOnce` or `mockImplementation` — no external HTTP mock libraries
 - **Multi-API mocking:** For clients that call multiple APIs sequentially (e.g., Census: FCC geocoder → Census API), use a URL-matching `mockImplementation` that inspects the request URL
@@ -113,6 +114,7 @@ docs/               → Product docs, build strategy, implementation plan, revie
 - **Map component:** Uses Mapbox GL JS via `mapbox-gl` package with `NEXT_PUBLIC_MAPBOX_TOKEN`. Imports `mapbox-gl/dist/mapbox-gl.css` directly. Guards against SSR via `"use client"`.
 - **Mapbox hex color mirroring:** Mapbox GL JS paint properties and DOM-style-based markers require hardcoded hex values (cannot use CSS custom properties). Any such value must include a comment citing the corresponding `--color-*` token name. If a token value changes in `globals.css`, the hardcoded hex must be updated manually in `Map.tsx`.
 - **Isochrone rendering:** Sorted largest-first (15 > 10 > 5) so smaller polygons render on top. Uses design token accent colors with graduated opacity.
+- **XSS prevention in Map popups:** Always escape user-contributed data (especially OSM POI names) before passing to Mapbox `.setHTML()`. Use the `escapeHtml()` helper in `Map.tsx`.
 
 ## Shared Utilities (`src/lib/`)
 
