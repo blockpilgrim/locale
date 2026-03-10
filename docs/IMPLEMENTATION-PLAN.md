@@ -62,26 +62,26 @@
 ## Phase 3: Frontend — Core Components
 > These can be built in parallel with each other after Phase 0. Some can start during Phase 1/2.
 
-- [ ] **T3.1 — Layout shell + typography + design system components**
+- [x] **T3.1 — Layout shell + typography + design system components**
   Build `app/layout.tsx` with fonts, metadata, and global styles. Create shared components: `Container`, `SectionHeader`, `Badge`, `StatCard`, `Skeleton` loader. Establish the editorial/magazine visual language — typography scale, spacing rhythm, color palette. This sets the design DNA for every subsequent component.
   - *Depends on:* T0.1
   - *Parallelizable with:* T1.x, T3.2–T3.5
 
-- [ ] **T3.2 — Address input with geocoding autocomplete**
+- [x] **T3.2 — Address input with geocoding autocomplete**
   Build `components/AddressInput.tsx` — debounced input, calls `/api/geocode`, renders suggestion dropdown, handles selection, keyboard navigation, error states for unresolvable addresses. Mobile-friendly. This is the app's entry point interaction.
   - *Depends on:* T1.1, T3.1
 
-- [ ] **T3.3 — Interactive map component**
+- [x] **T3.3 — Interactive map component**
   Build `components/Map.tsx` — Mapbox GL JS instance, centered on address coordinates, renders isochrone polygons as colored overlays (5/10/15 min), plots POI markers with category icons, supports pan/zoom/tap on desktop and mobile. Handle the map token via `NEXT_PUBLIC_MAPBOX_TOKEN`.
   - *Depends on:* T0.1, T3.1
   - *Parallelizable with:* T3.2, T3.4, T3.5
 
-- [ ] **T3.4 — Data section components (Demographics, Housing, Economic, Getting Around, What's Nearby)**
+- [x] **T3.4 — Data section components (Demographics, Housing, Economic, Getting Around, What's Nearby)**
   Build 5 section components, each rendering structured data with contextual visualizations (bar comparisons vs. city/national avg, donut charts for composition, icon grids for amenity categories). Each section gracefully hides when its data is missing. Use Framer Motion for reveal animations. Source attribution footers on each section.
   - *Depends on:* T3.1
   - *Parallelizable with:* T3.2, T3.3, T3.5
 
-- [ ] **T3.5 — AI narrative display with streaming**
+- [x] **T3.5 — AI narrative display with streaming**
   Build `components/VibeCheck.tsx` — renders the AI narrative with a streaming text effect (character-by-character or word-by-word). Styled as the editorial centerpiece — large type, generous whitespace. Loading skeleton before stream starts. Uses `useChat` or a custom hook consuming the streaming API response.
   - *Depends on:* T3.1
   - *Parallelizable with:* T3.2, T3.3, T3.4
