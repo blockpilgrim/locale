@@ -17,6 +17,9 @@ import { AutoRefresh } from "@/components/AutoRefresh";
 import { Container } from "@/components/Container";
 import type { ReportData } from "@/lib/report/generate";
 
+// Prevent Next.js from caching this page — report status changes dynamically.
+export const dynamic = "force-dynamic";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -169,6 +172,9 @@ export default async function ReportPage({ params }: ReportPageProps) {
   }
 
   // --- Status: "complete" — render the full report ------------------------
+  if (!row.data) {
+    notFound();
+  }
   const reportData = row.data as ReportData;
 
   return (

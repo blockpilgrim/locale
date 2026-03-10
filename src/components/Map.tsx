@@ -70,9 +70,14 @@ export function Map({
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  const hasValidCoordinates =
+    coordinates &&
+    Number.isFinite(coordinates.latitude) &&
+    Number.isFinite(coordinates.longitude);
+
   // Initialize the map.
   useEffect(() => {
-    if (!mapContainer.current) return;
+    if (!mapContainer.current || !hasValidCoordinates) return;
 
     const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
     if (!token) {
@@ -218,16 +223,24 @@ export function Map({
 
   return (
     <div className={`relative overflow-hidden rounded-xl ${className}`}>
-      {!isLoaded && (
-        <div className="absolute inset-0 z-10">
-          <Skeleton width="w-full" height="h-full" className="rounded-xl" />
+      {!hasValidCoordinates ? (
+        <div className="flex items-center justify-center rounded-xl border border-border-light bg-warm-50 h-[400px] sm:h-[500px]">
+          <p className="text-sm text-ink-muted">Map unavailable</p>
         </div>
+      ) : (
+        <>
+          {!isLoaded && (
+            <div className="absolute inset-0 z-10">
+              <Skeleton width="w-full" height="h-full" className="rounded-xl" />
+            </div>
+          )}
+          <div
+            ref={mapContainer}
+            className="h-[400px] w-full sm:h-[500px]"
+            aria-label="Interactive neighborhood map"
+          />
+        </>
       )}
-      <div
-        ref={mapContainer}
-        className="h-[400px] w-full sm:h-[500px]"
-        aria-label="Interactive neighborhood map"
-      />
     </div>
   );
 }

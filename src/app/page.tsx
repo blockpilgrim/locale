@@ -79,9 +79,8 @@ export default function Home() {
             See what a report looks like
           </h2>
           <p className="mx-auto mb-12 max-w-(--container-prose) text-center text-base text-ink-muted">
-            Browse example reports for some of America&apos;s most iconic
-            addresses to see the kind of neighborhood intelligence Locale
-            delivers.
+            Explore example reports for some of America&apos;s most iconic
+            addresses. Reports are generated on first visit.
           </p>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -101,7 +100,7 @@ export default function Home() {
                   {report.teaser}
                 </p>
                 <p className="mt-4 text-sm font-medium text-accent">
-                  Read report &rarr;
+                  Explore &rarr;
                 </p>
               </Link>
             ))}
