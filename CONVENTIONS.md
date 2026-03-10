@@ -36,8 +36,24 @@ docs/           → Product docs, build strategy, implementation plan, reviews
 - **Connection:** Lazy-initialized via `getDb()` from `src/lib/db/index.ts` — never imported at module top level to avoid build-time errors
 - **Migrations:** Generated with `npm run db:generate`, applied with `npm run db:migrate`. Use `npm run db:push` for rapid local iteration
 
+## Database (continued)
+
+- **Foreign keys:** Use `{ onDelete: "cascade" }` when child rows should be cleaned up with their parent
+- **Indexes:** Always add explicit indexes on foreign key columns (PostgreSQL does not create them automatically)
+- **Migration files:** Auto-generated names (e.g., `0000_cute_scrambler.sql`) — never rename or edit manually. Regenerating migrations produces new names.
+
+## Linting
+
+- **ESLint:** Flat config format at `eslint.config.mjs` (ESLint 9+)
+- **Extends:** `eslint-config-next` with `core-web-vitals` + `typescript` presets
+
 ## TypeScript
 
 - Strict mode enabled
 - Prefer explicit types over `any`
 - Use path alias `@/` for all imports within `src/`
+
+## Documentation
+
+- Architectural deviations from BUILD-STRATEGY.md are recorded in `docs/DECISIONS.md`
+- Code reviews are stored in `docs/reviews/` with resolution status tracked in the file header

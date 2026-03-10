@@ -3,10 +3,10 @@
 ## Phase 0: Project Scaffolding
 > Foundation that everything depends on. Must be done first, sequentially.
 
-- [ ] **T0.1 — Next.js project init + core config**
+- [x] **T0.1 — Next.js project init + core config**
   Initialize Next.js (App Router, TypeScript), install core dependencies (`tailwindcss`, `framer-motion`, `mapbox-gl`), configure `tsconfig.json`, `tailwind.config.ts`, `postcss.config.js`, `.eslintrc.json`, `.gitignore`, `.env.example` with all expected env vars. Set up `src/` directory structure: `app/`, `components/`, `lib/`, `types/`. Establish the Tailwind design tokens (colors, fonts, spacing) that express the "magazine not dashboard" principle.
 
-- [ ] **T0.2 — Database setup + schema**
+- [x] **T0.2 — Database setup + schema**
   Install Drizzle ORM + `@neondatabase/serverless` (Neon HTTP driver for serverless compatibility). Define schema in `lib/db/schema.ts`: `locations`, `reports` (with JSONB `data` column, `status` enum, unique `slug`), optional `search_queries`. Write migration script. Add a `lib/db/index.ts` connection helper with lazy initialization. Verify migration generates cleanly.
   - *Depends on:* T0.1
 
