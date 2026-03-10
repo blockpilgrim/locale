@@ -44,3 +44,19 @@ Record of significant architectural decisions that deviate from or extend the or
 - The Overpass QL query can be precisely tuned to our tag map, reducing noise
 - If POI quality proves insufficient post-MVP, switching to a paid provider requires changing only `src/lib/poi/index.ts` — the typed interface (`PoiResult`, `PointOfInterest`) remains stable
 **Trade-off:** Community-run infrastructure with variable availability and no SLA. Added `AbortSignal.timeout(20s)` to mitigate. Data may be sparser in rural areas. Monitor POI quality during golden dataset testing (T7.1).
+
+## D5. Insert-then-retry for slug uniqueness instead of check-then-insert
+
+**Date:** 2026-03-10
+**Context:** The initial implementation of `generateUniqueSlug` checked the database for an existing slug, then inserted. Under concurrent requests for similar addresses, two requests could both read "slug is available" and both attempt to insert, causing a unique constraint violation (Postgres error 23505).
+**Decision:** Replace with insert-then-retry pattern: attempt the INSERT directly, catch unique constraint errors, and retry with a random 5-char suffix (up to 3 retries).
+**Rationale:** Eliminates the TOCTOU (time-of-check-to-time-of-use) race condition entirely. Simpler than wrapping in a transaction with row-level locking. The retry overhead is negligible since collisions are rare.
+**Trade-off:** Slightly more complex error detection (inspecting error messages for "unique"/"duplicate key"/"23505") vs. a clean database-level check.
+
+## D6. Case-insensitive address cache lookup
+
+**Date:** 2026-03-10
+**Context:** The report generation route checks for existing reports by matching the address string. Exact string matching meant "123 Main St" and "123 main st" would generate separate (duplicate) reports for the same location.
+**Decision:** Use SQL `lower()` for case-insensitive comparison in the cache lookup query.
+**Rationale:** Reduces unnecessary duplicate report generation and wasted API costs (each report triggers Mapbox, Census, and LLM calls). The `sql` tagged template from `drizzle-orm` provides escape-safe raw SQL for operations not expressible in the type-safe query builder.
+**Trade-off:** Cannot use a standard Postgres index on `address` for this query. For MVP traffic this is fine; at scale, add a functional index: `CREATE INDEX ON locations (lower(address))`.

@@ -91,11 +91,12 @@ docs/           → Product docs, build strategy, implementation plan, reviews
 
 - **Orchestrator pattern:** `generateReport()` fires all data-fetching API calls via `Promise.all` with `.catch()` wrappers so individual failures return `null` rather than rejecting the entire batch.
 - **Minimum viable report:** At least one data source (census, isochrone, or POI) must succeed. If ALL fail, the report status is set to `"failed"`. The `isViable` boolean on the result signals this.
-- **Slug generation:** Human-readable URL slugs derived from the address (lowercase, hyphens, max 60 chars). Uniqueness is enforced by checking the DB and appending a random suffix if needed.
+- **Slug generation:** Human-readable URL slugs derived from the address (lowercase, hyphens, max 60 chars). Uniqueness is enforced via insert-then-retry: the slug is inserted directly, and on unique constraint violation (Postgres 23505), retried with a random suffix (up to 3 retries). This avoids the check-then-insert race condition.
 - **Narrative streaming:** Uses Vercel AI SDK (`streamText` from `"ai"` + `anthropic` provider from `"@ai-sdk/anthropic"`). The stream is returned to the caller for HTTP response piping, while a background task awaits the full text and persists it to the DB.
 - **AI SDK type note:** `StreamTextResult` requires two generic type parameters in v4+. Prefer using `Awaited<ReturnType<typeof streamText>>` over explicit generics. Use `maxOutputTokens` (not `maxTokens`) and `toTextStreamResponse()` (not `toDataStreamResponse()`).
 - **Prompt construction:** System prompt and user prompt are separate functions (`buildSystemPrompt`, `buildUserPrompt`) exported for testability. The user prompt serializes structured data into labeled text sections, only including sections where data is available.
-- **API route caching:** The POST generate route checks for an existing report by matching the address string in the `locations` table. If found, returns the slug immediately without re-generating.
+- **API route caching:** The POST generate route checks for an existing report via case-insensitive address match (`sql\`lower(...) = lower(...)\``) in the `locations` table. If found, returns the slug immediately without re-generating.
+- **Raw SQL in Drizzle:** Use the `sql` tagged template from `drizzle-orm` for operations not expressible through the type-safe query builder (e.g., `lower()` for case-insensitive comparisons). Import as `import { sql } from "drizzle-orm"`.
 
 ## Documentation
 

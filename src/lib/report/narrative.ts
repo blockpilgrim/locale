@@ -292,7 +292,7 @@ function buildUserPrompt(data: ReportData): string {
  * Generate a streaming AI narrative from report data.
  *
  * Returns the Vercel AI SDK stream result, which can be piped directly to a
- * Response via `result.toDataStreamResponse()`. Also starts a background
+ * Response via `result.toTextStreamResponse()`. Also starts a background
  * listener that updates the DB when the stream completes.
  *
  * @param reportId - The database ID of the report to update on completion.
