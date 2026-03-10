@@ -12,6 +12,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Map } from "@/components/Map";
 import { VibeCheck } from "@/components/VibeCheck";
+import { ShareControls } from "@/components/ShareControls";
 import { DemographicsSection } from "@/components/sections/DemographicsSection";
 import { HousingSection } from "@/components/sections/HousingSection";
 import { EconomicSection } from "@/components/sections/EconomicSection";
@@ -26,6 +27,8 @@ interface ReportContentProps {
   data: ReportData;
   /** The AI narrative text. */
   narrative: string | null;
+  /** The report's URL slug. */
+  slug: string;
   /** The resolved location info. */
   location: {
     address: string;
@@ -37,6 +40,7 @@ interface ReportContentProps {
 export function ReportContent({
   data,
   narrative,
+  slug,
   location,
 }: ReportContentProps) {
   const cityState = [location.city, location.state]
@@ -147,24 +151,10 @@ export function ReportContent({
         </Container>
       </div>
 
-      {/* CTA: Generate your own report */}
-      <section className="border-t border-border-light bg-surface-warm px-6 py-16">
+      {/* Share controls + Generate your own CTA */}
+      <section className="px-6 py-(--spacing-section)">
         <Container variant="prose">
-          <div className="text-center">
-            <h2 className="mb-4 font-serif">
-              Curious about your neighborhood?
-            </h2>
-            <p className="mb-8 text-base text-ink-muted">
-              Enter any US address and get your own AI-powered neighborhood
-              intelligence report.
-            </p>
-            <Link
-              href="/"
-              className="inline-block rounded-lg bg-accent px-8 py-3 text-sm font-medium text-white transition-colors hover:bg-accent-light"
-            >
-              Generate your report
-            </Link>
-          </div>
+          <ShareControls address={location.address} slug={slug} />
         </Container>
       </section>
     </div>

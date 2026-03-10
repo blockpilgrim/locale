@@ -94,6 +94,13 @@ export async function generateMetadata({
       (row.narrative.length > 155 ? "..." : "")
     : `Neighborhood intelligence report for ${row.address}. Demographics, housing, walkability, and what it's actually like to live here.`;
 
+  // Build a Mapbox Static Images URL for the OG image.
+  // Uses the public token since OG image URLs are visible in HTML meta tags.
+  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+  const ogImage = mapboxToken
+    ? `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l+2D5A3D(${row.longitude},${row.latitude})/${row.longitude},${row.latitude},13,0/1200x630@2x?access_token=${mapboxToken}`
+    : undefined;
+
   return {
     title,
     description,
@@ -102,11 +109,24 @@ export async function generateMetadata({
       description,
       type: "article",
       siteName: "Locale",
+      ...(ogImage && {
+        images: [
+          {
+            url: ogImage,
+            width: 2400,
+            height: 1260,
+            alt: `Map of ${row.address}`,
+          },
+        ],
+      }),
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      ...(ogImage && {
+        images: [ogImage],
+      }),
     },
   };
 }
@@ -181,6 +201,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
     <ReportContent
       data={reportData}
       narrative={row.narrative}
+      slug={row.slug}
       location={{
         address: row.address,
         city: row.city,
