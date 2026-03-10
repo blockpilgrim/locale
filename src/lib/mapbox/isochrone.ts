@@ -91,7 +91,9 @@ export async function fetchIsochrone(
   url.searchParams.set("access_token", token);
 
   try {
-    const response = await fetch(url.toString());
+    const response = await fetch(url.toString(), {
+      signal: AbortSignal.timeout(10_000),
+    });
 
     if (!response.ok) {
       console.error(

@@ -116,7 +116,9 @@ export async function forwardGeocode(
   url.searchParams.set("types", "address,place");
 
   try {
-    const response = await fetch(url.toString());
+    const response = await fetch(url.toString(), {
+      signal: AbortSignal.timeout(10_000),
+    });
 
     if (!response.ok) {
       console.error(

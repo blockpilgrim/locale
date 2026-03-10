@@ -141,6 +141,10 @@ const CENSUS_VARIABLES = [
   "B11001_007E", // non-family households
   // Educational attainment (25+)
   "B15003_017E", // high school diploma
+  "B15003_018E", // GED or alternative credential
+  "B15003_019E", // some college, less than 1 year
+  "B15003_020E", // some college, 1 or more years, no degree
+  "B15003_021E", // associate's degree
   "B15003_022E", // bachelor's degree
   "B15003_023E", // master's degree
   "B15003_024E", // professional school degree
@@ -160,11 +164,10 @@ const CENSUS_VARIABLES = [
   "B25003_003E", // renter-occupied units
   "B25001_001E", // total housing units
   // Year built
-  "B25034_010E", // built 1940-1949
-  "B25034_011E", // built 1939 or earlier
+  "B25034_009E", // built 1940-1949
+  "B25034_010E", // built 1939 or earlier
   "B25034_007E", // built 1960-1969
   "B25034_008E", // built 1950-1959
-  "B25034_009E", // built 1940-1949 (duplicate, intentional in some tables)
   "B25034_005E", // built 1980-1989
   "B25034_006E", // built 1970-1979
   "B25034_004E", // built 1990-1999
@@ -183,19 +186,10 @@ const CENSUS_VARIABLES = [
   "B08301_019E", // walked
   "B08301_021E", // worked from home
   "B08301_001E", // total commuters
-  // Commute time
-  "B08303_001E", // total (for denominator if needed)
-  "B08135_001E", // aggregate travel time — median not directly available, use B08303
+  // Commute time — B08013_001E is aggregate travel time to work (minutes),
+  // divide by total commuters (B08301_001E) to get mean commute time.
+  "B08013_001E", // aggregate travel time to work (minutes)
 ] as const;
-
-// We need median commute time; the most straightforward variable is B08013_001E
-// (aggregate travel time to work) but median is best from B08303 distribution.
-// However, B08303 gives a distribution, not a median. Instead, use the simpler
-// approach with the "median" variable from ACS table B08136 or just report
-// aggregate. Actually the direct variable is:
-//   B08303 → Travel time to work (distribution)
-// A better approach: fetch the pre-computed median from another table.
-// For simplicity, we'll use the mean travel time B08013_001E / B08301_001E.
 
 // --- Helpers -----------------------------------------------------------------
 
@@ -224,7 +218,9 @@ async function lookupFips(
   url.searchParams.set("format", "json");
 
   try {
-    const response = await fetch(url.toString());
+    const response = await fetch(url.toString(), {
+      signal: AbortSignal.timeout(10_000),
+    });
     if (!response.ok) {
       console.error(
         `[census] FCC geocoder error: ${response.status} ${response.statusText}`,
@@ -301,13 +297,15 @@ export async function fetchCensusData(
   );
   url.searchParams.set("get", variableList);
   url.searchParams.set("for", `tract:${fips.tract}`);
-  url.searchParams.set("in", `state:${fips.state}+county:${fips.county}`);
+  url.searchParams.set("in", `state:${fips.state} county:${fips.county}`);
   url.searchParams.set("key", apiKey);
 
   let row: Record<string, string>;
 
   try {
-    const response = await fetch(url.toString());
+    const response = await fetch(url.toString(), {
+      signal: AbortSignal.timeout(15_000),
+    });
     if (!response.ok) {
       console.error(
         `[census] Census API error: ${response.status} ${response.statusText}`,
@@ -334,8 +332,11 @@ export async function fetchCensusData(
   const v = (key: string) => parseNum(row[key]);
 
   // --- Demographics ---
-  const totalPop25Plus = v("B15003_001E");
   const hsGrad = v("B15003_017E");
+  const ged = v("B15003_018E");
+  const someCollege1 = v("B15003_019E");
+  const someCollege2 = v("B15003_020E");
+  const associates = v("B15003_021E");
   const bachelors = v("B15003_022E");
   const masters = v("B15003_023E");
   const professional = v("B15003_024E");
@@ -344,14 +345,11 @@ export async function fetchCensusData(
   const bachelorOrHigher = sumNullable([bachelors, masters, professional, doctorate]);
   const graduateOrProfessional = sumNullable([masters, professional, doctorate]);
 
-  // For "high school or higher", we need total minus below HS. Since we don't
-  // fetch all the below-HS variables, approximate as total minus (total - hsGrad - bachelorOrHigher).
-  // Actually, hsGrad is just high-school diploma holders. "HS or higher" is complex.
-  // Simplify: report bachelor+ and graduate+, and HS diploma count for now.
-  const hsOrHigher =
-    totalPop25Plus !== null && hsGrad !== null && bachelorOrHigher !== null
-      ? hsGrad + bachelorOrHigher
-      : null;
+  // HS or higher = HS diploma + GED + some college + associate's + bachelor's+
+  const hsOrHigher = sumNullable([
+    hsGrad, ged, someCollege1, someCollege2, associates,
+    bachelors, masters, professional, doctorate,
+  ]);
 
   const raceTotal = v("B03002_001E");
   const whiteCount = v("B03002_003E");
@@ -395,7 +393,7 @@ export async function fetchCensusData(
   };
 
   // --- Housing ---
-  const builtBefore1950 = sumNullable([v("B25034_010E"), v("B25034_011E")]);
+  const builtBefore1950 = sumNullable([v("B25034_009E"), v("B25034_010E")]);
   const builtFrom1950to1979 = sumNullable([
     v("B25034_008E"),
     v("B25034_007E"),
@@ -437,10 +435,8 @@ export async function fetchCensusData(
         (workedFromHome ?? 0)
       : null;
 
-  // Mean commute time approximation: we don't have a direct "median commute"
-  // variable in our fetch set. We'll use the aggregate travel time / workers
-  // if available, otherwise null.
-  const aggregateTime = v("B08135_001E");
+  // Mean commute time: aggregate travel time / total commuters.
+  const aggregateTime = v("B08013_001E");
   const medianCommuteMinutes =
     aggregateTime !== null && totalCommuters !== null && totalCommuters > 0
       ? Math.round(aggregateTime / totalCommuters)

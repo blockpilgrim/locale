@@ -255,6 +255,7 @@ export async function fetchPoi(
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: `data=${encodeURIComponent(query)}`,
+      signal: AbortSignal.timeout(20_000),
     });
 
     if (!response.ok) {
