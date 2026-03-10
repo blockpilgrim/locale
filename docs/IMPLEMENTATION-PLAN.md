@@ -110,12 +110,12 @@
 ## Phase 5: Shareability + SEO
 > Depends on the report page being functional.
 
-- [ ] **T5.1 — Dynamic Open Graph metadata + social previews**
+- [x] **T5.1 — Dynamic Open Graph metadata + social previews**
   Implement `generateMetadata` in the report page for dynamic OG tags (title: address/neighborhood name, description: first ~150 chars of narrative, image: static map thumbnail via Mapbox Static Images API). Add `app/api/og/route.tsx` if a custom OG image is needed (using `@vercel/og`). Test with social media debuggers.
   - *Depends on:* T4.2
-  - *Note:* `generateMetadata` with title/description/OG tags already implemented in T4.2. Remaining: OG image (static map thumbnail or @vercel/og).
+  - *Note:* `generateMetadata` with title/description/OG tags already implemented in T4.2. OG image now uses Mapbox Static Images API with pin overlay — no need for `@vercel/og`.
 
-- [ ] **T5.2 — Share controls + copy link**
+- [x] **T5.2 — Share controls + copy link**
   Build `components/ShareControls.tsx` — copy-to-clipboard button, native share API on mobile, Twitter/Facebook share links with pre-filled text. Placed prominently on the report page. "Generate your own report" CTA for viewers of shared reports.
   - *Depends on:* T4.2
   - *Parallelizable with:* T5.1
