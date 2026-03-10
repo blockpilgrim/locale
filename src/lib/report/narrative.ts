@@ -1,0 +1,357 @@
+// ---------------------------------------------------------------------------
+// AI Narrative Prompt + Streaming (T2.2)
+// ---------------------------------------------------------------------------
+// Constructs the Claude prompt from structured report data and streams the
+// AI response. On stream completion, updates the report row in the DB with
+// the final narrative and status: "complete".
+//
+// Uses the Vercel AI SDK with the Anthropic provider.
+// Model: claude-sonnet-4-6 (per BUILD-STRATEGY.md)
+// ---------------------------------------------------------------------------
+
+import { streamText } from "ai";
+import { anthropic } from "@ai-sdk/anthropic";
+import { eq } from "drizzle-orm";
+import { getDb } from "@/lib/db";
+import { reports } from "@/lib/db/schema";
+import type { ReportData } from "./generate";
+
+// --- Env validation ----------------------------------------------------------
+
+function getApiKey(): string {
+  const key = process.env.ANTHROPIC_API_KEY;
+  if (!key) {
+    throw new Error(
+      "ANTHROPIC_API_KEY is not set. See .env.example for required environment variables.",
+    );
+  }
+  return key;
+}
+
+// --- Prompt construction -----------------------------------------------------
+
+/**
+ * Build the system prompt that establishes the AI's voice and constraints.
+ */
+function buildSystemPrompt(): string {
+  return `You are a knowledgeable local friend writing a neighborhood profile for someone considering moving to or learning about a specific area. Your tone is warm, specific, candid, and conversational — like a trusted friend who happens to know a lot about this place.
+
+VOICE GUIDELINES:
+- Write as if you are talking to a friend over coffee, explaining what it is really like to live in this specific spot
+- Be specific: reference actual data points (numbers, distances, categories) when they support your narrative
+- Be honest about tradeoffs and shortcomings — never use generic boosterism
+- Acknowledge what the data shows AND what it does not show
+- Make the neighborhood feel distinct — avoid descriptions that could apply to any neighborhood
+
+STRICTLY AVOID these words and phrases:
+- "bustling", "vibrant", "tapestry", "diverse tapestry", "rich tapestry"
+- "hidden gem", "best-kept secret", "up-and-coming"
+- "offers something for everyone", "there is something for everyone"
+- "nestled", "boasts", "plethora"
+- Generic superlatives without supporting data
+
+STRUCTURE:
+- Write 3-5 paragraphs
+- Start with overall character and personality — what makes this area distinctive
+- Cover who tends to live here and what daily life looks like
+- Address practical considerations: walkability, amenities, commute patterns
+- End with honest tradeoffs and a sense of trajectory (stable, changing, emerging) if the data supports it
+
+HANDLING MISSING DATA:
+- If a data section is missing, simply do not reference it — do not call attention to its absence
+- Never fabricate or guess at data that was not provided
+- Work with whatever data is available to create the most helpful portrait possible`;
+}
+
+/**
+ * Build the user prompt with the actual location data.
+ */
+function buildUserPrompt(data: ReportData): string {
+  const parts: string[] = [];
+
+  // Location header
+  parts.push(
+    `Write a neighborhood profile for: ${data.address.full}`,
+  );
+  if (data.address.city || data.address.state) {
+    const location = [data.address.city, data.address.state]
+      .filter(Boolean)
+      .join(", ");
+    parts.push(`Location: ${location}`);
+  }
+  parts.push(
+    `Coordinates: ${data.coordinates.latitude}, ${data.coordinates.longitude}`,
+  );
+  parts.push("");
+
+  // Census data
+  if (data.census) {
+    parts.push("=== DEMOGRAPHICS & CENSUS DATA ===");
+
+    const demo = data.census.demographics;
+    if (demo.totalPopulation !== null) {
+      parts.push(`Census tract population: ${demo.totalPopulation.toLocaleString()}`);
+    }
+    if (demo.medianAge !== null) {
+      parts.push(
+        `Median age: ${demo.medianAge} (national avg: ${data.census.nationalAverages.demographics.medianAge})`,
+      );
+    }
+
+    // Household composition
+    const hh = demo.householdTypes;
+    if (hh.totalHouseholds !== null) {
+      parts.push(`Total households: ${hh.totalHouseholds.toLocaleString()}`);
+      const types: string[] = [];
+      if (hh.marriedCouple !== null) types.push(`married couples: ${hh.marriedCouple}`);
+      if (hh.nonFamily !== null) types.push(`non-family: ${hh.nonFamily}`);
+      if (hh.singleMale !== null) types.push(`single male householder: ${hh.singleMale}`);
+      if (hh.singleFemale !== null) types.push(`single female householder: ${hh.singleFemale}`);
+      if (types.length > 0) parts.push(`Household breakdown: ${types.join(", ")}`);
+    }
+
+    // Education
+    const edu = demo.educationalAttainment;
+    if (edu.bachelorsOrHigher !== null && hh.totalHouseholds !== null) {
+      // Use total population 25+ if available, approximate otherwise
+      parts.push(
+        `Education: bachelor's degree or higher: ${edu.bachelorsOrHigher} residents`,
+      );
+    }
+    if (edu.graduateOrProfessional !== null) {
+      parts.push(
+        `Graduate/professional degree: ${edu.graduateOrProfessional} residents`,
+      );
+    }
+
+    // Race/ethnicity
+    const race = demo.raceEthnicity;
+    const raceEntries: string[] = [];
+    if (race.white !== null) raceEntries.push(`White: ${race.white}`);
+    if (race.blackOrAfricanAmerican !== null) raceEntries.push(`Black/African American: ${race.blackOrAfricanAmerican}`);
+    if (race.asian !== null) raceEntries.push(`Asian: ${race.asian}`);
+    if (race.hispanicOrLatino !== null) raceEntries.push(`Hispanic/Latino: ${race.hispanicOrLatino}`);
+    if (race.twoOrMore !== null) raceEntries.push(`Two or more races: ${race.twoOrMore}`);
+    if (race.other !== null && race.other > 0) raceEntries.push(`Other: ${race.other}`);
+    if (raceEntries.length > 0) parts.push(`Race/ethnicity: ${raceEntries.join(", ")}`);
+
+    parts.push("");
+    parts.push("=== HOUSING DATA ===");
+
+    const housing = data.census.housing;
+    if (housing.medianHomeValue !== null) {
+      parts.push(
+        `Median home value: $${housing.medianHomeValue.toLocaleString()} (national avg: $${data.census.nationalAverages.housing.medianHomeValue.toLocaleString()})`,
+      );
+    }
+    if (housing.medianRent !== null) {
+      parts.push(
+        `Median rent: $${housing.medianRent.toLocaleString()}/month (national avg: $${data.census.nationalAverages.housing.medianRent.toLocaleString()})`,
+      );
+    }
+    if (housing.ownerOccupied !== null && housing.renterOccupied !== null) {
+      const total = housing.ownerOccupied + housing.renterOccupied;
+      if (total > 0) {
+        const ownerPct = Math.round((housing.ownerOccupied / total) * 100);
+        parts.push(
+          `Owner-occupied: ${ownerPct}% (national avg: ${data.census.nationalAverages.housing.ownerOccupiedPct}%)`,
+        );
+      }
+    }
+
+    // Year built
+    const yb = housing.yearBuilt;
+    const ybEntries: string[] = [];
+    if (yb.before1950 !== null) ybEntries.push(`Pre-1950: ${yb.before1950}`);
+    if (yb.from1950to1979 !== null) ybEntries.push(`1950-1979: ${yb.from1950to1979}`);
+    if (yb.from1980to1999 !== null) ybEntries.push(`1980-1999: ${yb.from1980to1999}`);
+    if (yb.from2000to2009 !== null) ybEntries.push(`2000-2009: ${yb.from2000to2009}`);
+    if (yb.from2010orLater !== null) ybEntries.push(`2010+: ${yb.from2010orLater}`);
+    if (ybEntries.length > 0) parts.push(`Housing age: ${ybEntries.join(", ")}`);
+
+    parts.push("");
+    parts.push("=== ECONOMIC DATA ===");
+
+    const econ = data.census.economic;
+    if (econ.medianHouseholdIncome !== null) {
+      parts.push(
+        `Median household income: $${econ.medianHouseholdIncome.toLocaleString()} (national avg: $${data.census.nationalAverages.economic.medianHouseholdIncome.toLocaleString()})`,
+      );
+    }
+
+    const emp = econ.employmentStatus;
+    if (emp.employed !== null && emp.unemployed !== null) {
+      const laborForce = (emp.employed ?? 0) + (emp.unemployed ?? 0);
+      if (laborForce > 0) {
+        const unempRate = ((emp.unemployed / laborForce) * 100).toFixed(1);
+        parts.push(
+          `Unemployment rate: ${unempRate}% (national avg: ${data.census.nationalAverages.economic.unemploymentRate}%)`,
+        );
+      }
+    }
+
+    // Commute
+    const commute = econ.commuteMeans;
+    const commuteEntries: string[] = [];
+    if (commute.droveAlone !== null) commuteEntries.push(`drove alone: ${commute.droveAlone}`);
+    if (commute.carpooled !== null) commuteEntries.push(`carpooled: ${commute.carpooled}`);
+    if (commute.publicTransit !== null) commuteEntries.push(`public transit: ${commute.publicTransit}`);
+    if (commute.walked !== null) commuteEntries.push(`walked: ${commute.walked}`);
+    if (commute.workedFromHome !== null) commuteEntries.push(`work from home: ${commute.workedFromHome}`);
+    if (commuteEntries.length > 0) parts.push(`Commute modes: ${commuteEntries.join(", ")}`);
+    if (econ.medianCommuteMinutes !== null) {
+      parts.push(`Median commute time: ${econ.medianCommuteMinutes} minutes`);
+    }
+
+    parts.push("");
+  }
+
+  // Isochrone data
+  if (data.isochrone) {
+    parts.push("=== WALKABILITY (ISOCHRONE DATA) ===");
+    for (const feature of data.isochrone.features) {
+      const minutes = feature.properties.contour;
+      // We don't have area in sq km from the raw data, but the polygon exists
+      parts.push(`${minutes}-minute walking isochrone polygon available`);
+    }
+    parts.push("");
+  }
+
+  // POI data
+  if (data.poi) {
+    parts.push("=== NEARBY AMENITIES (within ~1km) ===");
+    parts.push(`Total POIs found: ${data.poi.totalCount}`);
+    parts.push("");
+
+    for (const cat of data.poi.byCategory) {
+      if (cat.count === 0) continue;
+      parts.push(`${cat.category.toUpperCase()} (${cat.count}):`);
+      // List up to 8 named items per category
+      const named = cat.items.filter((i) => i.name).slice(0, 8);
+      for (const item of named) {
+        parts.push(
+          `  - ${item.name} (${item.osmTag}, ${item.walkingMinutes} min walk)`,
+        );
+      }
+      const unnamed = cat.count - named.length;
+      if (unnamed > 0) {
+        parts.push(`  + ${unnamed} more`);
+      }
+    }
+
+    parts.push("");
+    parts.push("NEAREST ESSENTIALS:");
+    const ess = data.poi.nearestEssentials;
+    if (ess.grocery) {
+      parts.push(
+        `  Nearest grocery: ${ess.grocery.name || "unnamed"} (${ess.grocery.walkingMinutes} min walk)`,
+      );
+    } else {
+      parts.push("  Nearest grocery: none found within search radius");
+    }
+    if (ess.pharmacy) {
+      parts.push(
+        `  Nearest pharmacy: ${ess.pharmacy.name || "unnamed"} (${ess.pharmacy.walkingMinutes} min walk)`,
+      );
+    } else {
+      parts.push("  Nearest pharmacy: none found within search radius");
+    }
+    if (ess.park) {
+      parts.push(
+        `  Nearest park: ${ess.park.name || "unnamed"} (${ess.park.walkingMinutes} min walk)`,
+      );
+    } else {
+      parts.push("  Nearest park: none found within search radius");
+    }
+    parts.push("");
+  }
+
+  // Data availability summary
+  const missing: string[] = [];
+  if (!data.census) missing.push("demographics/housing/economic");
+  if (!data.isochrone) missing.push("walkability isochrone");
+  if (!data.poi) missing.push("nearby amenities");
+  if (missing.length > 0) {
+    parts.push(
+      `NOTE: The following data sections were unavailable for this location: ${missing.join(", ")}. Write your narrative using only the data provided above. Do not mention missing data.`,
+    );
+  }
+
+  return parts.join("\n");
+}
+
+// --- Streaming narrative generation ------------------------------------------
+
+/**
+ * Generate a streaming AI narrative from report data.
+ *
+ * Returns the Vercel AI SDK stream result, which can be piped directly to a
+ * Response via `result.toDataStreamResponse()`. Also starts a background
+ * listener that updates the DB when the stream completes.
+ *
+ * @param reportId - The database ID of the report to update on completion.
+ * @param data - The structured report data to narrate.
+ */
+export async function generateNarrative(
+  reportId: number,
+  data: ReportData,
+) {
+  // Validate API key eagerly.
+  getApiKey();
+
+  const result = streamText({
+    model: anthropic("claude-sonnet-4-6"),
+    system: buildSystemPrompt(),
+    prompt: buildUserPrompt(data),
+    maxOutputTokens: 1500,
+    temperature: 0.7,
+  });
+
+  // Start a background task to collect the full text and update the DB.
+  // This runs concurrently — the stream is already being consumed by the caller.
+  collectAndPersistNarrative(reportId, result).catch((err) => {
+    console.error("[narrative] Failed to persist narrative:", err);
+  });
+
+  return result;
+}
+
+/** The return type of streamText(), used for the persistence helper. */
+type StreamResult = Awaited<ReturnType<typeof streamText>>;
+
+/**
+ * Await the full text from the stream and persist it to the database.
+ */
+async function collectAndPersistNarrative(
+  reportId: number,
+  result: StreamResult,
+): Promise<void> {
+  try {
+    const text = await result.text;
+
+    const db = getDb();
+    await db
+      .update(reports)
+      .set({
+        narrative: text,
+        status: "complete",
+      })
+      .where(eq(reports.id, reportId));
+  } catch (error) {
+    console.error("[narrative] Stream collection/persistence failed:", error);
+
+    // Mark the report as failed if we can't get the narrative.
+    try {
+      const db = getDb();
+      await db
+        .update(reports)
+        .set({ status: "failed" })
+        .where(eq(reports.id, reportId));
+    } catch (dbError) {
+      console.error("[narrative] Failed to mark report as failed:", dbError);
+    }
+  }
+}
+
+// --- Exports for testing -----------------------------------------------------
+export { buildSystemPrompt, buildUserPrompt };

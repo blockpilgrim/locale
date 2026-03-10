@@ -15,7 +15,9 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.58",
     "@neondatabase/serverless": "^1.0.2",
+    "ai": "^6.0.116",
     "drizzle-orm": "^0.45.1",
     "framer-motion": "^12.35.2",
     "mapbox-gl": "^3.19.1",
