@@ -170,7 +170,7 @@ export function DemographicsSection({
                 <p className="text-2xl font-serif text-ink">
                   {educationalAttainment.bachelorsOrHigher.toLocaleString()}
                 </p>
-                <p className="text-xs text-ink-muted mt-1">Bachelor's or higher</p>
+                <p className="text-xs text-ink-muted mt-1">Bachelor&apos;s or higher</p>
               </div>
             )}
             {educationalAttainment.graduateOrProfessional !== null && (
