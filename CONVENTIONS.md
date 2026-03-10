@@ -53,6 +53,27 @@ docs/           → Product docs, build strategy, implementation plan, reviews
 - Prefer explicit types over `any`
 - Use path alias `@/` for all imports within `src/`
 
+## API Clients (`src/lib/`)
+
+- **One directory per external service:** `lib/mapbox/`, `lib/census/`, `lib/poi/`, etc.
+- **Error handling at the boundary:** API clients catch their own errors and return `null` (or an empty result) rather than throwing. Only truly fatal errors (missing env vars) throw.
+- **Console logging on failure:** Use `console.error("[module] message", error)` with a bracketed module tag for grep-ability.
+- **Env var validation:** Each client has a private `getAccessToken()` / `getApiKey()` helper that throws eagerly if the env var is missing. This is the one place throwing is acceptable.
+- **Types co-located with client:** Export TypeScript interfaces from the same file as the client function (e.g., `GeocodeSuggestion` from `geocoding.ts`). Move to `src/types/` only when types are shared across multiple modules.
+- **No external HTTP libraries:** Use the built-in `fetch` API for all HTTP calls.
+
+## API Routes (`src/app/api/`)
+
+- **Proxy pattern for secrets:** Client-facing API routes proxy requests to external APIs so that secret tokens (e.g., `MAPBOX_ACCESS_TOKEN`) never reach the browser. The client-side public token (`NEXT_PUBLIC_MAPBOX_TOKEN`) is only for Mapbox GL JS map rendering.
+- **Input validation:** Validate query params at the route level before forwarding to the client library.
+- **Return `NextResponse.json()`** for all JSON API responses.
+
+## Rate Limiting
+
+- **In-memory for MVP:** `src/lib/rate-limit.ts` uses a `Map` with periodic cleanup. Replace with Redis-backed limiter (e.g., `@upstash/ratelimit`) for multi-instance production.
+- **Factory pattern:** Use `createRateLimiter(config)` for custom limits; import the `rateLimit` singleton for the default 10 req/hour.
+- **IP extraction:** Uses `x-forwarded-for` header (standard behind Vercel / proxies).
+
 ## Documentation
 
 - Architectural deviations from BUILD-STRATEGY.md are recorded in `docs/DECISIONS.md`

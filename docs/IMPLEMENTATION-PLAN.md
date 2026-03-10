@@ -15,27 +15,27 @@
 ## Phase 1: Data Layer — API Clients & Backend
 > These are independent of each other and can be built in parallel after Phase 0.
 
-- [ ] **T1.1 — Mapbox geocoding client + autocomplete API route**
+- [x] **T1.1 — Mapbox geocoding client + autocomplete API route**
   Build `lib/mapbox/geocoding.ts` — wrapper around Mapbox Geocoding API (forward geocode, US-only filtering). Create `app/api/geocode/route.ts` that proxies client requests, keeping the secret token server-side. Return structured suggestions with coordinates. Add TypeScript types for geocode responses.
   - *Depends on:* T0.1
   - *Parallelizable with:* T1.2, T1.3, T1.4, T1.5
 
-- [ ] **T1.2 — Mapbox isochrone client**
+- [x] **T1.2 — Mapbox isochrone client**
   Build `lib/mapbox/isochrone.ts` — fetches 5/10/15-minute walking isochrone polygons for given coordinates. Return GeoJSON. Add types.
   - *Depends on:* T0.1
   - *Parallelizable with:* T1.1, T1.3, T1.4, T1.5
 
-- [ ] **T1.3 — Census ACS data client**
+- [x] **T1.3 — Census ACS data client**
   Build `lib/census/index.ts` — fetches demographics, housing, economic data from Census Bureau ACS API for a given lat/lng (reverse geocode to FIPS code first). Structure response into typed sections: `demographics`, `housing`, `economic`. Include city-level and national averages for comparison. Handle missing fields gracefully.
   - *Depends on:* T0.1
   - *Parallelizable with:* T1.1, T1.2, T1.4, T1.5
 
-- [ ] **T1.4 — POI / amenities data client**
+- [x] **T1.4 — POI / amenities data client**
   Build `lib/poi/index.ts` — fetches nearby points of interest via Mapbox POI API (or Overpass as fallback). Categorize results: dining, groceries, parks, fitness, nightlife, healthcare, shopping, education. Calculate walking time to nearest essentials. Return structured, typed data.
   - *Depends on:* T0.1
   - *Parallelizable with:* T1.1, T1.2, T1.3, T1.5
 
-- [ ] **T1.5 — Rate limiting middleware**
+- [x] **T1.5 — Rate limiting middleware**
   Build `lib/rate-limit.ts` using `@upstash/ratelimit` or a simple in-memory limiter for dev. Create reusable middleware for API routes. Configure: 10 reports/IP/hour. Return appropriate 429 responses.
   - *Depends on:* T0.1
   - *Parallelizable with:* T1.1–T1.4
