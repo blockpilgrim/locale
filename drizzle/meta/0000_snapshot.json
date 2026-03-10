@@ -1,5 +1,5 @@
 {
-  "id": "d750d39e-7441-4dde-bd6c-efcb6fdff20b",
+  "id": "7252c2d0-d7e4-487f-bb67-0054ce950ae4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -122,7 +122,23 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "reports_location_id_idx": {
+          "name": "reports_location_id_idx",
+          "columns": [
+            {
+              "expression": "location_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "reports_location_id_locations_id_fk": {
           "name": "reports_location_id_locations_id_fk",
@@ -134,7 +150,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },

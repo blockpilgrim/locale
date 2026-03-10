@@ -6,6 +6,7 @@ import {
   timestamp,
   integer,
   jsonb,
+  index,
 } from "drizzle-orm/pg-core";
 
 // ---------------------------------------------------------------------------
@@ -27,24 +28,29 @@ export const locations = pgTable("locations", {
 // ---------------------------------------------------------------------------
 // Reports
 // ---------------------------------------------------------------------------
-export const reports = pgTable("reports", {
-  id: serial("id").primaryKey(),
-  locationId: integer("location_id")
-    .references(() => locations.id)
-    .notNull(),
-  slug: text("slug").unique().notNull(),
-  status: text("status", { enum: ["generating", "complete", "failed"] })
-    .default("generating")
-    .notNull(),
-  data: jsonb("data"),
-  narrative: text("narrative"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+export const reports = pgTable(
+  "reports",
+  {
+    id: serial("id").primaryKey(),
+    locationId: integer("location_id")
+      .references(() => locations.id, { onDelete: "cascade" })
+      .notNull(),
+    slug: text("slug").unique().notNull(),
+    status: text("status", { enum: ["generating", "complete", "failed"] })
+      .default("generating")
+      .notNull(),
+    data: jsonb("data"),
+    narrative: text("narrative"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [index("reports_location_id_idx").on(table.locationId)],
+);
 
 // ---------------------------------------------------------------------------
 // Search Queries (analytics)
