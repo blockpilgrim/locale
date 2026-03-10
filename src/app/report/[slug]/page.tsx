@@ -97,9 +97,13 @@ export async function generateMetadata({
   // Build a Mapbox Static Images URL for the OG image.
   // Uses the public token since OG image URLs are visible in HTML meta tags.
   const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
-  const ogImage = mapboxToken
-    ? `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l+2D5A3D(${row.longitude},${row.latitude})/${row.longitude},${row.latitude},13,0/1200x630@2x?access_token=${mapboxToken}`
-    : undefined;
+  const lng = Math.round(row.longitude * 1e6) / 1e6;
+  const lat = Math.round(row.latitude * 1e6) / 1e6;
+  const validCoords = lng >= -180 && lng <= 180 && lat >= -90 && lat <= 90;
+  const ogImage =
+    mapboxToken && validCoords
+      ? `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l+2D5A3D(${lng},${lat})/${lng},${lat},13,0/1200x630@2x?access_token=${mapboxToken}`
+      : undefined;
 
   return {
     title,
@@ -113,8 +117,8 @@ export async function generateMetadata({
         images: [
           {
             url: ogImage,
-            width: 2400,
-            height: 1260,
+            width: 1200,
+            height: 630,
             alt: `Map of ${row.address}`,
           },
         ],

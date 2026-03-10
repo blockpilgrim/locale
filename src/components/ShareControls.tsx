@@ -8,7 +8,7 @@
 // available, falling back to just the copy button.
 // ---------------------------------------------------------------------------
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { fadeUp } from "@/lib/motion";
@@ -126,6 +126,16 @@ export function ShareControls({
   className = "",
 }: ShareControlsProps) {
   const [copied, setCopied] = useState(false);
+  const [supportsNativeShare, setSupportsNativeShare] = useState(false);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  // Detect native share support after hydration to avoid SSR/client mismatch (C1).
+  useEffect(() => {
+    setSupportsNativeShare(
+      typeof navigator !== "undefined" && typeof navigator.share === "function"
+    );
+    return () => clearTimeout(copyTimerRef.current);
+  }, []);
 
   const getReportUrl = useCallback(() => {
     if (typeof window !== "undefined") {
@@ -137,18 +147,24 @@ export function ShareControls({
   const handleCopyLink = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(getReportUrl());
+      clearTimeout(copyTimerRef.current);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback: select and copy from a temporary input
-      const input = document.createElement("input");
-      input.value = getReportUrl();
-      document.body.appendChild(input);
-      input.select();
-      document.execCommand("copy");
-      document.body.removeChild(input);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      // Fallback: textarea + execCommand for older browsers
+      const textarea = document.createElement("textarea");
+      textarea.value = getReportUrl();
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      const success = document.execCommand("copy");
+      document.body.removeChild(textarea);
+      if (success) {
+        clearTimeout(copyTimerRef.current);
+        setCopied(true);
+        copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
+      }
     }
   }, [getReportUrl]);
 
@@ -167,8 +183,8 @@ export function ShareControls({
   const handleTwitterShare = useCallback(() => {
     const text = `Check out this neighborhood report for ${address} on Locale`;
     const url = getReportUrl();
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-    window.open(twitterUrl, "_blank", "noopener,noreferrer,width=550,height=420");
+    const xUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    window.open(xUrl, "_blank", "noopener,noreferrer,width=550,height=420");
   }, [address, getReportUrl]);
 
   const handleFacebookShare = useCallback(() => {
@@ -176,9 +192,6 @@ export function ShareControls({
     const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
     window.open(facebookUrl, "_blank", "noopener,noreferrer,width=550,height=420");
   }, [getReportUrl]);
-
-  const supportsNativeShare =
-    typeof navigator !== "undefined" && typeof navigator.share === "function";
 
   return (
     <motion.section
@@ -199,6 +212,7 @@ export function ShareControls({
         {/* Copy link */}
         <button
           onClick={handleCopyLink}
+          aria-label={copied ? "Link copied to clipboard" : "Copy report link to clipboard"}
           className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-all hover:border-accent hover:text-accent"
         >
           {copied ? (
@@ -218,6 +232,7 @@ export function ShareControls({
         {supportsNativeShare && (
           <button
             onClick={handleNativeShare}
+            aria-label="Share this report"
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-all hover:border-accent hover:text-accent"
           >
             <ShareIcon />
@@ -228,6 +243,7 @@ export function ShareControls({
         {/* Twitter/X */}
         <button
           onClick={handleTwitterShare}
+          aria-label="Share on Twitter (opens in new window)"
           className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-all hover:border-accent hover:text-accent"
         >
           <TwitterIcon />
@@ -237,6 +253,7 @@ export function ShareControls({
         {/* Facebook */}
         <button
           onClick={handleFacebookShare}
+          aria-label="Share on Facebook (opens in new window)"
           className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-all hover:border-accent hover:text-accent"
         >
           <FacebookIcon />
