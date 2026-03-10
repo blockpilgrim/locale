@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Check if the user invoked the /implement skill in this conversation. If they did NOT use /implement, return {\"decision\": \"allow\"}. If they DID use /implement, verify ALL of these phases completed: (1) builder subagent was invoked, (2) test-writer subagent was either invoked OR explicitly skipped with a stated reason, (3) code-reviewer subagent was invoked, (4) review feedback was addressed, (5) doc-verifier subagent was invoked, (6) a final summary was provided. If any phase is missing, return {\"decision\": \"block\", \"reason\": \"[missing phase] has not been completed yet\"}. If all phases completed, return {\"decision\": \"allow\"}."
+          }
+        ]
+      }
+    ]
+  }
+}
