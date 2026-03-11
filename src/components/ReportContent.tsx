@@ -16,6 +16,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { VibeCheck } from "@/components/VibeCheck";
+import { ArchetypeBanner } from "@/components/ArchetypeBanner";
 import { ShareControls } from "@/components/ShareControls";
 import { DemographicsSection } from "@/components/sections/DemographicsSection";
 import { HousingSection } from "@/components/sections/HousingSection";
@@ -132,6 +133,17 @@ export function ReportContent({
         {/* Bottom border with accent gradient */}
         <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       </header>
+
+      {/* Archetype banner — below header, above map */}
+      {data.archetype && (
+        <section className="pt-10 sm:pt-14">
+          <Container variant="content">
+            <SectionErrorBoundary sectionName="Archetype">
+              <ArchetypeBanner archetype={data.archetype} />
+            </SectionErrorBoundary>
+          </Container>
+        </section>
+      )}
 
       {/* Map */}
       <section className="pt-10 sm:pt-14">
