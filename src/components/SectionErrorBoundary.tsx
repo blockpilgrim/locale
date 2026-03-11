@@ -22,7 +22,10 @@ interface SectionErrorBoundaryProps {
 
 interface SectionErrorBoundaryState {
   hasError: boolean;
+  retryCount: number;
 }
+
+const MAX_RETRIES = 3;
 
 export class SectionErrorBoundary extends React.Component<
   SectionErrorBoundaryProps,
@@ -30,14 +33,16 @@ export class SectionErrorBoundary extends React.Component<
 > {
   constructor(props: SectionErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, retryCount: 0 };
   }
 
   static getDerivedStateFromError(): SectionErrorBoundaryState {
-    return { hasError: true };
+    return { hasError: true, retryCount: 0 };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+    // Increment retry count in componentDidCatch (has access to instance state)
+    this.setState((prev) => ({ retryCount: prev.retryCount + 1 }));
     console.error(
       `[SectionErrorBoundary] ${this.props.sectionName} failed to render:`,
       error,
@@ -51,6 +56,8 @@ export class SectionErrorBoundary extends React.Component<
 
   render() {
     if (this.state.hasError) {
+      const canRetry = this.state.retryCount < MAX_RETRIES;
+
       return (
         <div className="rounded-lg border border-border-light bg-warm-50 px-6 py-8 text-center">
           <p className="text-sm text-ink-muted">
@@ -59,12 +66,18 @@ export class SectionErrorBoundary extends React.Component<
               {this.props.sectionName}
             </span>
           </p>
-          <button
-            onClick={this.handleRetry}
-            className="mt-3 text-sm font-medium text-accent underline decoration-accent/30 underline-offset-2 hover:decoration-accent"
-          >
-            Try again
-          </button>
+          {canRetry ? (
+            <button
+              onClick={this.handleRetry}
+              className="mt-3 text-sm font-medium text-accent underline decoration-accent/30 underline-offset-2 hover:decoration-accent"
+            >
+              Try again
+            </button>
+          ) : (
+            <p className="mt-3 text-xs text-ink-faint">
+              This section is temporarily unavailable.
+            </p>
+          )}
         </div>
       );
     }
