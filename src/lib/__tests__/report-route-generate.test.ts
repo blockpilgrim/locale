@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // --- Mocks -------------------------------------------------------------------
 
@@ -69,8 +69,63 @@ function makeRequest(body: unknown): Request {
 // --- Tests -------------------------------------------------------------------
 
 describe("POST /api/report/generate", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
+  });
+
+  it("returns 429 when rate limit is exceeded", async () => {
+    // Override the rate limiter mock for this test.
+    const { rateLimit: rl } = await import("@/lib/rate-limit");
+    vi.spyOn(rl, "check").mockReturnValueOnce({
+      success: false,
+      remaining: 0,
+      reset: Math.ceil(Date.now() / 1000) + 3600,
+    });
+
+    const response = await POST(
+      makeRequest({
+        address: "123 Main St",
+        latitude: 39.78,
+        longitude: -89.65,
+      }),
+    );
+
+    expect(response.status).toBe(429);
+  });
+
+  it("returns 500 when the report orchestrator throws", async () => {
+    mockSelectLimit.mockResolvedValueOnce([]); // no cached location
+
+    vi.mocked(generateReport).mockRejectedValueOnce(
+      new Error("DB insert failed"),
+    );
+
+    const response = await POST(
+      makeRequest({
+        address: "500 Crash Ave, Bugtown, NJ",
+        latitude: 40.0,
+        longitude: -74.0,
+      }),
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body.error).toContain("Report generation failed");
+  });
+
+  it("returns 400 for address exceeding 500 characters", async () => {
+    const longAddress = "a".repeat(501);
+    const response = await POST(
+      makeRequest({ address: longAddress, latitude: 39.78, longitude: -89.65 }),
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body.error).toContain("address");
   });
 
   it("returns 400 for missing address", async () => {

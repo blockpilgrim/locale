@@ -12,6 +12,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 const mockInsertReturning = vi.fn();
 const mockUpdateSet = vi.fn();
 
+// Note: This mock returns the same `mockInsertReturning` for both `insert(locations)`
+// and `insert(reports)`. Tests rely on call order (location first, then report) to
+// sequence their `mockResolvedValueOnce` calls. If the insert order in `generateReport`
+// changes, these tests will need updating.
 vi.mock("@/lib/db", () => ({
   getDb: () => ({
     insert: () => ({
@@ -53,7 +57,7 @@ import type { ReportData } from "@/lib/report/generate";
 import { fetchCensusData } from "@/lib/census";
 import { fetchIsochrone } from "@/lib/mapbox/isochrone";
 import { fetchPoi } from "@/lib/poi";
-import { buildUserPrompt } from "@/lib/report/narrative";
+import { buildUserPrompt, buildSystemPrompt } from "@/lib/report/narrative";
 import type { CensusResult } from "@/lib/census/index";
 import type { IsochroneResult } from "@/lib/mapbox/isochrone";
 import type { PoiResult, PointOfInterest, PoiCategorySummary } from "@/lib/poi/index";
@@ -1003,6 +1007,13 @@ describe("Integration: prompt construction with data combinations", () => {
     expect(prompt).not.toContain("Median household income:");
   });
 
+  it("includes the address in the prompt header", () => {
+    const data = makeFullReportData();
+    const prompt = buildUserPrompt(data);
+
+    expect(prompt).toContain("456 DeKalb Ave, Brooklyn, NY 11205");
+  });
+
   it("handles empty isochrone features without crashing", () => {
     const data = makeFullReportData({
       isochrone: { type: "FeatureCollection", features: [] },
@@ -1013,6 +1024,29 @@ describe("Integration: prompt construction with data combinations", () => {
     // Section header should appear but no walking area lines
     expect(prompt).toContain("WALKABILITY");
     expect(prompt).not.toContain("walking area");
+  });
+});
+
+// =============================================================================
+// System prompt verification
+// =============================================================================
+
+describe("Integration: system prompt content", () => {
+  it("establishes the knowledgeable local friend voice", () => {
+    const prompt = buildSystemPrompt();
+
+    expect(prompt).toContain("knowledgeable local friend");
+    expect(prompt).toContain("warm");
+    expect(prompt).toContain("candid");
+  });
+
+  it("bans generic AI boosterism words", () => {
+    const prompt = buildSystemPrompt();
+
+    expect(prompt).toContain("bustling");
+    expect(prompt).toContain("vibrant");
+    expect(prompt).toContain("tapestry");
+    expect(prompt).toContain("hidden gem");
   });
 });
 
@@ -1029,8 +1063,8 @@ describe("Integration: slug generation edge cases", () => {
 
     expect(slug.length).toBeLessThanOrEqual(60);
     expect(slug).toMatch(/^[a-z0-9-]+$/);
-    // Note: truncation at 60 chars may leave a trailing hyphen if a word
-    // boundary falls at that position. This is acceptable for URL slugs.
+    // After truncation, trailing hyphens should be trimmed
+    expect(slug).not.toMatch(/-$/);
   });
 
   it("handles addresses with special characters", () => {

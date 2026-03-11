@@ -92,8 +92,8 @@ export const goldenAddresses: GoldenAddress[] = [
   // 5. College town
   {
     address: "530 S State St, Ann Arbor, MI 48109",
-    lat: 40.1092,
-    lng: -83.7137,
+    lat: 42.2808,
+    lng: -83.7430,
     label: "college-town-ann-arbor",
     description:
       "Near University of Michigan campus. High rental rates, young population skew, vibrant food/nightlife. Tests age demographics narrative.",

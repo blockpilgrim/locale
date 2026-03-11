@@ -90,7 +90,8 @@ export function generateSlug(address: string): string {
     .replace(/\s+/g, "-") // spaces to hyphens
     .replace(/-+/g, "-") // collapse multiple hyphens
     .replace(/^-|-$/g, "") // trim leading/trailing hyphens
-    .slice(0, 60);
+    .slice(0, 60)
+    .replace(/-$/, ""); // trim trailing hyphen introduced by truncation
 }
 
 

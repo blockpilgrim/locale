@@ -539,8 +539,8 @@ function buildMockPoi(addr: GoldenAddress): PoiResult {
       name,
       category,
       osmTag,
-      latitude: lat + (Math.random() - 0.5) * 0.01,
-      longitude: lng + (Math.random() - 0.5) * 0.01,
+      latitude: lat + ((nextId * 0.0013) % 0.01) - 0.005,
+      longitude: lng + ((nextId * 0.0017) % 0.01) - 0.005,
       distanceMeters: dist,
       walkingMinutes: Math.ceil(dist / 80),
     });
