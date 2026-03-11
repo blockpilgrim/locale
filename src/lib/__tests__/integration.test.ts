@@ -337,6 +337,7 @@ function makeFullReportData(
     isochrone: makeRealisticIsochroneResult(),
     poi: makeRealisticPoiResult(),
     availableSections: { census: true, isochrone: true, poi: true },
+    archetype: null,
     fetchedAt: "2026-03-11T12:00:00.000Z",
     ...overrides,
   };

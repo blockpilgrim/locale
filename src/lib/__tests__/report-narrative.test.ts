@@ -169,6 +169,7 @@ function makeReportData(
       totalCount: 2,
     },
     availableSections: { census: true, isochrone: true, poi: true },
+    archetype: null,
     fetchedAt: "2026-03-10T12:00:00.000Z",
     ...overrides,
   };

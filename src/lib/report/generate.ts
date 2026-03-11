@@ -23,6 +23,26 @@ import { fetchPoi, type PoiResult } from "@/lib/poi";
 
 // --- Types -------------------------------------------------------------------
 
+/** AI-classified neighborhood personality archetype (Section 4 of feature spec). */
+export interface ArchetypeResult {
+  /** The archetype label, e.g. "The Brownstone Belt". 2-5 words, title case. */
+  archetype: string;
+  /** One vivid, place-specific sentence. */
+  tagline: string;
+  /** Five normalized scores (0-100) capturing the character of the place. */
+  vibeSpectrum: {
+    walkable: number;
+    buzzing: number;
+    settled: number;
+    accessible: number;
+    diverse: number;
+  };
+  /** Exactly three short data-grounded phrases. */
+  definingTraits: [string, string, string];
+  /** Internal reasoning for eval — not displayed to users. */
+  reasoning: string;
+}
+
 /** The structured JSONB payload stored in `reports.data`. */
 export interface ReportData {
   /** Address information used to generate the report. */
@@ -49,6 +69,8 @@ export interface ReportData {
     isochrone: boolean;
     poi: boolean;
   };
+  /** AI-classified neighborhood archetype (null if classification failed or pre-feature report). */
+  archetype: ArchetypeResult | null;
   /** Timestamp of when the data was fetched. */
   fetchedAt: string;
 }
@@ -230,6 +252,7 @@ export async function generateReport(
     isochrone: isochroneResult,
     poi: poiResult,
     availableSections,
+    archetype: null,
     fetchedAt: new Date().toISOString(),
   };
 

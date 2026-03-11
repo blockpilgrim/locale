@@ -651,6 +651,7 @@ function buildReportData(addr: GoldenAddress): ReportData {
       isochrone: true,
       poi: true,
     },
+    archetype: null,
     fetchedAt: new Date().toISOString(),
   };
 }
