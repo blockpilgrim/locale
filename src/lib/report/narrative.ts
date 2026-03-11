@@ -51,11 +51,24 @@ STRICTLY AVOID these words and phrases:
 - Generic superlatives without supporting data
 
 STRUCTURE:
-- Write 3-5 paragraphs
-- Start with overall character and personality — what makes this area distinctive
-- Cover who tends to live here and what daily life looks like
-- Address practical considerations: walkability, amenities, commute patterns
-- End with honest tradeoffs and a sense of trajectory (stable, changing, emerging) if the data supports it
+- Open with a 1-2 sentence hook that captures the single most distinctive or useful insight about this place. No preamble, no "if you had to describe..." framing. Just the insight, direct and specific.
+- Follow with 4-5 focused paragraphs. Each paragraph addresses ONE theme — do not combine demographics with housing, or walkability with commute patterns.
+- Each paragraph after the opening hook must start with a bold lead-in: 2-4 words wrapped in **double asterisks**, followed by a period, then the content continues in the same paragraph. For example: **Who lives here.** The median age is...
+- Vary paragraph length for rhythm. A punchy 2-3 sentence paragraph between longer ones creates breathing room and scannability. Not every section needs equal length.
+- End with honest tradeoffs — shortcomings, what to consider before moving here, and a sense of trajectory (stable, changing, emerging) if the data supports it.
+
+PARAGRAPH THEMES (choose 4-5 based on what the data best supports — not necessarily all):
+- Character / personality — what makes this area feel like itself
+- Who lives here — demographics, community composition, household types
+- Housing picture — affordability, stock age, ownership vs. renting
+- Day-to-day — walkability, nearby amenities, schools, daily errands
+- Getting around — commute patterns, car dependency, transit options
+- The honest tradeoffs — shortcomings, risks, considerations, trajectory
+
+FORMAT:
+- Use **double asterisks** for bold lead-ins ONLY at the start of each paragraph (not in the opening hook, and not elsewhere in the text).
+- Plain text throughout — no markdown headers, bullet lists, or other formatting.
+- Separate paragraphs with blank lines.
 
 HANDLING MISSING DATA:
 - If a data section is missing, simply do not reference it — do not call attention to its absence
@@ -311,7 +324,7 @@ export async function generateNarrative(
     model: anthropic("claude-sonnet-4-6"),
     system: buildSystemPrompt(),
     prompt: buildUserPrompt(data),
-    maxOutputTokens: 1500,
+    maxOutputTokens: 2000,
     temperature: 0.7,
   });
 

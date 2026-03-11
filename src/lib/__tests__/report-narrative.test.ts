@@ -184,7 +184,7 @@ describe("buildSystemPrompt", () => {
     expect(prompt).toContain("bustling");
     expect(prompt).toContain("vibrant");
     expect(prompt).toContain("tapestry");
-    expect(prompt).toContain("3-5 paragraphs");
+    expect(prompt).toContain("4-5 focused paragraphs");
     expect(prompt).toContain("HANDLING MISSING DATA");
   });
 

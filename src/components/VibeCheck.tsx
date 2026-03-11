@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 // ---------------------------------------------------------------------------
 // VibeCheck — AI narrative display with streaming text
 // ---------------------------------------------------------------------------
@@ -12,6 +14,26 @@ import { motion } from "framer-motion";
 import { SectionHeader } from "@/components/SectionHeader";
 import { Skeleton } from "@/components/Skeleton";
 import { fadeUp } from "@/lib/motion";
+
+/**
+ * Render text with **bold** markup as <strong> elements.
+ * Only supports double-asterisk bold — no other markdown.
+ */
+function renderWithBold(text: string): ReactNode {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  if (parts.length === 1) return text;
+  return parts.map((part, i) => {
+    const bold = part.match(/^\*\*(.*)\*\*$/);
+    if (bold) {
+      return (
+        <strong key={i} className="font-semibold text-ink">
+          {bold[1]}
+        </strong>
+      );
+    }
+    return part;
+  });
+}
 
 interface VibeCheckProps {
   /** The full narrative text (for completed reports). */
@@ -78,7 +100,7 @@ export function VibeCheck({
                   i === 0 ? "drop-cap" : ""
                 }`}
               >
-                {paragraph.trim()}
+                {renderWithBold(paragraph.trim())}
               </p>
             ))}
 
