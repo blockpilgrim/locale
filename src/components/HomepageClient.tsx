@@ -62,25 +62,9 @@ export function HomepageClient() {
           );
         }
 
-        // Both cached (JSON) and streaming responses may return the slug.
-        const contentType = response.headers.get("content-type") ?? "";
-
-        if (contentType.includes("application/json")) {
-          // Cached or error-with-slug response.
-          const data = await response.json();
-          if (isValidSlug(data.slug)) {
-            router.push(`/report/${data.slug}`);
-            return;
-          }
-          throw new Error("Invalid or missing slug returned from server.");
-        }
-
-        // Streaming response -- read slug from header and redirect immediately.
-        // The narrative is being generated in the background; the report page
-        // will handle the "generating" state.
-        const slug = response.headers.get("X-Report-Slug");
-        if (isValidSlug(slug)) {
-          router.push(`/report/${slug}`);
+        const data = await response.json();
+        if (isValidSlug(data.slug)) {
+          router.push(`/report/${data.slug}`);
           return;
         }
 

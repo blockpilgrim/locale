@@ -289,11 +289,12 @@ function buildUserPrompt(data: ReportData): string {
 // --- Streaming narrative generation ------------------------------------------
 
 /**
- * Generate a streaming AI narrative from report data.
+ * Generate an AI narrative from report data and persist it to the DB.
  *
- * Returns the Vercel AI SDK stream result, which can be piped directly to a
- * Response via `result.toTextStreamResponse()`. Also starts a background
- * listener that updates the DB when the stream completes.
+ * Streams text from the Anthropic API, awaits the full response, and updates
+ * the report row with the narrative and status "complete". On failure, sets
+ * status to "failed". The caller should run this inside `after()` so the
+ * work survives after the HTTP response is sent.
  *
  * @param reportId - The database ID of the report to update on completion.
  * @param data - The structured report data to narrate.
@@ -314,11 +315,10 @@ export async function generateNarrative(
     temperature: 0.7,
   });
 
-  // Start a background task to collect the full text and update the DB.
-  // This runs concurrently — the stream is already being consumed by the caller.
-  collectAndPersistNarrative(reportId, result).catch((err) => {
-    console.error("[narrative] Failed to persist narrative:", err);
-  });
+  // Await full stream consumption and DB persistence. The caller (route
+  // handler) is responsible for scheduling this via next/server `after()` so
+  // the work survives after the HTTP response is sent.
+  await collectAndPersistNarrative(reportId, result);
 
   return result;
 }

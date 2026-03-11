@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------------
 // Accepts address + coordinates from the client. Checks DB for an existing
 // report (cache hit -> return slug immediately). Otherwise runs the
-// orchestrator, starts narrative streaming, and returns a streaming response.
+// orchestrator, generates the AI narrative, and returns the slug.
 // ---------------------------------------------------------------------------
 
 import { NextResponse } from "next/server";
@@ -11,7 +11,7 @@ import { eq, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { locations, reports } from "@/lib/db/schema";
 import { rateLimit } from "@/lib/rate-limit";
-import { generateReport } from "@/lib/report/generate";
+import { generateReport, type ReportData } from "@/lib/report/generate";
 import { generateNarrative } from "@/lib/report/narrative";
 
 /** Shape of the POST request body. */
@@ -67,6 +67,30 @@ function validateBody(body: unknown): string | null {
   return null;
 }
 
+/**
+ * Attempt narrative generation for a report, setting status to "failed" on error.
+ * Returns without throwing — errors are handled internally.
+ */
+async function runNarrative(reportId: number, data: ReportData): Promise<void> {
+  try {
+    await generateNarrative(reportId, data);
+  } catch (err) {
+    console.error("[report/generate] Narrative generation failed:", err);
+    try {
+      const db = getDb();
+      await db
+        .update(reports)
+        .set({ status: "failed" })
+        .where(eq(reports.id, reportId));
+    } catch (dbErr) {
+      console.error(
+        "[report/generate] Failed to mark report as failed:",
+        dbErr,
+      );
+    }
+  }
+}
+
 export async function POST(request: Request): Promise<Response> {
   // --- Rate limiting ---
   const rl = rateLimit.check(request);
@@ -108,18 +132,49 @@ export async function POST(request: Request): Promise<Response> {
     if (existingLocations.length > 0) {
       const existingReport = await db
         .select({
+          id: reports.id,
           slug: reports.slug,
           status: reports.status,
+          data: reports.data,
+          updatedAt: reports.updatedAt,
         })
         .from(reports)
         .where(eq(reports.locationId, existingLocations[0].id))
         .limit(1);
 
       if (existingReport.length > 0) {
+        const cached = existingReport[0];
+
+        // Re-trigger narrative for reports stuck in "generating" (> 60s).
+        // This recovers from previously dropped background tasks.
+        if (
+          cached.status === "generating" &&
+          cached.data &&
+          Date.now() - new Date(cached.updatedAt).getTime() > 60_000
+        ) {
+          await runNarrative(cached.id, cached.data as ReportData);
+
+          // Re-read status after narrative attempt.
+          const [updated] = await db
+            .select({ status: reports.status })
+            .from(reports)
+            .where(eq(reports.id, cached.id))
+            .limit(1);
+
+          return NextResponse.json(
+            {
+              slug: cached.slug,
+              status: updated?.status ?? "failed",
+              cached: true,
+            },
+            { headers: rateLimit.headers(rl) },
+          );
+        }
+
         return NextResponse.json(
           {
-            slug: existingReport[0].slug,
-            status: existingReport[0].status,
+            slug: cached.slug,
+            status: cached.status,
             cached: true,
           },
           { headers: rateLimit.headers(rl) },
@@ -153,39 +208,17 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
-    // --- Start narrative streaming ---
-    try {
-      const streamResult = await generateNarrative(
-        result.reportId,
-        result.data,
-      );
+    // --- Await narrative generation ---
+    // Narrative is generated synchronously before returning so the report is
+    // ready when the client navigates to the report page. The previous
+    // fire-and-forget approach was unreliable because the runtime could drop
+    // background promises after responding.
+    await runNarrative(result.reportId, result.data);
 
-      // Return the AI stream as the response.
-      // The narrative module handles DB persistence on completion in the background.
-      return streamResult.toTextStreamResponse({
-        headers: {
-          ...rateLimit.headers(rl),
-          "X-Report-Slug": result.slug,
-          "X-Report-Id": String(result.reportId),
-        },
-      });
-    } catch (narrativeError) {
-      // Narrative streaming failed — return the data we have with the slug.
-      // The report still has data, it just won't have a narrative yet.
-      console.error(
-        "[report/generate] Narrative generation failed:",
-        narrativeError,
-      );
-      return NextResponse.json(
-        {
-          slug: result.slug,
-          status: "generating",
-          data: result.data,
-          narrativeError: true,
-        },
-        { status: 200, headers: rateLimit.headers(rl) },
-      );
-    }
+    return NextResponse.json(
+      { slug: result.slug, status: "generating" },
+      { headers: rateLimit.headers(rl) },
+    );
   } catch (error) {
     console.error("[report/generate] Report generation failed:", error);
     return NextResponse.json(

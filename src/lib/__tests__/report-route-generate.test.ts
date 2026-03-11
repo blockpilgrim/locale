@@ -19,7 +19,7 @@ vi.mock("@/lib/db", () => ({
 
 vi.mock("@/lib/db/schema", () => ({
   locations: { id: "id", address: "address" },
-  reports: { id: "id", slug: "slug", locationId: "location_id", status: "status" },
+  reports: { id: "id", slug: "slug", locationId: "location_id", status: "status", data: "data", updatedAt: "updated_at" },
 }));
 
 // Mock rate limiter to always allow.
@@ -51,6 +51,7 @@ vi.mock("@/lib/report/generate", () => ({
 vi.mock("@/lib/report/narrative", () => ({
   generateNarrative: vi.fn(),
 }));
+
 
 import { POST } from "@/app/api/report/generate/route";
 import { generateReport } from "@/lib/report/generate";
@@ -266,7 +267,7 @@ describe("POST /api/report/generate", () => {
     expect(body.slug).toBe("789-elm-st-nowhere-tx");
   });
 
-  it("starts narrative generation and returns streaming response for viable reports", async () => {
+  it("awaits narrative generation and returns JSON with slug", async () => {
     mockSelectLimit.mockResolvedValue([]); // No cached report
 
     vi.mocked(generateReport).mockResolvedValueOnce({
@@ -285,13 +286,7 @@ describe("POST /api/report/generate", () => {
       isViable: true,
     });
 
-    // Mock the narrative stream.
-    const mockStreamResponse = new Response("streaming narrative text", {
-      headers: { "Content-Type": "text/plain" },
-    });
-    vi.mocked(generateNarrative).mockResolvedValueOnce({
-      toTextStreamResponse: () => mockStreamResponse,
-    } as ReturnType<typeof generateNarrative> extends Promise<infer T> ? T : never);
+    vi.mocked(generateNarrative).mockResolvedValueOnce({} as never);
 
     const response = await POST(
       makeRequest({
@@ -301,13 +296,16 @@ describe("POST /api/report/generate", () => {
       }),
     );
 
-    // The response should be the stream response.
+    const body = await response.json();
+
     expect(generateReport).toHaveBeenCalled();
     expect(generateNarrative).toHaveBeenCalledWith(1, expect.any(Object));
-    expect(response).toBe(mockStreamResponse);
+    expect(response.status).toBe(200);
+    expect(body.slug).toBe("123-main-st-springfield-il");
+    expect(body.status).toBe("generating");
   });
 
-  it("returns JSON fallback when narrative generation fails", async () => {
+  it("returns JSON with slug even when narrative generation fails", async () => {
     mockSelectLimit.mockResolvedValue([]);
 
     vi.mocked(generateReport).mockResolvedValueOnce({
@@ -326,6 +324,8 @@ describe("POST /api/report/generate", () => {
       isViable: true,
     });
 
+    // Narrative fails — runNarrative catches the error and marks the report as
+    // failed. The response still returns the slug so the client can navigate.
     vi.mocked(generateNarrative).mockRejectedValueOnce(
       new Error("ANTHROPIC_API_KEY is not set"),
     );
@@ -341,6 +341,6 @@ describe("POST /api/report/generate", () => {
 
     expect(response.status).toBe(200);
     expect(body.slug).toBe("test-slug");
-    expect(body.narrativeError).toBe(true);
+    expect(body.status).toBe("generating");
   });
 });
