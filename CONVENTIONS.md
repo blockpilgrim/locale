@@ -111,7 +111,8 @@ docs/               → Product docs, build strategy, implementation plan, revie
 - **Framer Motion animations:** Import `fadeUp` from `@/lib/motion` — do not redefine per-component. Use `motion.div` (or `motion.section`) with the `fadeUp` variant and `whileInView` trigger with `viewport={{ once: true }}` for reveal animations on scroll.
 - **Section component structure:** Each section in `components/sections/` follows the pattern: accept typed data props, return null if no data, use SectionHeader for consistent heading, use StatCard for key metrics, include source attribution footer.
 - **Data section directory:** `src/components/sections/` for report data sections (Demographics, Housing, Economic, GettingAround, WhatsNearby).
-- **Map component:** Uses Mapbox GL JS via `mapbox-gl` package with `NEXT_PUBLIC_MAPBOX_TOKEN`. Imports `mapbox-gl/dist/mapbox-gl.css` directly. Guards against SSR via `"use client"`.
+- **Error boundaries:** `SectionErrorBoundary` (class component — React requires class components for error boundaries) wraps each section in `ReportContent`. Shows a subtle fallback with retry button. Every independent section (Map, VibeCheck, Demographics, Housing, Economic, GettingAround, WhatsNearby, ShareControls) has its own boundary so one failure does not crash the page.
+- **Map component:** Uses Mapbox GL JS via `mapbox-gl` package with `NEXT_PUBLIC_MAPBOX_TOKEN`. Imports `mapbox-gl/dist/mapbox-gl.css` directly. Guards against SSR via `"use client"`. Lazy-loaded in `ReportContent` via `next/dynamic` with `ssr: false` to keep the large Mapbox GL JS bundle out of the initial load.
 - **Mapbox hex color mirroring:** Mapbox GL JS paint properties and DOM-style-based markers require hardcoded hex values (cannot use CSS custom properties). Any such value must include a comment citing the corresponding `--color-*` token name. If a token value changes in `globals.css`, the hardcoded hex must be updated manually in `Map.tsx`.
 - **Isochrone rendering:** Sorted largest-first (15 > 10 > 5) so smaller polygons render on top. Uses design token accent colors with graduated opacity.
 - **XSS prevention in Map popups:** Always escape user-contributed data (especially OSM POI names) before passing to Mapbox `.setHTML()`. Use the `escapeHtml()` helper in `Map.tsx`.
@@ -137,6 +138,22 @@ docs/               → Product docs, build strategy, implementation plan, revie
 - **Client components:** `HomepageClient` (address input + generation + redirect), `ReportContent` (full report composition with Map + sections + VibeCheck + ShareControls), `AutoRefresh` (polling), `ShareControls` (copy link, native share, Twitter/Facebook share, generate CTA).
 - **Share controls pattern:** Use `navigator.share()` when available (mobile), with clipboard copy fallback. Social share links open in `window.open()` with sized popup. Inline SVG icons (no icon library). Clipboard feedback uses `useState` with `setTimeout` reset.
 - **Hydration-safe browser feature detection:** Never check browser-only APIs (e.g., `navigator.share`) at render scope — SSR returns `false` while the client returns `true`, causing a hydration mismatch. Instead use `useState(false)` + `useEffect` to detect after hydration.
+
+## Responsive Design
+
+- **Container padding:** `Container` uses `px-4 sm:px-6` (responsive) — do NOT add extra outer `px-*` wrappers around Container. The Container component owns horizontal padding.
+- **No horizontal scroll:** `html { overflow-x: hidden }` is set globally. Avoid fixed-width elements wider than 375px without responsive alternatives.
+- **Breakpoint targets:** 375px (mobile), 768px (tablet/sm), 1024px (md), 1440px (lg). All components must render correctly at all four.
+- **Responsive text sizes:** Use `text-xl sm:text-2xl` or `text-base sm:text-lg` patterns for text that might overflow on narrow screens.
+- **Responsive padding:** Use `p-4 sm:p-5` or `p-3 sm:p-4` patterns for cards and containers.
+- **Responsive label widths:** Fixed-width label columns (e.g., in bar charts) use `w-24 sm:w-32` or `w-28 sm:w-40` to avoid overflowing on mobile.
+- **Map responsive height:** `h-[300px] sm:h-[400px] md:h-[500px]` — shorter on mobile to avoid dominating the viewport.
+
+## Performance
+
+- **Dynamic imports for heavy dependencies:** Use `next/dynamic` with `ssr: false` for components that depend on large client-only libraries (e.g., Mapbox GL JS ~200KB). Provide a loading skeleton that matches the component's dimensions.
+- **Edge caching for completed reports:** The GET report API route sets `Cache-Control: public, s-maxage=3600, stale-while-revalidate=86400` for completed reports. Non-complete reports get `no-cache, no-store` to allow status polling.
+- **Parallel API fetching:** The orchestrator (`generateReport`) fires Census, isochrone, and POI calls via `Promise.all` with individual `.catch()` wrappers. Never fetch sequentially.
 
 ## Custom Hooks (`src/hooks/`)
 

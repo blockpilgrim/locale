@@ -124,15 +124,15 @@
 
 ## Phase 6: Polish + Hardening
 
-- [ ] **T6.1 — Error boundaries + edge case handling**
+- [x] **T6.1 — Error boundaries + edge case handling**
   Add React error boundaries around each report section (map, data, narrative) so one failure doesn't crash the page. Handle: invalid slugs (404 page), API timeouts (retry UI), empty data (section hiding). Test with the graceful degradation matrix from BUILD-STRATEGY Decision 4.
   - *Depends on:* T4.2
 
-- [ ] **T6.2 — Mobile responsiveness pass**
+- [x] **T6.2 — Mobile responsiveness pass**
   Audit and fix all components at 375px, 768px, 1024px, 1440px. Map touch interactions, data visualization scaling, narrative readability, address input usability on mobile keyboards. No horizontal scroll on any width.
   - *Depends on:* T4.3
 
-- [ ] **T6.3 — Performance optimization**
+- [x] **T6.3 — Performance optimization**
   Lazy-load Mapbox GL JS. Optimize bundle with dynamic imports for heavy components. Verify parallel API fetching in the orchestrator. Add edge caching headers for completed reports. Lighthouse audit targeting 90+ performance score.
   - *Depends on:* T4.3
   - *Parallelizable with:* T6.1, T6.2
