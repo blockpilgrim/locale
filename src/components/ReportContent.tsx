@@ -6,11 +6,15 @@
 // Composes the Map, all 5 data sections, VibeCheck narrative, and a CTA.
 // Receives pre-fetched data from the server component and renders everything
 // on the client (required for Mapbox GL JS + Framer Motion).
+//
+// Each section is wrapped in a SectionErrorBoundary so that one failure
+// does not crash the entire page (T6.1). The Map component is lazy-loaded
+// via next/dynamic to keep Mapbox GL JS out of the initial bundle (T6.3).
 // ---------------------------------------------------------------------------
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { Map } from "@/components/Map";
 import { VibeCheck } from "@/components/VibeCheck";
 import { ShareControls } from "@/components/ShareControls";
 import { DemographicsSection } from "@/components/sections/DemographicsSection";
@@ -19,8 +23,26 @@ import { EconomicSection } from "@/components/sections/EconomicSection";
 import { GettingAroundSection } from "@/components/sections/GettingAroundSection";
 import { WhatsNearbySection } from "@/components/sections/WhatsNearbySection";
 import { Container } from "@/components/Container";
+import { SectionErrorBoundary } from "@/components/SectionErrorBoundary";
+import { Skeleton } from "@/components/Skeleton";
 import { fadeUp } from "@/lib/motion";
 import type { ReportData } from "@/lib/report/generate";
+
+// Lazy-load Map component — Mapbox GL JS requires `window` and is a large
+// dependency (~200KB gzipped). Using ssr: false prevents it from being
+// included in the server bundle. The loading fallback matches the Map
+// component's skeleton pattern.
+const Map = dynamic(
+  () => import("@/components/Map").then((mod) => mod.Map),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="relative overflow-hidden rounded-xl">
+        <Skeleton width="w-full" height="h-[300px] sm:h-[400px] md:h-[500px]" className="rounded-xl" />
+      </div>
+    ),
+  },
+);
 
 interface ReportContentProps {
   /** The structured report data (JSONB from DB). */
@@ -50,7 +72,7 @@ export function ReportContent({
   return (
     <div className="min-h-screen pb-20">
       {/* Report header */}
-      <header className="border-b border-border-light bg-surface px-6 pb-10 pt-12 sm:pt-16">
+      <header className="border-b border-border-light bg-surface px-4 pb-10 pt-12 sm:px-6 sm:pt-16">
         <Container variant="content">
           <motion.div
             variants={fadeUp}
@@ -76,75 +98,89 @@ export function ReportContent({
       </header>
 
       {/* Map */}
-      <section className="px-6 pt-12">
+      <section className="px-4 pt-8 sm:px-6 sm:pt-12">
         <Container variant="content">
-          <Map
-            coordinates={data.coordinates}
-            isochrone={data.isochrone}
-            pois={data.poi}
-            className="shadow-sm"
-          />
+          <SectionErrorBoundary sectionName="Map">
+            <Map
+              coordinates={data.coordinates}
+              isochrone={data.isochrone}
+              pois={data.poi}
+              className="shadow-sm"
+            />
+          </SectionErrorBoundary>
         </Container>
       </section>
 
       {/* Vibe Check (AI Narrative) */}
       {narrative && (
-        <section className="px-6 pt-(--spacing-section)">
+        <section className="px-4 pt-(--spacing-section) sm:px-6">
           <Container variant="prose">
-            <VibeCheck narrative={narrative} isStreaming={false} />
+            <SectionErrorBoundary sectionName="Vibe Check">
+              <VibeCheck narrative={narrative} isStreaming={false} />
+            </SectionErrorBoundary>
           </Container>
         </section>
       )}
 
       {/* Data sections */}
-      <div className="px-6">
+      <div className="px-4 sm:px-6">
         <Container variant="content">
           <div className="divide-y divide-border-light">
             {/* Demographics */}
             {data.census && (
               <div className="py-(--spacing-section)">
-                <DemographicsSection
-                  demographics={data.census.demographics}
-                  nationalAverages={data.census.nationalAverages}
-                />
+                <SectionErrorBoundary sectionName="Demographics">
+                  <DemographicsSection
+                    demographics={data.census.demographics}
+                    nationalAverages={data.census.nationalAverages}
+                  />
+                </SectionErrorBoundary>
               </div>
             )}
 
             {/* Housing */}
             {data.census && (
               <div className="py-(--spacing-section)">
-                <HousingSection
-                  housing={data.census.housing}
-                  nationalAverages={data.census.nationalAverages}
-                />
+                <SectionErrorBoundary sectionName="Housing">
+                  <HousingSection
+                    housing={data.census.housing}
+                    nationalAverages={data.census.nationalAverages}
+                  />
+                </SectionErrorBoundary>
               </div>
             )}
 
             {/* Economic */}
             {data.census && (
               <div className="py-(--spacing-section)">
-                <EconomicSection
-                  economic={data.census.economic}
-                  nationalAverages={data.census.nationalAverages}
-                />
+                <SectionErrorBoundary sectionName="Economic Profile">
+                  <EconomicSection
+                    economic={data.census.economic}
+                    nationalAverages={data.census.nationalAverages}
+                  />
+                </SectionErrorBoundary>
               </div>
             )}
 
             {/* Getting Around */}
             {(data.isochrone || data.census || data.poi) && (
               <div className="py-(--spacing-section)">
-                <GettingAroundSection
-                  isochrone={data.isochrone}
-                  economic={data.census?.economic ?? null}
-                  poi={data.poi}
-                />
+                <SectionErrorBoundary sectionName="Getting Around">
+                  <GettingAroundSection
+                    isochrone={data.isochrone}
+                    economic={data.census?.economic ?? null}
+                    poi={data.poi}
+                  />
+                </SectionErrorBoundary>
               </div>
             )}
 
             {/* What's Nearby */}
             {data.poi && (
               <div className="py-(--spacing-section)">
-                <WhatsNearbySection poi={data.poi} />
+                <SectionErrorBoundary sectionName="What's Nearby">
+                  <WhatsNearbySection poi={data.poi} />
+                </SectionErrorBoundary>
               </div>
             )}
           </div>
@@ -152,9 +188,11 @@ export function ReportContent({
       </div>
 
       {/* Share controls + Generate your own CTA */}
-      <section className="px-6 py-(--spacing-section)">
+      <section className="px-4 py-(--spacing-section) sm:px-6">
         <Container variant="prose">
-          <ShareControls address={location.address} slug={slug} />
+          <SectionErrorBoundary sectionName="Share Controls">
+            <ShareControls address={location.address} slug={slug} />
+          </SectionErrorBoundary>
         </Container>
       </section>
     </div>
