@@ -136,6 +136,7 @@ docs/               → Product docs, build strategy, implementation plan, revie
 - **Featured report cards:** Hardcoded illustrative data on the homepage (no DB queries). These link to `/report/[slug]` and serve as social proof / discovery mechanism.
 - **Client components:** `HomepageClient` (address input + generation + redirect), `ReportContent` (full report composition with Map + sections + VibeCheck + ShareControls), `AutoRefresh` (polling), `ShareControls` (copy link, native share, Twitter/Facebook share, generate CTA).
 - **Share controls pattern:** Use `navigator.share()` when available (mobile), with clipboard copy fallback. Social share links open in `window.open()` with sized popup. Inline SVG icons (no icon library). Clipboard feedback uses `useState` with `setTimeout` reset.
+- **Hydration-safe browser feature detection:** Never check browser-only APIs (e.g., `navigator.share`) at render scope — SSR returns `false` while the client returns `true`, causing a hydration mismatch. Instead use `useState(false)` + `useEffect` to detect after hydration.
 
 ## Custom Hooks (`src/hooks/`)
 
