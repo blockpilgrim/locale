@@ -141,12 +141,12 @@
 
 ## Phase 7: Testing
 
-- [ ] **T7.1 — Golden dataset prompt evaluation**
+- [x] **T7.1 — Golden dataset prompt evaluation**
   Create `tests/golden-addresses.ts` with 20 diverse US addresses (urban, suburban, rural, gentrifying, wealthy, etc.). Build a script that generates reports for all 20 and outputs narratives for human review. This is the highest-ROI test per BUILD-STRATEGY.
   - *Depends on:* T2.2
   - *Parallelizable with:* T7.2
 
-- [ ] **T7.2 — Mocked API integration tests**
+- [x] **T7.2 — Mocked API integration tests**
   Write tests for the report orchestrator and each API client using mocked responses. Cover: successful responses, partial data, missing fields, timeouts, malformed responses. Verify the minimum viable report logic. Use Vitest or Jest.
   - *Depends on:* T2.1
   - *Parallelizable with:* T7.1

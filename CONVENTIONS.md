@@ -89,6 +89,9 @@ docs/               → Product docs, build strategy, implementation plan, revie
 - **Multi-API mocking:** For clients that call multiple APIs sequentially (e.g., Census: FCC geocoder → Census API), use a URL-matching `mockImplementation` that inspects the request URL
 - **Env var mocking:** `vi.stubEnv("VAR_NAME", "value")` in `beforeEach`, `vi.unstubAllEnvs()` in `afterEach`
 - **Imports:** Always explicitly import from `vitest` (`describe`, `it`, `expect`, `vi`, etc.) — do not rely on globals
+- **Fixture builders:** Use `makeRealistic<Type>()` factory functions for complex test data (e.g., `makeRealisticCensusResult()`). For overrides of nested null-safe fields, mutate the returned object directly rather than using `??` (which treats `null` as nullish and falls through to the default).
+- **Integration tests:** `src/lib/__tests__/integration.test.ts` covers cross-module orchestration (partial failures, timeouts, slug collisions, prompt construction). Keep unit tests in per-module files.
+- **Golden dataset evaluation:** `tests/golden-addresses.ts` (20 diverse US addresses) + `tests/eval-narratives.ts` (prompt generation script). Run with `npm run test:eval`. Add `--live` for actual AI generation (requires `ANTHROPIC_API_KEY`). Output goes to `tests/output/` (gitignored).
 
 ## Report Generation (`src/lib/report/`)
 
