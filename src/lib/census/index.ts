@@ -258,13 +258,19 @@ async function lookupFips(
   }
 }
 
+// Census Bureau sentinel values meaning "data not available" / "suppressed".
+const CENSUS_SENTINELS = new Set([-666666666, -999999999, -888888888]);
+
 /** Safely parse a numeric value from Census API data. Returns null for missing/invalid. */
 function parseNum(value: unknown): number | null {
   if (value === null || value === undefined || value === "" || value === "-") {
     return null;
   }
   const num = Number(value);
-  return Number.isFinite(num) ? num : null;
+  if (!Number.isFinite(num) || CENSUS_SENTINELS.has(num)) {
+    return null;
+  }
+  return num;
 }
 
 // --- Public API --------------------------------------------------------------

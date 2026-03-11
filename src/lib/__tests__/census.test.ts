@@ -232,6 +232,24 @@ describe("fetchCensusData", () => {
     expect(result!.economic.medianHouseholdIncome).toBe(65000);
   });
 
+  it("treats Census sentinel values (-666666666, -999999999, -888888888) as null", async () => {
+    mockFetchSequence({
+      B01002_001E: "-666666666",   // "data not available"
+      B25064_001E: "-666666666",   // median rent
+      B19013_001E: "-666666666",   // median household income
+      B25077_001E: "-999999999",   // "data suppressed"
+      B01003_001E: "-888888888",   // "no comparable data"
+    });
+
+    const result = await fetchCensusData(41.8781, -87.6298);
+
+    expect(result!.demographics.medianAge).toBeNull();
+    expect(result!.housing.medianRent).toBeNull();
+    expect(result!.economic.medianHouseholdIncome).toBeNull();
+    expect(result!.housing.medianHomeValue).toBeNull();
+    expect(result!.demographics.totalPopulation).toBeNull();
+  });
+
   it("returns null when FIPS lookup fails", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
       new Response(JSON.stringify({ results: [] }), { status: 200 }),

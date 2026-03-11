@@ -23,14 +23,14 @@ const FEATURED_REPORTS = [
     longitude: -73.9857,
   },
   {
-    address: "1600 Pennsylvania Ave NW",
-    fullAddress: "1600 Pennsylvania Ave NW, Washington, DC 20500",
-    city: "Washington",
-    state: "DC",
+    address: "700 Bourbon St",
+    fullAddress: "700 Bourbon St, New Orleans, LA 70116",
+    city: "New Orleans",
+    state: "LA",
     teaser:
-      "The most famous address in America, nestled in a walkable corridor of monuments, museums, and government power.",
-    latitude: 38.8977,
-    longitude: -77.0365,
+      "The heart of the French Quarter -- jazz on every corner, century-old architecture, and a neighborhood that never sleeps.",
+    latitude: 29.9584,
+    longitude: -90.0654,
   },
   {
     address: "Fisherman's Wharf",
