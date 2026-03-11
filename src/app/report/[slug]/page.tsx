@@ -14,6 +14,7 @@ import { getDb } from "@/lib/db";
 import { locations, reports } from "@/lib/db/schema";
 import { ReportContent } from "@/components/ReportContent";
 import { AutoRefresh } from "@/components/AutoRefresh";
+import { NarrativeTrigger } from "@/components/NarrativeTrigger";
 import { Container } from "@/components/Container";
 import type { ReportData } from "@/lib/report/generate";
 
@@ -168,7 +169,10 @@ export default async function ReportPage({ params }: ReportPageProps) {
             </p>
           </div>
         </Container>
-        {/* Client component that polls for completion via router.refresh(). */}
+        {/* Trigger narrative generation via dedicated endpoint. The connection
+            stays alive because the client remains on this page. */}
+        <NarrativeTrigger slug={row.slug} />
+        {/* Poll for completion via router.refresh(). */}
         <AutoRefresh intervalMs={3000} />
       </div>
     );

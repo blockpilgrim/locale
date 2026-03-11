@@ -293,8 +293,8 @@ function buildUserPrompt(data: ReportData): string {
  *
  * Streams text from the Anthropic API, awaits the full response, and updates
  * the report row with the narrative and status "complete". On failure, sets
- * status to "failed". The caller should run this inside `after()` so the
- * work survives after the HTTP response is sent.
+ * status to "failed". Called from the dedicated narrative endpoint
+ * (POST /api/report/[slug]/narrative).
  *
  * @param reportId - The database ID of the report to update on completion.
  * @param data - The structured report data to narrate.

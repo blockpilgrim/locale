@@ -19,7 +19,7 @@ vi.mock("@/lib/db", () => ({
 
 vi.mock("@/lib/db/schema", () => ({
   locations: { id: "id", address: "address" },
-  reports: { id: "id", slug: "slug", locationId: "location_id", status: "status", data: "data", updatedAt: "updated_at" },
+  reports: { id: "id", slug: "slug", locationId: "location_id", status: "status" },
 }));
 
 // Mock rate limiter to always allow.
@@ -47,15 +47,8 @@ vi.mock("@/lib/report/generate", () => ({
   generateReport: vi.fn(),
 }));
 
-// Mock the narrative generator.
-vi.mock("@/lib/report/narrative", () => ({
-  generateNarrative: vi.fn(),
-}));
-
-
 import { POST } from "@/app/api/report/generate/route";
 import { generateReport } from "@/lib/report/generate";
-import { generateNarrative } from "@/lib/report/narrative";
 
 // --- Helpers -----------------------------------------------------------------
 
@@ -267,7 +260,7 @@ describe("POST /api/report/generate", () => {
     expect(body.slug).toBe("789-elm-st-nowhere-tx");
   });
 
-  it("awaits narrative generation and returns JSON with slug", async () => {
+  it("returns slug immediately for viable report (narrative deferred)", async () => {
     mockSelectLimit.mockResolvedValue([]); // No cached report
 
     vi.mocked(generateReport).mockResolvedValueOnce({
@@ -277,7 +270,7 @@ describe("POST /api/report/generate", () => {
       data: {
         address: { full: "123 Main St, Springfield, IL" },
         coordinates: { latitude: 39.78, longitude: -89.65 },
-        census: null, // Simplified for test
+        census: null,
         isochrone: null,
         poi: null,
         availableSections: { census: true, isochrone: false, poi: false },
@@ -285,8 +278,6 @@ describe("POST /api/report/generate", () => {
       },
       isViable: true,
     });
-
-    vi.mocked(generateNarrative).mockResolvedValueOnce({} as never);
 
     const response = await POST(
       makeRequest({
@@ -299,48 +290,8 @@ describe("POST /api/report/generate", () => {
     const body = await response.json();
 
     expect(generateReport).toHaveBeenCalled();
-    expect(generateNarrative).toHaveBeenCalledWith(1, expect.any(Object));
     expect(response.status).toBe(200);
     expect(body.slug).toBe("123-main-st-springfield-il");
-    expect(body.status).toBe("generating");
-  });
-
-  it("returns JSON with slug even when narrative generation fails", async () => {
-    mockSelectLimit.mockResolvedValue([]);
-
-    vi.mocked(generateReport).mockResolvedValueOnce({
-      slug: "test-slug",
-      reportId: 1,
-      locationId: 1,
-      data: {
-        address: { full: "Test" },
-        coordinates: { latitude: 40, longitude: -74 },
-        census: null,
-        isochrone: null,
-        poi: null,
-        availableSections: { census: true, isochrone: false, poi: false },
-        fetchedAt: new Date().toISOString(),
-      },
-      isViable: true,
-    });
-
-    // Narrative fails — runNarrative catches the error and marks the report as
-    // failed. The response still returns the slug so the client can navigate.
-    vi.mocked(generateNarrative).mockRejectedValueOnce(
-      new Error("ANTHROPIC_API_KEY is not set"),
-    );
-
-    const response = await POST(
-      makeRequest({
-        address: "Test",
-        latitude: 40,
-        longitude: -74,
-      }),
-    );
-    const body = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(body.slug).toBe("test-slug");
     expect(body.status).toBe("generating");
   });
 });
