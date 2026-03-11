@@ -60,26 +60,40 @@ export async function GET(
 
     const row = results[0];
 
-    return NextResponse.json({
-      report: {
-        id: row.reportId,
-        slug: row.slug,
-        status: row.status,
-        data: row.data,
-        narrative: row.narrative,
-        createdAt: row.reportCreatedAt,
-        updatedAt: row.reportUpdatedAt,
+    // Completed reports are immutable — cache aggressively at the edge.
+    // "generating" and "failed" reports get no-cache to allow status polling.
+    const cacheControl =
+      row.status === "complete"
+        ? "public, s-maxage=3600, stale-while-revalidate=86400"
+        : "no-cache, no-store";
+
+    return NextResponse.json(
+      {
+        report: {
+          id: row.reportId,
+          slug: row.slug,
+          status: row.status,
+          data: row.data,
+          narrative: row.narrative,
+          createdAt: row.reportCreatedAt,
+          updatedAt: row.reportUpdatedAt,
+        },
+        location: {
+          id: row.locationId,
+          address: row.address,
+          latitude: row.latitude,
+          longitude: row.longitude,
+          city: row.city,
+          state: row.state,
+          zip: row.zip,
+        },
       },
-      location: {
-        id: row.locationId,
-        address: row.address,
-        latitude: row.latitude,
-        longitude: row.longitude,
-        city: row.city,
-        state: row.state,
-        zip: row.zip,
+      {
+        headers: {
+          "Cache-Control": cacheControl,
+        },
       },
-    });
+    );
   } catch (error) {
     console.error("[report/slug] Failed to fetch report:", error);
     return NextResponse.json(
