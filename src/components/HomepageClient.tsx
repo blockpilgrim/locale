@@ -101,7 +101,7 @@ export function HomepageClient() {
 
   return (
     <div>
-      <div className="mt-8 sm:mt-12">
+      <div className="mt-10 sm:mt-12">
         <AddressInput
           onSelect={handleSelect}
           disabled={state === "generating"}
@@ -114,12 +114,19 @@ export function HomepageClient() {
         <div
           role="status"
           aria-live="polite"
-          className="mt-8 rounded-xl border border-border bg-surface p-5 shadow-sm sm:mt-10 sm:p-8"
+          className="mt-8 rounded-2xl border border-accent/15 bg-accent-subtle/50 p-6 sm:mt-10 sm:p-8"
         >
-          <div className="flex items-center justify-center gap-3">
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-warm-300 border-t-accent" />
-            <p className="font-serif text-ink-light italic">
-              Generating your report...
+          <div className="flex flex-col items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 animate-pulse rounded-full bg-accent" />
+              <div className="h-2 w-2 animate-pulse rounded-full bg-accent [animation-delay:150ms]" />
+              <div className="h-2 w-2 animate-pulse rounded-full bg-accent [animation-delay:300ms]" />
+            </div>
+            <p className="font-serif text-ink-light">
+              Generating your neighborhood report...
+            </p>
+            <p className="text-xs text-ink-muted">
+              Gathering data from Census, OpenStreetMap, and Mapbox
             </p>
           </div>
         </div>
@@ -130,7 +137,7 @@ export function HomepageClient() {
         <div
           role="alert"
           aria-live="assertive"
-          className="mt-8 rounded-xl border border-data-4/30 bg-data-4/5 p-5 sm:mt-10 sm:p-8"
+          className="mt-8 rounded-2xl border border-data-4/20 bg-data-4/5 p-6 sm:mt-10"
         >
           <p className="text-sm text-data-4">{error}</p>
           <button
@@ -138,7 +145,7 @@ export function HomepageClient() {
               setState("idle");
               setError(null);
             }}
-            className="mt-4 text-sm font-medium text-accent underline decoration-accent/30 underline-offset-2 hover:decoration-accent"
+            className="mt-4 text-sm font-medium text-accent underline decoration-accent/30 underline-offset-2 hover:decoration-accent transition-colors"
           >
             Try again
           </button>

@@ -31,14 +31,16 @@ export function StatCard({
 
   return (
     <div
-      className={`rounded-lg border border-border-light bg-surface p-4 sm:p-5 ${className}`}
+      className={`group relative overflow-hidden rounded-xl border border-border-light bg-surface p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5 ${className}`}
     >
-      <p className="text-xs font-medium tracking-wide uppercase text-ink-muted">
+      {/* Subtle top accent line */}
+      <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-accent/20 via-accent/40 to-accent/20" />
+      <p className="text-[11px] font-semibold tracking-wide uppercase text-ink-muted">
         {label}
       </p>
-      <p className="mt-1 font-serif text-xl text-ink sm:text-2xl">{value}</p>
+      <p className="mt-1.5 font-serif text-2xl text-ink sm:text-[1.75rem] leading-tight tracking-tight">{value}</p>
       {comparison && (
-        <p className={`mt-1 text-sm ${trendColor}`}>{comparison}</p>
+        <p className={`mt-1.5 text-sm leading-snug ${trendColor}`}>{comparison}</p>
       )}
     </div>
   );

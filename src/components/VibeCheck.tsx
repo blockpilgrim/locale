@@ -4,8 +4,8 @@
 // VibeCheck — AI narrative display with streaming text
 // ---------------------------------------------------------------------------
 // The editorial centerpiece of every report. Renders the AI narrative
-// with large serif typography and generous whitespace. Supports both
-// completed narratives and in-progress streaming text.
+// with large serif typography, drop cap, and generous whitespace.
+// Supports both completed narratives and in-progress streaming text.
 // ---------------------------------------------------------------------------
 
 import { motion } from "framer-motion";
@@ -33,13 +33,17 @@ export function VibeCheck({
   const displayText = isStreaming ? streamingText : narrative;
   const showSkeleton = isStreaming && !streamingText;
 
+  const paragraphs = displayText
+    .split("\n\n")
+    .filter((p) => p.trim());
+
   return (
     <motion.section
       variants={fadeUp}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.6 }}
       className={className}
     >
       <SectionHeader
@@ -67,14 +71,12 @@ export function VibeCheck({
         </div>
       ) : (
         <div className="max-w-(--container-prose)">
-          {/* Split the text into paragraphs and render each one. */}
-          {displayText
-            .split("\n\n")
-            .filter((p) => p.trim())
-            .map((paragraph, i) => (
+          {paragraphs.map((paragraph, i) => (
               <p
                 key={i}
-                className="mb-6 font-serif text-lg leading-relaxed text-ink-light sm:text-xl sm:leading-relaxed"
+                className={`mb-6 font-serif text-lg leading-[1.8] text-ink-light sm:text-xl sm:leading-[1.8] ${
+                  i === 0 ? "drop-cap" : ""
+                }`}
               >
                 {paragraph.trim()}
               </p>
@@ -89,7 +91,7 @@ export function VibeCheck({
 
       {/* Source attribution */}
       {!showSkeleton && displayText && (
-        <p className="mt-8 text-xs text-ink-muted">
+        <p className="mt-10 border-t border-border-light pt-4 text-xs text-ink-muted">
           AI-generated narrative based on Census, isochrone, and POI data.
           Powered by Claude.
         </p>

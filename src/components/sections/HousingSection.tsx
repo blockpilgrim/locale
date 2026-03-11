@@ -127,20 +127,20 @@ export function HousingSection({
 
       {/* Owner vs Renter */}
       {ownerPct !== null && renterPct !== null && (
-        <div className="mt-8">
-          <h4 className="mb-4 font-serif text-lg">Owner vs. Renter</h4>
+        <div className="mt-10">
+          <h4 className="mb-5 font-serif text-lg">Owner vs. Renter</h4>
           <div
-            className="flex h-5 w-full overflow-hidden rounded-full"
+            className="flex h-6 w-full overflow-hidden rounded-full"
             role="img"
             aria-label={`Owner-occupied: ${ownerPct}%, Renter-occupied: ${renterPct}%`}
           >
             <div
-              className="bg-accent transition-all duration-500"
+              className="bg-gradient-to-r from-accent to-accent-light transition-all duration-700 ease-out"
               style={{ width: `${ownerPct}%` }}
               title={`Owner: ${ownerPct}%`}
             />
             <div
-              className="bg-data-2 transition-all duration-500"
+              className="bg-gradient-to-r from-data-2 to-data-2/80 transition-all duration-700 ease-out"
               style={{ width: `${renterPct}%` }}
               title={`Renter: ${renterPct}%`}
             />
@@ -164,7 +164,7 @@ export function HousingSection({
       )}
 
       {/* Comparison bars */}
-      <div className="mt-8 space-y-6">
+      <div className="mt-10 space-y-6">
         {medianHomeValue !== null && natAvg && (
           <ComparisonBar
             label="Median Home Value"
@@ -185,23 +185,23 @@ export function HousingSection({
 
       {/* Housing age */}
       {yearBuiltEntries.length > 0 && totalYearBuilt > 0 && (
-        <div className="mt-8">
-          <h4 className="mb-4 font-serif text-lg">Housing Stock Age</h4>
-          <div className="space-y-2">
+        <div className="mt-10">
+          <h4 className="mb-5 font-serif text-lg">Housing Stock Age</h4>
+          <div className="space-y-3">
             {yearBuiltEntries.map((entry) => {
               const pct = Math.round(((entry.value ?? 0) / totalYearBuilt) * 100);
               return (
                 <div key={entry.label} className="flex items-center gap-3">
-                  <span className="w-24 shrink-0 text-sm text-ink-light">
+                  <span className="w-24 shrink-0 text-sm text-ink-light sm:w-28">
                     {entry.label}
                   </span>
-                  <div className="h-2 flex-1 rounded-full bg-warm-100">
+                  <div className="h-2.5 flex-1 rounded-full bg-warm-100">
                     <div
-                      className={`h-full rounded-full ${entry.color} transition-all duration-500`}
+                      className={`h-full rounded-full ${entry.color} transition-all duration-700 ease-out`}
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <span className="w-10 text-right text-sm font-medium text-ink">
+                  <span className="w-10 text-right text-sm font-semibold tabular-nums text-ink">
                     {pct}%
                   </span>
                 </div>
@@ -211,7 +211,7 @@ export function HousingSection({
         </div>
       )}
 
-      <p className="mt-8 text-xs text-ink-muted">
+      <p className="mt-10 border-t border-border-light pt-4 text-xs text-ink-muted">
         Source: U.S. Census Bureau, ACS 5-Year Estimates
       </p>
     </motion.section>

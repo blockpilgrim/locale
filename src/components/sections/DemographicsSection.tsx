@@ -112,9 +112,9 @@ export function DemographicsSection({
       {/* Household composition */}
       {householdTypes.totalHouseholds !== null &&
         householdTypes.totalHouseholds > 0 && (
-          <div className="mt-8">
-            <h4 className="mb-4 font-serif text-lg">Household Composition</h4>
-            <div className="space-y-3">
+          <div className="mt-10">
+            <h4 className="mb-5 font-serif text-lg">Household Composition</h4>
+            <div className="space-y-3.5">
               {[
                 { label: "Married couples", value: householdTypes.marriedCouple },
                 { label: "Single-parent (female)", value: householdTypes.singleFemale },
@@ -129,15 +129,15 @@ export function DemographicsSection({
                       <span className="w-28 shrink-0 text-sm text-ink-light sm:w-40">
                         {entry.label}
                       </span>
-                      <div className="h-2 flex-1 rounded-full bg-warm-100">
+                      <div className="h-2.5 flex-1 rounded-full bg-warm-100">
                         <div
-                          className="h-full rounded-full bg-accent-muted transition-all duration-500"
+                          className="h-full rounded-full bg-gradient-to-r from-accent-muted to-accent-muted/70 transition-all duration-700 ease-out"
                           style={{
                             width: pct ?? "0%",
                           }}
                         />
                       </div>
-                      <span className="w-10 text-right text-sm font-medium text-ink">
+                      <span className="w-10 text-right text-sm font-semibold tabular-nums text-ink">
                         {pct ?? "--"}
                       </span>
                     </div>
@@ -150,31 +150,34 @@ export function DemographicsSection({
       {/* Education */}
       {(educationalAttainment.bachelorsOrHigher !== null ||
         educationalAttainment.highSchoolOrHigher !== null) && (
-        <div className="mt-8">
-          <h4 className="mb-4 font-serif text-lg">Educational Attainment</h4>
+        <div className="mt-10">
+          <h4 className="mb-5 font-serif text-lg">Educational Attainment</h4>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
             {educationalAttainment.highSchoolOrHigher !== null && (
-              <div className="rounded-lg border border-border-light bg-surface p-3 sm:p-4">
-                <p className="text-xl font-serif text-ink sm:text-2xl">
+              <div className="relative overflow-hidden rounded-xl border border-border-light bg-surface p-4 sm:p-5">
+                <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-data-1/30 via-data-1/60 to-data-1/30" />
+                <p className="text-2xl font-serif text-ink sm:text-[1.75rem] tracking-tight">
                   {educationalAttainment.highSchoolOrHigher.toLocaleString()}
                 </p>
-                <p className="text-xs text-ink-muted mt-1">High school or higher</p>
+                <p className="text-[11px] font-medium text-ink-muted mt-1.5 uppercase tracking-wide">High school or higher</p>
               </div>
             )}
             {educationalAttainment.bachelorsOrHigher !== null && (
-              <div className="rounded-lg border border-border-light bg-surface p-3 sm:p-4">
-                <p className="text-xl font-serif text-ink sm:text-2xl">
+              <div className="relative overflow-hidden rounded-xl border border-border-light bg-surface p-4 sm:p-5">
+                <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-data-2/30 via-data-2/60 to-data-2/30" />
+                <p className="text-2xl font-serif text-ink sm:text-[1.75rem] tracking-tight">
                   {educationalAttainment.bachelorsOrHigher.toLocaleString()}
                 </p>
-                <p className="text-xs text-ink-muted mt-1">Bachelor&apos;s or higher</p>
+                <p className="text-[11px] font-medium text-ink-muted mt-1.5 uppercase tracking-wide">Bachelor&apos;s or higher</p>
               </div>
             )}
             {educationalAttainment.graduateOrProfessional !== null && (
-              <div className="rounded-lg border border-border-light bg-surface p-3 sm:p-4">
-                <p className="text-xl font-serif text-ink sm:text-2xl">
+              <div className="relative overflow-hidden rounded-xl border border-border-light bg-surface p-4 sm:p-5">
+                <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-data-5/30 via-data-5/60 to-data-5/30" />
+                <p className="text-2xl font-serif text-ink sm:text-[1.75rem] tracking-tight">
                   {educationalAttainment.graduateOrProfessional.toLocaleString()}
                 </p>
-                <p className="text-xs text-ink-muted mt-1">Graduate / professional</p>
+                <p className="text-[11px] font-medium text-ink-muted mt-1.5 uppercase tracking-wide">Graduate / professional</p>
               </div>
             )}
           </div>
@@ -183,11 +186,11 @@ export function DemographicsSection({
 
       {/* Race / ethnicity */}
       {raceEntries.length > 0 && totalForRace > 0 && (
-        <div className="mt-8">
-          <h4 className="mb-4 font-serif text-lg">Race & Ethnicity</h4>
+        <div className="mt-10">
+          <h4 className="mb-5 font-serif text-lg">Race & Ethnicity</h4>
           {/* Stacked bar */}
           <div
-            className="flex h-4 w-full overflow-hidden rounded-full"
+            className="flex h-5 w-full overflow-hidden rounded-full"
             role="img"
             aria-label={`Race and ethnicity breakdown: ${raceEntries.map((e) => `${e.label} ${Math.round((e.value! / totalForRace) * 100)}%`).join(", ")}`}
           >
@@ -218,7 +221,7 @@ export function DemographicsSection({
 
       {/* Median age comparison bar */}
       {medianAge !== null && natAvg && (
-        <div className="mt-8">
+        <div className="mt-10">
           <ComparisonBar
             label="Median Age"
             localValue={medianAge}
@@ -229,7 +232,7 @@ export function DemographicsSection({
       )}
 
       {/* Source attribution */}
-      <p className="mt-8 text-xs text-ink-muted">
+      <p className="mt-10 border-t border-border-light pt-4 text-xs text-ink-muted">
         Source: U.S. Census Bureau, ACS 5-Year Estimates
       </p>
     </motion.section>

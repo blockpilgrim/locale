@@ -37,8 +37,8 @@ const Map = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="relative overflow-hidden rounded-xl">
-        <Skeleton width="w-full" height="h-[300px] sm:h-[400px] md:h-[500px]" className="rounded-xl" />
+      <div className="relative overflow-hidden rounded-2xl">
+        <Skeleton width="w-full" height="h-[300px] sm:h-[400px] md:h-[500px]" className="rounded-2xl" />
       </div>
     ),
   },
@@ -71,9 +71,25 @@ export function ReportContent({
 
   return (
     <div className="min-h-screen pb-20">
-      {/* Report header */}
-      <header className="border-b border-border-light bg-surface pb-10 pt-12 sm:pt-16">
-        <Container variant="content">
+      {/* Report header — editorial masthead with gradient background */}
+      <header className="relative overflow-hidden pb-12 pt-12 sm:pb-16 sm:pt-16">
+        {/* Subtle gradient backdrop */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, #F5F0E8 0%, #FAF7F2 100%)",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 50% at 30% 60%, rgba(45,90,61,0.04) 0%, transparent 70%)",
+          }}
+        />
+
+        <Container variant="content" className="relative z-10">
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -82,30 +98,50 @@ export function ReportContent({
           >
             <Link
               href="/"
-              className="mb-8 inline-block text-sm font-medium text-accent hover:underline decoration-accent/30 underline-offset-2"
+              className="mb-10 inline-flex items-center gap-2 text-sm font-medium text-ink-muted hover:text-accent transition-colors"
             >
-              &larr; Back to Locale
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+              Back to Locale
             </Link>
-            <p className="mb-2 text-sm font-medium tracking-widest uppercase text-accent">
-              Neighborhood Report
-            </p>
-            <h1>{location.address}</h1>
+
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-px w-8 bg-accent/40" />
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-accent">
+                Neighborhood Report
+              </p>
+            </div>
+            <h1 className="max-w-2xl">{location.address}</h1>
             {cityState && (
-              <p className="mt-2 text-lg text-ink-muted">{cityState}</p>
+              <p className="mt-3 text-lg text-ink-muted font-light">{cityState}</p>
             )}
           </motion.div>
         </Container>
+
+        {/* Bottom border with accent gradient */}
+        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       </header>
 
       {/* Map */}
-      <section className="pt-8 sm:pt-12">
+      <section className="pt-10 sm:pt-14">
         <Container variant="content">
           <SectionErrorBoundary sectionName="Map">
             <Map
               coordinates={data.coordinates}
               isochrone={data.isochrone}
               pois={data.poi}
-              className="shadow-sm"
+              className="shadow-md rounded-2xl"
             />
           </SectionErrorBoundary>
         </Container>
@@ -122,73 +158,69 @@ export function ReportContent({
         </section>
       )}
 
-      {/* Data sections */}
-      <div>
-        <Container variant="content">
-          <div className="divide-y divide-border-light">
-            {/* Demographics */}
-            {data.census && (
-              <div className="py-(--spacing-section)">
-                <SectionErrorBoundary sectionName="Demographics">
-                  <DemographicsSection
-                    demographics={data.census.demographics}
-                    nationalAverages={data.census.nationalAverages}
-                  />
-                </SectionErrorBoundary>
-              </div>
-            )}
-
-            {/* Housing */}
-            {data.census && (
-              <div className="py-(--spacing-section)">
-                <SectionErrorBoundary sectionName="Housing">
-                  <HousingSection
-                    housing={data.census.housing}
-                    nationalAverages={data.census.nationalAverages}
-                  />
-                </SectionErrorBoundary>
-              </div>
-            )}
-
-            {/* Economic */}
-            {data.census && (
-              <div className="py-(--spacing-section)">
-                <SectionErrorBoundary sectionName="Economic Profile">
-                  <EconomicSection
-                    economic={data.census.economic}
-                    nationalAverages={data.census.nationalAverages}
-                  />
-                </SectionErrorBoundary>
-              </div>
-            )}
-
-            {/* Getting Around */}
-            {(data.isochrone || data.census || data.poi) && (
-              <div className="py-(--spacing-section)">
-                <SectionErrorBoundary sectionName="Getting Around">
-                  <GettingAroundSection
-                    isochrone={data.isochrone}
-                    economic={data.census?.economic ?? null}
-                    poi={data.poi}
-                  />
-                </SectionErrorBoundary>
-              </div>
-            )}
-
-            {/* What's Nearby */}
-            {data.poi && (
-              <div className="py-(--spacing-section)">
-                <SectionErrorBoundary sectionName="What's Nearby">
-                  <WhatsNearbySection poi={data.poi} />
-                </SectionErrorBoundary>
-              </div>
-            )}
+      {/* Data sections — separated by generous spacing instead of dividers */}
+      <Container variant="content">
+        {/* Demographics */}
+        {data.census && (
+          <div className="pt-(--spacing-section)">
+            <SectionErrorBoundary sectionName="Demographics">
+              <DemographicsSection
+                demographics={data.census.demographics}
+                nationalAverages={data.census.nationalAverages}
+              />
+            </SectionErrorBoundary>
           </div>
-        </Container>
-      </div>
+        )}
+
+        {/* Housing */}
+        {data.census && (
+          <div className="pt-(--spacing-section)">
+            <SectionErrorBoundary sectionName="Housing">
+              <HousingSection
+                housing={data.census.housing}
+                nationalAverages={data.census.nationalAverages}
+              />
+            </SectionErrorBoundary>
+          </div>
+        )}
+
+        {/* Economic */}
+        {data.census && (
+          <div className="pt-(--spacing-section)">
+            <SectionErrorBoundary sectionName="Economic Profile">
+              <EconomicSection
+                economic={data.census.economic}
+                nationalAverages={data.census.nationalAverages}
+              />
+            </SectionErrorBoundary>
+          </div>
+        )}
+
+        {/* Getting Around */}
+        {(data.isochrone || data.census || data.poi) && (
+          <div className="pt-(--spacing-section)">
+            <SectionErrorBoundary sectionName="Getting Around">
+              <GettingAroundSection
+                isochrone={data.isochrone}
+                economic={data.census?.economic ?? null}
+                poi={data.poi}
+              />
+            </SectionErrorBoundary>
+          </div>
+        )}
+
+        {/* What's Nearby */}
+        {data.poi && (
+          <div className="pt-(--spacing-section)">
+            <SectionErrorBoundary sectionName="What's Nearby">
+              <WhatsNearbySection poi={data.poi} />
+            </SectionErrorBoundary>
+          </div>
+        )}
+      </Container>
 
       {/* Share controls + Generate your own CTA */}
-      <section className="py-(--spacing-section)">
+      <section className="pt-(--spacing-section)">
         <Container variant="prose">
           <SectionErrorBoundary sectionName="Share Controls">
             <ShareControls address={location.address} slug={slug} />

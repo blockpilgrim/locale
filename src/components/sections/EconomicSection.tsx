@@ -135,7 +135,7 @@ export function EconomicSection({
 
       {/* Income comparison bar */}
       {medianHouseholdIncome !== null && natAvg && (
-        <div className="mt-8">
+        <div className="mt-10">
           <ComparisonBar
             label="Median Household Income"
             localValue={medianHouseholdIncome}
@@ -147,9 +147,9 @@ export function EconomicSection({
 
       {/* Commute modes */}
       {commuteEntries.length > 0 && totalCommuters > 0 && (
-        <div className="mt-8">
-          <h4 className="mb-4 font-serif text-lg">How People Commute</h4>
-          <div className="space-y-2">
+        <div className="mt-10">
+          <h4 className="mb-5 font-serif text-lg">How People Commute</h4>
+          <div className="space-y-3">
             {commuteEntries.map((entry) => {
               const pct = Math.round(
                 ((entry.value ?? 0) / totalCommuters) * 100,
@@ -159,13 +159,13 @@ export function EconomicSection({
                   <span className="w-24 shrink-0 text-sm text-ink-light sm:w-32">
                     {entry.label}
                   </span>
-                  <div className="h-2 flex-1 rounded-full bg-warm-100">
+                  <div className="h-2.5 flex-1 rounded-full bg-warm-100">
                     <div
-                      className={`h-full rounded-full ${entry.color} transition-all duration-500`}
+                      className={`h-full rounded-full ${entry.color} transition-all duration-700 ease-out`}
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <span className="w-10 text-right text-sm font-medium text-ink">
+                  <span className="w-10 text-right text-sm font-semibold tabular-nums text-ink">
                     {pct}%
                   </span>
                 </div>
@@ -175,7 +175,7 @@ export function EconomicSection({
         </div>
       )}
 
-      <p className="mt-8 text-xs text-ink-muted">
+      <p className="mt-10 border-t border-border-light pt-4 text-xs text-ink-muted">
         Source: U.S. Census Bureau, ACS 5-Year Estimates
       </p>
     </motion.section>

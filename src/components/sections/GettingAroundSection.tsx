@@ -119,17 +119,17 @@ export function GettingAroundSection({
 
       {/* Walkability assessment */}
       {walkability && (
-        <div className="mb-8 flex items-start gap-4 rounded-lg border border-border-light bg-surface p-4 sm:gap-5 sm:p-6">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent-subtle sm:h-14 sm:w-14">
-            <span className="text-2xl font-serif font-bold text-accent">
+        <div className="mb-10 relative overflow-hidden flex items-start gap-5 rounded-2xl border border-accent/15 bg-gradient-to-br from-accent-subtle/50 to-accent-subtle/20 p-5 sm:gap-6 sm:p-7">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-accent shadow-sm sm:h-[4.5rem] sm:w-[4.5rem]">
+            <span className="text-3xl font-serif font-bold text-white">
               {walkability.score}
             </span>
           </div>
           <div>
-            <p className="font-serif text-lg font-bold text-ink">
+            <p className="font-serif text-xl font-bold text-ink">
               {walkability.label}
             </p>
-            <p className="mt-1 text-sm text-ink-muted leading-relaxed">
+            <p className="mt-1.5 text-sm text-ink-muted leading-relaxed">
               {walkability.description}
             </p>
           </div>
@@ -138,7 +138,7 @@ export function GettingAroundSection({
 
       {/* Isochrone reference (map shows the visual; section references it) */}
       {isochrone && (
-        <p className="mb-8 text-sm text-ink-muted">
+        <p className="mb-10 text-sm text-ink-muted italic">
           The map above shows 5, 10, and 15-minute walking coverage areas from this address.
         </p>
       )}
@@ -146,7 +146,7 @@ export function GettingAroundSection({
       {/* Commute pattern highlights */}
       {(walkedPct !== null || transitPct !== null || wfhPct !== null) && (
         <div>
-          <h4 className="mb-4 font-serif text-lg">Commute Highlights</h4>
+          <h4 className="mb-5 font-serif text-lg">Commute Highlights</h4>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             {walkedPct !== null && (
               <StatCard label="Walk to work" value={`${walkedPct}%`} />
@@ -172,7 +172,7 @@ export function GettingAroundSection({
         </div>
       )}
 
-      <p className="mt-8 text-xs text-ink-muted">
+      <p className="mt-10 border-t border-border-light pt-4 text-xs text-ink-muted">
         Source: Mapbox Isochrone API, U.S. Census Bureau ACS 5-Year Estimates
       </p>
     </motion.section>

@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// SectionHeader — Section heading with optional label and subtitle
+// SectionHeader — Section heading with decorative accent and optional subtitle
 // ---------------------------------------------------------------------------
 
 interface SectionHeaderProps {
@@ -20,15 +20,18 @@ export function SectionHeader({
   className = "",
 }: SectionHeaderProps) {
   return (
-    <div className={`mb-8 ${className}`}>
+    <div className={`mb-10 ${className}`}>
       {label && (
-        <p className="mb-2 text-xs font-medium tracking-widest uppercase text-accent">
-          {label}
-        </p>
+        <div className="mb-3 flex items-center gap-3">
+          <div className="h-px w-8 bg-accent/40" />
+          <p className="text-xs font-semibold tracking-[0.2em] uppercase text-accent">
+            {label}
+          </p>
+        </div>
       )}
       <h2 className="font-serif">{title}</h2>
       {subtitle && (
-        <p className="mt-2 text-base text-ink-muted">{subtitle}</p>
+        <p className="mt-2 text-base text-ink-muted leading-relaxed">{subtitle}</p>
       )}
     </div>
   );

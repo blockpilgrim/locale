@@ -150,16 +150,20 @@ export default async function ReportPage({ params }: ReportPageProps) {
   // --- Status: "generating" — report is still being built -----------------
   if (row.status === "generating") {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center">
+      <div className="flex min-h-screen flex-col items-center justify-center px-4">
         <Container variant="prose">
           <div className="text-center">
-            <div className="mx-auto mb-6 h-8 w-8 animate-spin rounded-full border-2 border-warm-300 border-t-accent" />
+            <div className="mx-auto mb-8 flex items-center justify-center gap-2">
+              <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-accent" />
+              <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-accent [animation-delay:150ms]" />
+              <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-accent [animation-delay:300ms]" />
+            </div>
             <h1 className="mb-4">Generating your report</h1>
-            <p className="text-base text-ink-muted sm:text-lg">
+            <p className="text-base text-ink-muted sm:text-lg leading-relaxed">
               We&apos;re gathering data and writing your neighborhood
               intelligence report. This usually takes a few seconds.
             </p>
-            <p className="mt-8 text-sm text-ink-muted">
+            <p className="mt-8 text-xs text-ink-muted">
               This page will refresh automatically.
             </p>
           </div>
@@ -173,18 +177,25 @@ export default async function ReportPage({ params }: ReportPageProps) {
   // --- Status: "failed" — report generation failed ------------------------
   if (row.status === "failed") {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center">
+      <div className="flex min-h-screen flex-col items-center justify-center px-4">
         <Container variant="prose">
           <div className="text-center">
+            <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-data-4/10">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-data-4">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="15" y1="9" x2="9" y2="15" />
+                <line x1="9" y1="9" x2="15" y2="15" />
+              </svg>
+            </div>
             <h1 className="mb-4">Report generation failed</h1>
-            <p className="text-base text-ink-muted sm:text-lg">
+            <p className="text-base text-ink-muted sm:text-lg leading-relaxed">
               We weren&apos;t able to generate a report for this address. This
               can happen when our data sources are temporarily unavailable.
             </p>
             <div className="mt-8 flex items-center justify-center gap-4">
               <Link
                 href="/"
-                className="inline-block rounded-lg bg-accent px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-accent-light"
+                className="inline-block rounded-xl bg-accent px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-accent-light hover:shadow-md"
               >
                 Try another address
               </Link>

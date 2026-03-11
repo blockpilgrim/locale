@@ -35,8 +35,8 @@ function CopyIcon({ className = "" }: { className?: string }) {
   return (
     <svg
       className={className}
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -54,8 +54,8 @@ function CheckIcon({ className = "" }: { className?: string }) {
   return (
     <svg
       className={className}
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -72,8 +72,8 @@ function ShareIcon({ className = "" }: { className?: string }) {
   return (
     <svg
       className={className}
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -92,8 +92,8 @@ function TwitterIcon({ className = "" }: { className?: string }) {
   return (
     <svg
       className={className}
-      width="18"
-      height="18"
+      width="15"
+      height="15"
       viewBox="0 0 24 24"
       fill="currentColor"
     >
@@ -106,8 +106,8 @@ function FacebookIcon({ className = "" }: { className?: string }) {
   return (
     <svg
       className={className}
-      width="18"
-      height="18"
+      width="15"
+      height="15"
       viewBox="0 0 24 24"
       fill="currentColor"
     >
@@ -193,6 +193,9 @@ export function ShareControls({
     window.open(facebookUrl, "_blank", "noopener,noreferrer,width=550,height=420");
   }, [getReportUrl]);
 
+  const buttonBase =
+    "inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-ink-light transition-all duration-200 hover:border-accent/40 hover:text-accent hover:shadow-sm";
+
   return (
     <motion.section
       variants={fadeUp}
@@ -208,12 +211,12 @@ export function ShareControls({
         subtitle="Know someone who would find this useful? Share this report."
       />
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2.5">
         {/* Copy link */}
         <button
           onClick={handleCopyLink}
           aria-label={copied ? "Link copied to clipboard" : "Copy report link to clipboard"}
-          className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-all hover:border-accent hover:text-accent"
+          className={buttonBase}
         >
           {copied ? (
             <>
@@ -233,7 +236,7 @@ export function ShareControls({
           <button
             onClick={handleNativeShare}
             aria-label="Share this report"
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-all hover:border-accent hover:text-accent"
+            className={buttonBase}
           >
             <ShareIcon />
             <span>Share</span>
@@ -244,7 +247,7 @@ export function ShareControls({
         <button
           onClick={handleTwitterShare}
           aria-label="Share on Twitter (opens in new window)"
-          className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-all hover:border-accent hover:text-accent"
+          className={buttonBase}
         >
           <TwitterIcon />
           <span>Twitter</span>
@@ -254,7 +257,7 @@ export function ShareControls({
         <button
           onClick={handleFacebookShare}
           aria-label="Share on Facebook (opens in new window)"
-          className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-all hover:border-accent hover:text-accent"
+          className={buttonBase}
         >
           <FacebookIcon />
           <span>Facebook</span>
@@ -262,15 +265,15 @@ export function ShareControls({
       </div>
 
       {/* Generate your own report CTA */}
-      <div className="mt-10 rounded-xl border border-border-light bg-surface-warm p-5 text-center sm:p-8">
+      <div className="mt-12 relative overflow-hidden rounded-2xl border border-accent/15 bg-gradient-to-br from-accent-subtle/60 to-accent-subtle/30 p-6 text-center sm:p-10">
         <h3 className="mb-3 font-serif">Curious about your neighborhood?</h3>
-        <p className="mb-6 text-base text-ink-muted">
+        <p className="mx-auto max-w-md mb-6 text-base text-ink-muted leading-relaxed">
           Enter any US address and get your own AI-powered neighborhood
           intelligence report.
         </p>
         <Link
           href="/"
-          className="inline-block rounded-lg bg-accent px-8 py-3 text-sm font-medium text-white transition-colors hover:bg-accent-light"
+          className="inline-block rounded-xl bg-accent px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-accent-light hover:shadow-md hover:-translate-y-0.5"
         >
           Generate your report
         </Link>

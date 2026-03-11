@@ -56,42 +56,45 @@ export function WhatsNearbySection({
       {(nearestEssentials.grocery ||
         nearestEssentials.pharmacy ||
         nearestEssentials.park) && (
-        <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+        <div className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
           {nearestEssentials.grocery && (
-            <div className="rounded-lg border border-border-light bg-surface p-4 sm:p-5">
-              <p className="text-xs font-medium tracking-wide uppercase text-ink-muted">
+            <div className="relative overflow-hidden rounded-xl border border-border-light bg-surface p-5 sm:p-6">
+              <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-data-1/30 via-data-1/60 to-data-1/30" />
+              <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-ink-muted">
                 Nearest Grocery
               </p>
-              <p className="mt-1 font-serif text-base text-ink sm:text-lg truncate">
+              <p className="mt-1.5 font-serif text-base text-ink sm:text-lg truncate">
                 {nearestEssentials.grocery.name || "Unnamed"}
               </p>
-              <p className="mt-1 text-sm text-accent font-medium">
+              <p className="mt-2 text-sm text-accent font-semibold">
                 {nearestEssentials.grocery.walkingMinutes} min walk
               </p>
             </div>
           )}
           {nearestEssentials.pharmacy && (
-            <div className="rounded-lg border border-border-light bg-surface p-4 sm:p-5">
-              <p className="text-xs font-medium tracking-wide uppercase text-ink-muted">
+            <div className="relative overflow-hidden rounded-xl border border-border-light bg-surface p-5 sm:p-6">
+              <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-data-4/30 via-data-4/60 to-data-4/30" />
+              <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-ink-muted">
                 Nearest Pharmacy
               </p>
-              <p className="mt-1 font-serif text-base text-ink sm:text-lg truncate">
+              <p className="mt-1.5 font-serif text-base text-ink sm:text-lg truncate">
                 {nearestEssentials.pharmacy.name || "Unnamed"}
               </p>
-              <p className="mt-1 text-sm text-accent font-medium">
+              <p className="mt-2 text-sm text-accent font-semibold">
                 {nearestEssentials.pharmacy.walkingMinutes} min walk
               </p>
             </div>
           )}
           {nearestEssentials.park && (
-            <div className="rounded-lg border border-border-light bg-surface p-4 sm:p-5">
-              <p className="text-xs font-medium tracking-wide uppercase text-ink-muted">
+            <div className="relative overflow-hidden rounded-xl border border-border-light bg-surface p-5 sm:p-6">
+              <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-accent/30 via-accent/60 to-accent/30" />
+              <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-ink-muted">
                 Nearest Park
               </p>
-              <p className="mt-1 font-serif text-base text-ink sm:text-lg truncate">
+              <p className="mt-1.5 font-serif text-base text-ink sm:text-lg truncate">
                 {nearestEssentials.park.name || "Unnamed"}
               </p>
-              <p className="mt-1 text-sm text-accent font-medium">
+              <p className="mt-2 text-sm text-accent font-semibold">
                 {nearestEssentials.park.walkingMinutes} min walk
               </p>
             </div>
@@ -102,14 +105,14 @@ export function WhatsNearbySection({
       {/* Category grid */}
       {categoriesWithItems.length > 0 && (
         <div>
-          <h4 className="mb-4 font-serif text-lg">By Category</h4>
+          <h4 className="mb-5 font-serif text-lg">By Category</h4>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {categoriesWithItems.map((cat) => {
               const meta = CATEGORY_META[cat.category];
               return (
                 <div
                   key={cat.category}
-                  className="rounded-lg border border-border-light bg-surface p-3 sm:p-4"
+                  className="rounded-xl border border-border-light bg-surface p-4 sm:p-5 transition-shadow hover:shadow-sm"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-ink">
@@ -118,7 +121,7 @@ export function WhatsNearbySection({
                     <Badge variant="accent">{cat.count}</Badge>
                   </div>
                   {/* Top named items */}
-                  <div className="mt-2 space-y-1">
+                  <div className="mt-3 space-y-1.5">
                     {cat.items
                       .filter((i) => i.name)
                       .slice(0, 3)
@@ -129,13 +132,13 @@ export function WhatsNearbySection({
                           title={`${item.name} (${item.walkingMinutes} min walk)`}
                         >
                           {item.name}{" "}
-                          <span className="text-ink-muted/60">
+                          <span className="text-accent/60 font-medium">
                             {item.walkingMinutes}m
                           </span>
                         </p>
                       ))}
                     {cat.count > 3 && (
-                      <p className="text-xs text-ink-muted">
+                      <p className="text-xs text-ink-muted font-medium">
                         +{cat.count - 3} more
                       </p>
                     )}
@@ -156,7 +159,7 @@ export function WhatsNearbySection({
         ))}
       </div>
 
-      <p className="mt-8 text-xs text-ink-muted">
+      <p className="mt-10 border-t border-border-light pt-4 text-xs text-ink-muted">
         Source: OpenStreetMap via Overpass API
       </p>
     </motion.section>

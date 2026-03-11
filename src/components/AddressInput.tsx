@@ -21,6 +21,44 @@ interface AddressInputProps {
 const DEBOUNCE_MS = 300;
 const MIN_QUERY_LENGTH = 3;
 
+function SearchIcon() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="text-ink-muted"
+    >
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+  );
+}
+
+function MapPinIcon() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="text-accent shrink-0"
+    >
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  );
+}
+
 export function AddressInput({
   onSelect,
   placeholder = "Enter a US address...",
@@ -165,6 +203,11 @@ export function AddressInput({
   return (
     <div className={`relative w-full ${className}`}>
       <div className="relative">
+        {/* Search icon */}
+        <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
+          <SearchIcon />
+        </div>
+
         <input
           ref={inputRef}
           type="text"
@@ -183,12 +226,12 @@ export function AddressInput({
           aria-activedescendant={
             activeIndex >= 0 ? `suggestion-${activeIndex}` : undefined
           }
-          className="w-full rounded-lg border border-border bg-surface px-4 py-3.5 text-base text-ink placeholder:text-ink-muted transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent-subtle disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
+          className="w-full rounded-2xl border border-border bg-surface pl-12 pr-4 py-4 text-base text-ink shadow-sm placeholder:text-ink-muted/60 transition-all duration-200 focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/10 focus:shadow-md disabled:cursor-not-allowed disabled:opacity-50 appearance-none sm:text-lg sm:py-5 sm:pl-14"
         />
 
         {/* Loading indicator */}
         {isLoading && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+          <div className="absolute right-4 top-1/2 -translate-y-1/2">
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-warm-300 border-t-accent" />
           </div>
         )}
@@ -205,7 +248,7 @@ export function AddressInput({
           ref={listRef}
           id="address-suggestions"
           role="listbox"
-          className="absolute z-50 mt-1 w-full overflow-auto rounded-lg border border-border bg-surface shadow-lg max-h-72"
+          className="absolute z-50 mt-2 w-full overflow-auto rounded-2xl border border-border bg-surface shadow-xl max-h-72 py-2"
         >
           {suggestions.map((suggestion, index) => (
             <li
@@ -215,20 +258,25 @@ export function AddressInput({
               aria-selected={index === activeIndex}
               onClick={() => handleSelect(suggestion)}
               onMouseEnter={() => setActiveIndex(index)}
-              className={`cursor-pointer px-4 py-3 text-sm transition-colors ${
+              className={`cursor-pointer px-4 py-3 text-sm transition-colors flex items-start gap-3 ${
                 index === activeIndex
-                  ? "bg-accent-subtle text-ink"
-                  : "text-ink-light hover:bg-warm-50"
+                  ? "bg-accent-subtle"
+                  : "hover:bg-warm-50"
               }`}
             >
-              <span className="block font-medium text-ink">
-                {suggestion.name}
-              </span>
-              {suggestion.fullAddress !== suggestion.name && (
-                <span className="block text-xs text-ink-muted mt-0.5">
-                  {suggestion.fullAddress}
+              <div className="mt-0.5">
+                <MapPinIcon />
+              </div>
+              <div className="min-w-0">
+                <span className="block font-medium text-ink">
+                  {suggestion.name}
                 </span>
-              )}
+                {suggestion.fullAddress !== suggestion.name && (
+                  <span className="block text-xs text-ink-muted mt-0.5 truncate">
+                    {suggestion.fullAddress}
+                  </span>
+                )}
+              </div>
             </li>
           ))}
         </ul>
