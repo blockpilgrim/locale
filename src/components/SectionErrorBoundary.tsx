@@ -5,7 +5,8 @@
 // ---------------------------------------------------------------------------
 // Prevents a single broken section (map, data, narrative) from crashing the
 // entire report page. Displays a subtle, collapsed fallback with a retry
-// option, consistent with the editorial magazine aesthetic.
+// option (up to MAX_RETRIES attempts), consistent with the editorial magazine
+// aesthetic.
 //
 // React error boundaries must be class components — function components
 // cannot implement componentDidCatch / getDerivedStateFromError.
@@ -36,13 +37,14 @@ export class SectionErrorBoundary extends React.Component<
     this.state = { hasError: false, retryCount: 0 };
   }
 
-  static getDerivedStateFromError(): SectionErrorBoundaryState {
-    return { hasError: true, retryCount: 0 };
+  static getDerivedStateFromError(): Partial<SectionErrorBoundaryState> {
+    // Only flag the error — do not touch retryCount here (static method
+    // has no access to instance state, and returning retryCount: 0 would
+    // reset the counter on every error).
+    return { hasError: true };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    // Increment retry count in componentDidCatch (has access to instance state)
-    this.setState((prev) => ({ retryCount: prev.retryCount + 1 }));
     console.error(
       `[SectionErrorBoundary] ${this.props.sectionName} failed to render:`,
       error,
@@ -51,7 +53,12 @@ export class SectionErrorBoundary extends React.Component<
   }
 
   handleRetry = () => {
-    this.setState({ hasError: false });
+    // Increment retry count *before* clearing the error so that on the next
+    // crash getDerivedStateFromError sees the updated count.
+    this.setState((prev) => ({
+      hasError: false,
+      retryCount: prev.retryCount + 1,
+    }));
   };
 
   render() {
@@ -74,7 +81,7 @@ export class SectionErrorBoundary extends React.Component<
               Try again
             </button>
           ) : (
-            <p className="mt-3 text-xs text-ink-faint">
+            <p className="mt-3 text-xs text-ink-muted">
               This section is temporarily unavailable.
             </p>
           )}

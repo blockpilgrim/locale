@@ -85,4 +85,4 @@ Right-sized for a solo, 2-week build. Testing infrastructure should earn its kee
 
 * **Parallel Fetching:** The Next.js backend must use `Promise.all` to fetch Demographics, Housing, and POI data concurrently before passing it to the LLM. Sequential fetching will kill the user experience.
 * **Vector Tiles for Maps:** Ensure Mapbox is utilizing vector tiles rather than raster images, keeping the initial map load under 1 second, especially on mobile networks.
-* **Edge Caching:** Once a report is generated and saved to the database, its unique URL route should be heavily cached at the CDN level (e.g., Vercel Edge Network). A viral shared report on Twitter should result in zero database or LLM hits after the first load.
+* **Edge Caching:** Once a report is generated and saved to the database, the report API route (`GET /api/report/[slug]`) should return `Cache-Control` headers enabling CDN caching. Note: the SSR report page uses `force-dynamic` (needed during the `generating` → `complete` transition) so page visits always hit the database — but the DB query is lightweight for completed reports. The API route is CDN-cached for external consumers.
