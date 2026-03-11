@@ -6,42 +6,51 @@
 // (HomepageClient).
 // ---------------------------------------------------------------------------
 
-import Link from "next/link";
 import { HomepageClient } from "@/components/HomepageClient";
+import { FeaturedCard } from "@/components/FeaturedCard";
 
-/** Hardcoded example report cards for discovery (Flow 3 in PRODUCT.md). */
+/** Hardcoded example report cards for discovery (Flow 3 in PRODUCT.md).
+ *  Includes coordinates so FeaturedCard can POST to /api/report/generate. */
 const FEATURED_REPORTS = [
   {
     address: "350 5th Ave",
+    fullAddress: "350 5th Ave, New York, NY 10118",
     city: "New York",
     state: "NY",
     teaser:
       "Midtown Manhattan at its most iconic -- sky-high density, world-class transit, and the Empire State Building as your neighbor.",
-    slug: "350-5th-ave-new-york-ny",
+    latitude: 40.7484,
+    longitude: -73.9857,
   },
   {
     address: "1600 Pennsylvania Ave NW",
+    fullAddress: "1600 Pennsylvania Ave NW, Washington, DC 20500",
     city: "Washington",
     state: "DC",
     teaser:
       "The most famous address in America, nestled in a walkable corridor of monuments, museums, and government power.",
-    slug: "1600-pennsylvania-ave-nw-washington-dc",
+    latitude: 38.8977,
+    longitude: -77.0365,
   },
   {
     address: "Fisherman's Wharf",
+    fullAddress: "Fisherman's Wharf, San Francisco, CA 94133",
     city: "San Francisco",
     state: "CA",
     teaser:
       "Iconic waterfront living where sea lions, sourdough bread, and fog-kissed bay views define the daily rhythm.",
-    slug: "fishermans-wharf-san-francisco-ca",
+    latitude: 37.808,
+    longitude: -122.4177,
   },
   {
     address: "1000 Vin Scully Ave",
+    fullAddress: "1000 Vin Scully Ave, Los Angeles, CA 90012",
     city: "Los Angeles",
     state: "CA",
     teaser:
       "Echo Park-adjacent in the heart of LA -- a neighborhood where tacos, Dodger dogs, and cultural diversity collide.",
-    slug: "1000-vin-scully-ave-los-angeles-ca",
+    latitude: 34.0739,
+    longitude: -118.24,
   },
 ];
 
@@ -106,28 +115,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURED_REPORTS.map((report) => (
-              <Link
-                key={report.slug}
-                href={`/report/${report.slug}`}
-                className="group relative overflow-hidden rounded-2xl border border-border-light bg-surface p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
-              >
-                {/* Top accent gradient */}
-                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-accent/0 via-accent/50 to-accent/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-                <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-accent">
-                  {report.city}, {report.state}
-                </p>
-                <h3 className="mt-2 font-serif text-lg leading-snug text-ink transition-colors group-hover:text-accent">
-                  {report.address}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-                  {report.teaser}
-                </p>
-                <p className="mt-5 text-sm font-medium text-accent flex items-center gap-1.5 transition-all group-hover:gap-2.5">
-                  Explore
-                  <span className="transition-transform duration-300 group-hover:translate-x-0.5">&rarr;</span>
-                </p>
-              </Link>
+              <FeaturedCard key={report.fullAddress} report={report} />
             ))}
           </div>
         </div>
