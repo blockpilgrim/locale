@@ -103,6 +103,62 @@ describe("GET /api/report/[slug]", () => {
     expect(body.error).toContain("Invalid slug");
   });
 
+  it("sets Cache-Control with s-maxage for completed reports", async () => {
+    const mockRow = {
+      reportId: 1,
+      slug: "test-slug",
+      status: "complete",
+      data: {},
+      narrative: "Done",
+      reportCreatedAt: new Date(),
+      reportUpdatedAt: new Date(),
+      locationId: 1,
+      address: "123 Main St",
+      latitude: 40,
+      longitude: -74,
+      city: "Test",
+      state: "NJ",
+      zip: "07001",
+    };
+
+    mockSelectLimit.mockResolvedValueOnce([mockRow]);
+
+    const response = await GET(...makeRequest("test-slug"));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Cache-Control")).toBe(
+      "public, s-maxage=3600, stale-while-revalidate=86400",
+    );
+  });
+
+  it("sets Cache-Control to no-cache for generating reports", async () => {
+    const mockRow = {
+      reportId: 1,
+      slug: "test-slug",
+      status: "generating",
+      data: null,
+      narrative: null,
+      reportCreatedAt: new Date(),
+      reportUpdatedAt: new Date(),
+      locationId: 1,
+      address: "123 Main St",
+      latitude: 40,
+      longitude: -74,
+      city: "Test",
+      state: "NJ",
+      zip: "07001",
+    };
+
+    mockSelectLimit.mockResolvedValueOnce([mockRow]);
+
+    const response = await GET(...makeRequest("test-slug"));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Cache-Control")).toBe(
+      "no-cache, no-store",
+    );
+  });
+
   it("returns 500 when database query fails", async () => {
     mockSelectLimit.mockRejectedValueOnce(new Error("DB connection failed"));
 
