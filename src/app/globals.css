@@ -119,6 +119,38 @@ html {
   color: var(--color-ink);
 }
 
+/* --- Logotype (Fraunces Italic) --- */
+/* Use --logotype-font to avoid Tailwind v4 intercepting --font-* namespace */
+body {
+  --logotype-font: var(--font-fraunces), "Georgia", serif;
+}
+.logotype {
+  font-family: var(--logotype-font);
+  font-style: italic;
+}
+
+/* --- Hero entrance animation --- */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.6s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up {
+    animation: none;
+  }
+}
+
 /* --- Subtle grain texture for editorial warmth --- */
 body::before {
   content: "";

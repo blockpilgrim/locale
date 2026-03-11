@@ -18,7 +18,7 @@ const FEATURED_REPORTS = [
     city: "New York",
     state: "NY",
     teaser:
-      "Midtown Manhattan at its most iconic -- sky-high density, world-class transit, and the Empire State Building as your neighbor.",
+      "Midtown Manhattan at its most iconic — sky-high density, world-class transit, and the Empire State Building as your neighbor.",
     latitude: 40.7484,
     longitude: -73.9857,
   },
@@ -28,7 +28,7 @@ const FEATURED_REPORTS = [
     city: "New Orleans",
     state: "LA",
     teaser:
-      "The heart of the French Quarter -- jazz on every corner, century-old architecture, and a neighborhood that never sleeps.",
+      "The heart of the French Quarter — jazz on every corner, century-old architecture, and a neighborhood that never sleeps.",
     latitude: 29.9584,
     longitude: -90.0654,
   },
@@ -48,11 +48,18 @@ const FEATURED_REPORTS = [
     city: "Los Angeles",
     state: "CA",
     teaser:
-      "Echo Park-adjacent in the heart of LA -- a neighborhood where tacos, Dodger dogs, and cultural diversity collide.",
+      "Echo Park-adjacent in the heart of LA — a neighborhood where tacos, Dodger dogs, and cultural diversity collide.",
     latitude: 34.0739,
     longitude: -118.24,
   },
 ];
+
+/** Construct a Mapbox Static Images URL for card thumbnails. */
+function getMapThumbnailUrl(lat: number, lng: number): string | undefined {
+  const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+  if (!token) return undefined;
+  return `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/${lng},${lat},13,0/400x200@2x?access_token=${token}`;
+}
 
 export default function Home() {
   return (
@@ -64,33 +71,36 @@ export default function Home() {
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(45,90,61,0.06) 0%, transparent 70%), linear-gradient(180deg, #FAF7F2 0%, #F5F0E8 100%)",
+              "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(45,90,61,0.10) 0%, transparent 70%), linear-gradient(180deg, #FAF7F2 0%, #F5F0E8 100%)",
           }}
         />
 
         <main className="relative z-10 w-full max-w-xl text-center">
-          {/* Logo/brand mark */}
-          <div className="mb-8 flex items-center justify-center gap-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-accent" />
-            <p className="text-xs font-semibold tracking-[0.25em] uppercase text-accent">
+          {/* Brand mark */}
+          <div className="mb-10 animate-fade-up">
+            <p className="logotype text-3xl text-accent">
+              Locale
+            </p>
+            <p className="mt-1.5 text-xs font-semibold tracking-[0.25em] uppercase text-ink-muted">
               Neighborhood Intelligence
             </p>
-            <div className="h-1.5 w-1.5 rounded-full bg-accent" />
           </div>
 
-          <h1 className="mb-6 leading-[1.08]">
+          <h1 className="mb-6 leading-[1.08] animate-fade-up" style={{ animationDelay: "100ms" }}>
             Know your neighborhood
             <br />
             <span className="text-accent">before you move in.</span>
           </h1>
 
-          <p className="mx-auto max-w-md text-lg leading-relaxed text-ink-muted">
+          <p className="mx-auto max-w-md text-lg leading-relaxed text-ink-muted animate-fade-up" style={{ animationDelay: "200ms" }}>
             Enter any US address and get an AI-powered, data-driven portrait of
             what it&apos;s actually like to live there.
           </p>
 
           {/* Client island: AddressInput + generation flow */}
-          <HomepageClient />
+          <div className="animate-fade-up" style={{ animationDelay: "300ms" }}>
+            <HomepageClient />
+          </div>
         </main>
       </section>
 
@@ -115,7 +125,13 @@ export default function Home() {
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURED_REPORTS.map((report) => (
-              <FeaturedCard key={report.fullAddress} report={report} />
+              <FeaturedCard
+                key={report.fullAddress}
+                report={{
+                  ...report,
+                  mapImageUrl: getMapThumbnailUrl(report.latitude, report.longitude),
+                }}
+              />
             ))}
           </div>
         </div>
@@ -124,12 +140,24 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-border-light px-4 py-10 sm:px-6">
         <div className="mx-auto max-w-(--container-content) flex flex-col items-center gap-3">
-          <p className="font-serif text-sm font-semibold tracking-tight text-ink">
+          <p className="logotype text-2xl text-accent">
             Locale
           </p>
           <p className="text-center text-xs text-ink-muted leading-relaxed">
             AI-powered neighborhood intelligence. Data from U.S. Census Bureau,
             OpenStreetMap, and Mapbox. Narratives by Claude.
+          </p>
+          <p className="text-center text-xs text-ink-muted/70">
+            Made with ❤️ by{" "}
+            <a href="https://leroi.ai" target="_blank" rel="noopener noreferrer" className="underline hover:text-ink-muted">
+              Leroi
+            </a>
+            {" · "}
+            Enjoyed this?{" "}
+            <a href="https://buymeacoffee.com/leroi.ai" target="_blank" rel="noopener noreferrer" className="underline hover:text-ink-muted">
+              Buy me a coffee
+            </a>
+            .
           </p>
         </div>
       </footer>
