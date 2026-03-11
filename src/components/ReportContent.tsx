@@ -235,7 +235,7 @@ export function ReportContent({
       <section className="pt-(--spacing-section)">
         <Container variant="prose">
           <SectionErrorBoundary sectionName="Share Controls">
-            <ShareControls address={location.address} slug={slug} />
+            <ShareControls address={location.address} slug={slug} hasArchetype={!!data.archetype} />
           </SectionErrorBoundary>
         </Container>
       </section>

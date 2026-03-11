@@ -23,6 +23,8 @@ interface ShareControlsProps {
   address: string;
   /** Report slug for building the canonical URL. */
   slug: string;
+  /** Whether the report has archetype data (enables card download). */
+  hasArchetype?: boolean;
   /** Additional CSS classes. */
   className?: string;
 }
@@ -116,6 +118,26 @@ function FacebookIcon({ className = "" }: { className?: string }) {
   );
 }
 
+function DownloadIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -123,10 +145,12 @@ function FacebookIcon({ className = "" }: { className?: string }) {
 export function ShareControls({
   address,
   slug,
+  hasArchetype = false,
   className = "",
 }: ShareControlsProps) {
   const [copied, setCopied] = useState(false);
   const [supportsNativeShare, setSupportsNativeShare] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Detect native share support after hydration to avoid SSR/client mismatch (C1).
@@ -193,6 +217,29 @@ export function ShareControls({
     window.open(facebookUrl, "_blank", "noopener,noreferrer,width=550,height=420");
   }, [getReportUrl]);
 
+  const handleDownloadCard = useCallback(async () => {
+    setDownloading(true);
+    try {
+      const response = await fetch(
+        `/api/report/${encodeURIComponent(slug)}/card?format=story`,
+      );
+      if (!response.ok) throw new Error("Download failed");
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `locale-${slug}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      // Download failed — no user-facing error needed.
+    } finally {
+      setDownloading(false);
+    }
+  }, [slug]);
+
   const buttonBase =
     "inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-ink-light transition-all duration-200 hover:border-accent/40 hover:text-accent hover:shadow-sm";
 
@@ -230,6 +277,19 @@ export function ShareControls({
             </>
           )}
         </button>
+
+        {/* Download card (only when archetype exists) */}
+        {hasArchetype && (
+          <button
+            onClick={handleDownloadCard}
+            disabled={downloading}
+            aria-label="Download story card as PNG"
+            className={buttonBase}
+          >
+            <DownloadIcon />
+            <span>{downloading ? "Downloading..." : "Download Card"}</span>
+          </button>
+        )}
 
         {/* Native share (mobile) */}
         {supportsNativeShare && (

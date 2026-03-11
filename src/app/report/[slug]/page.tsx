@@ -94,16 +94,34 @@ export async function generateMetadata({
       (row.narrative.length > 155 ? "..." : "")
     : `Neighborhood intelligence report for ${row.address}. Demographics, housing, walkability, and what it's actually like to live here.`;
 
-  // Build a Mapbox Static Images URL for the OG image.
-  // Uses the public token since OG image URLs are visible in HTML meta tags.
-  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
-  const lng = Math.round(row.longitude * 1e6) / 1e6;
-  const lat = Math.round(row.latitude * 1e6) / 1e6;
-  const validCoords = lng >= -180 && lng <= 180 && lat >= -90 && lat <= 90;
-  const ogImage =
-    mapboxToken && validCoords
-      ? `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l+2D5A3D(${lng},${lat})/${lng},${lat},13,0/1200x630@2x?access_token=${mapboxToken}`
-      : undefined;
+  // OG image: prefer archetype card route when available, fall back to
+  // Mapbox Static Images for reports without archetype data.
+  const reportData = row.data as ReportData | null;
+  const hasArchetype = reportData?.archetype != null;
+
+  const baseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "");
+
+  let ogImage: string | undefined;
+  let ogAlt: string;
+
+  if (hasArchetype && baseUrl) {
+    // Archetype card — absolute URL for external crawlers
+    ogImage = `${baseUrl}/api/report/${slug}/card?format=og`;
+    ogAlt = `${reportData!.archetype!.archetype} — neighborhood archetype for ${row.address}`;
+  } else {
+    // Fallback: Mapbox Static Images
+    const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+    const lng = Math.round(row.longitude * 1e6) / 1e6;
+    const lat = Math.round(row.latitude * 1e6) / 1e6;
+    const validCoords = lng >= -180 && lng <= 180 && lat >= -90 && lat <= 90;
+    ogImage =
+      mapboxToken && validCoords
+        ? `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l+2D5A3D(${lng},${lat})/${lng},${lat},13,0/1200x630@2x?access_token=${mapboxToken}`
+        : undefined;
+    ogAlt = `Map of ${row.address}`;
+  }
 
   return {
     title,
@@ -119,7 +137,7 @@ export async function generateMetadata({
             url: ogImage,
             width: 1200,
             height: 630,
-            alt: `Map of ${row.address}`,
+            alt: ogAlt,
           },
         ],
       }),
