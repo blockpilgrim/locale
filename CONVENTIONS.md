@@ -67,7 +67,7 @@ docs/               → Product docs, build strategy, implementation plan, revie
 
 ## API Routes (`src/app/api/`)
 
-- **Proxy pattern for secrets:** Client-facing API routes proxy requests to external APIs so that secret tokens (e.g., `MAPBOX_ACCESS_TOKEN`) never reach the browser. The client-side public token (`NEXT_PUBLIC_MAPBOX_TOKEN`) is only for Mapbox GL JS map rendering.
+- **Proxy pattern for secrets:** Client-facing API routes proxy requests to external APIs so that secret tokens (e.g., `MAPBOX_ACCESS_TOKEN`) never reach the browser. The client-side public token (`NEXT_PUBLIC_MAPBOX_TOKEN`) is used for Mapbox GL JS map rendering and Mapbox Static Images OG URLs (both are publicly visible).
 - **Input validation:** Validate query params at the route level before forwarding to the client library.
 - **Rate limit all proxy routes:** Any route that forwards requests to a paid external API must apply rate limiting via `createRateLimiter()`. Use generous limits for high-frequency routes (e.g., autocomplete: 60/hr) and stricter limits for expensive operations (e.g., report generation: 10/hr).
 - **Error wrapping:** Wrap calls to client libraries in try/catch and return a generic error response (500) — don't leak internal error details to the client.
