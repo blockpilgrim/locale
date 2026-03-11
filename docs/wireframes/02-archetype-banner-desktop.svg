@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="960" height="400">
+  <defs>
+    <style>
+      text { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; }
+      .title { font-size: 14px; font-weight: 700; fill: #1C1917; }
+      .label { font-size: 10px; fill: #78716C; }
+      .annotation { font-size: 10px; fill: #2D5A3D; font-style: italic; }
+      .dim { font-size: 9px; fill: #B8A68E; }
+      .section-label { font-size: 12px; font-weight: 600; fill: #44403C; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="400" fill="#FAFAFA"/>
+
+  <!-- Title -->
+  <text x="480" y="24" text-anchor="middle" class="title" font-size="16">ARCHETYPE BANNER — DESKTOP (1024px+)</text>
+  <line x1="80" y1="34" x2="880" y2="34" stroke="#E7E0D6"/>
+
+  <!-- ==================== BANNER CONTAINER ==================== -->
+  <!-- Subtle green background -->
+  <rect x="60" y="54" width="840" height="220" rx="6" fill="#E8F0EB" stroke="#2D5A3D" stroke-width="1" opacity="0.6"/>
+  <rect x="60" y="54" width="840" height="220" rx="6" fill="url(#greenGrad)" stroke="#2D5A3D" stroke-width="1"/>
+
+  <defs>
+    <linearGradient id="greenGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#E8F0EB" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#FAF7F2" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- LEFT COLUMN: Text content -->
+  <!-- Archetype label -->
+  <text x="92" y="100" font-family="Georgia, serif" font-size="32" font-weight="700" fill="#2D5A3D">The Brownstone Belt</text>
+  <text x="92" y="118" class="dim">↑ Playfair Display Bold, 32px, accent green (#2D5A3D)</text>
+
+  <!-- Tagline -->
+  <text x="92" y="148" font-size="15" fill="#44403C" font-style="italic">Where stoops are social infrastructure and the bodega knows your order.</text>
+  <text x="92" y="164" class="dim">↑ Inter Italic, 15px, ink-light (#44403C)</text>
+
+  <!-- Defining traits -->
+  <g transform="translate(92, 192)">
+    <rect x="0" y="0" width="120" height="24" rx="12" fill="#FAF7F2" stroke="#CFC2B0" stroke-width="1"/>
+    <text x="60" y="16" text-anchor="middle" font-size="11" fill="#5F5344">$2,800 rent</text>
+
+    <text x="132" y="16" font-size="14" fill="#CFC2B0">·</text>
+
+    <rect x="144" y="0" width="160" height="24" rx="12" fill="#FAF7F2" stroke="#CFC2B0" stroke-width="1"/>
+    <text x="224" y="16" text-anchor="middle" font-size="11" fill="#5F5344">83% walk or transit</text>
+
+    <text x="316" y="16" font-size="14" fill="#CFC2B0">·</text>
+
+    <rect x="328" y="0" width="140" height="24" rx="12" fill="#FAF7F2" stroke="#CFC2B0" stroke-width="1"/>
+    <text x="398" y="16" text-anchor="middle" font-size="11" fill="#5F5344">47 restaurants</text>
+  </g>
+  <text x="92" y="232" class="dim">↑ Defining traits as pills, Inter 11px, warm-700</text>
+
+  <!-- RIGHT COLUMN: Pentagon -->
+  <g transform="translate(740, 145)">
+    <!-- Background pentagon (max) -->
+    <polygon points="0,-65 62,-20 38,53 -38,53 -62,-20" fill="none" stroke="#CFC2B0" stroke-width="1"/>
+    <!-- Mid-ring -->
+    <polygon points="0,-32 31,-10 19,26 -19,26 -31,-10" fill="none" stroke="#E7E0D6" stroke-width="0.5"/>
+    <!-- Data pentagon -->
+    <polygon points="0,-55 53,-17 28,42 -28,42 -50,-16" fill="#2D5A3D" fill-opacity="0.12" stroke="#2D5A3D" stroke-width="2"/>
+    <!-- Data dots -->
+    <circle cx="0" cy="-55" r="3" fill="#2D5A3D"/>
+    <circle cx="53" cy="-17" r="3" fill="#2D5A3D"/>
+    <circle cx="28" cy="42" r="3" fill="#2D5A3D"/>
+    <circle cx="-28" cy="42" r="3" fill="#2D5A3D"/>
+    <circle cx="-50" cy="-16" r="3" fill="#2D5A3D"/>
+    <!-- Axis labels with scores -->
+    <text x="0" y="-72" text-anchor="middle" font-size="10" fill="#44403C" font-weight="600">Walkable</text>
+    <text x="0" y="-82" text-anchor="middle" font-size="9" fill="#78716C">85</text>
+    <text x="74" y="-16" text-anchor="start" font-size="10" fill="#44403C" font-weight="600">Buzzing</text>
+    <text x="74" y="-6" text-anchor="start" font-size="9" fill="#78716C">62</text>
+    <text x="48" y="66" text-anchor="start" font-size="10" fill="#44403C" font-weight="600">Settled</text>
+    <text x="48" y="76" text-anchor="start" font-size="9" fill="#78716C">78</text>
+    <text x="-48" y="66" text-anchor="end" font-size="10" fill="#44403C" font-weight="600">Accessible</text>
+    <text x="-48" y="76" text-anchor="end" font-size="9" fill="#78716C">35</text>
+    <text x="-74" y="-16" text-anchor="end" font-size="10" fill="#44403C" font-weight="600">Diverse</text>
+    <text x="-74" y="-6" text-anchor="end" font-size="9" fill="#78716C">71</text>
+  </g>
+
+  <!-- Dimension annotations -->
+  <text x="480" y="288" text-anchor="middle" class="dim">Container: full-width, px-4 sm:px-6 (inherits from Container component)</text>
+  <line x1="60" y1="278" x2="60" y2="274" stroke="#B8A68E" stroke-width="0.5"/>
+  <line x1="900" y1="278" x2="900" y2="274" stroke="#B8A68E" stroke-width="0.5"/>
+  <line x1="60" y1="278" x2="900" y2="278" stroke="#B8A68E" stroke-width="0.5" stroke-dasharray="3,2"/>
+
+  <!-- Layout specification -->
+  <rect x="60" y="300" width="840" height="90" rx="4" fill="#FAF7F2" stroke="#E7E0D6"/>
+  <text x="80" y="320" class="section-label">LAYOUT SPEC</text>
+  <text x="80" y="338" class="label">Desktop (1024px+): Two-column — text left (60%), pentagon right (40%), vertically centered</text>
+  <text x="80" y="354" class="label">Tablet (640-1023px): Text above, pentagon below, both centered</text>
+  <text x="80" y="370" class="label">Mobile (&lt;640px): Text stacked, pentagon centered below, scores listed as text fallback</text>
+  <text x="80" y="386" class="label">Animation: fadeUp variant from src/lib/motion.ts, stagger children 0.1s</text>
+</svg>

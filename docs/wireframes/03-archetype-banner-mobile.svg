@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 600" width="430" height="600">
+  <defs>
+    <style>
+      text { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; }
+      .title { font-size: 13px; font-weight: 700; fill: #1C1917; }
+      .label { font-size: 9px; fill: #78716C; }
+      .annotation { font-size: 9px; fill: #2D5A3D; font-style: italic; }
+      .dim { font-size: 8px; fill: #B8A68E; }
+    </style>
+  </defs>
+
+  <rect width="430" height="600" fill="#FAFAFA"/>
+
+  <!-- Title -->
+  <text x="215" y="22" text-anchor="middle" class="title">ARCHETYPE BANNER — MOBILE (375px)</text>
+  <line x1="30" y1="32" x2="400" y2="32" stroke="#E7E0D6"/>
+
+  <!-- Phone frame -->
+  <rect x="28" y="46" width="375" height="510" rx="20" fill="none" stroke="#CFC2B0" stroke-width="2"/>
+  <rect x="28" y="46" width="375" height="510" rx="20" fill="#FAF7F2" opacity="0.5"/>
+
+  <!-- Status bar hint -->
+  <rect x="160" y="50" width="80" height="4" rx="2" fill="#CFC2B0"/>
+
+  <!-- Banner container -->
+  <rect x="44" y="70" width="343" height="470" rx="6" fill="#E8F0EB" stroke="#2D5A3D" stroke-width="1" opacity="0.5"/>
+
+  <!-- Content padding area -->
+  <!-- Archetype label -->
+  <text x="60" y="108" font-family="Georgia, serif" font-size="24" font-weight="700" fill="#2D5A3D">The Brownstone</text>
+  <text x="60" y="136" font-family="Georgia, serif" font-size="24" font-weight="700" fill="#2D5A3D">Belt</text>
+  <text x="60" y="150" class="dim">↑ Playfair 24px (scaled down from 32px desktop)</text>
+
+  <!-- Tagline -->
+  <text x="60" y="172" font-size="13" fill="#44403C" font-style="italic">Where stoops are social</text>
+  <text x="60" y="188" font-size="13" fill="#44403C" font-style="italic">infrastructure and the bodega</text>
+  <text x="60" y="204" font-size="13" fill="#44403C" font-style="italic">knows your order.</text>
+
+  <!-- Defining traits (stacked on mobile) -->
+  <g transform="translate(60, 224)">
+    <rect x="0" y="0" width="110" height="22" rx="11" fill="#FAF7F2" stroke="#CFC2B0" stroke-width="1"/>
+    <text x="55" y="15" text-anchor="middle" font-size="10" fill="#5F5344">$2,800 rent</text>
+
+    <rect x="118" y="0" width="140" height="22" rx="11" fill="#FAF7F2" stroke="#CFC2B0" stroke-width="1"/>
+    <text x="188" y="15" text-anchor="middle" font-size="10" fill="#5F5344">83% walk or transit</text>
+
+    <rect x="0" y="28" width="120" height="22" rx="11" fill="#FAF7F2" stroke="#CFC2B0" stroke-width="1"/>
+    <text x="60" y="43" text-anchor="middle" font-size="10" fill="#5F5344">47 restaurants</text>
+  </g>
+  <text x="60" y="290" class="dim">↑ Pills wrap to second row on narrow screens</text>
+
+  <!-- Pentagon (centered below on mobile) -->
+  <g transform="translate(215, 380)">
+    <!-- Background pentagon -->
+    <polygon points="0,-55 52,-17 32,45 -32,45 -52,-17" fill="none" stroke="#CFC2B0" stroke-width="1"/>
+    <!-- Data pentagon -->
+    <polygon points="0,-47 44,-14 24,36 -24,36 -42,-14" fill="#2D5A3D" fill-opacity="0.12" stroke="#2D5A3D" stroke-width="2"/>
+    <!-- Dots -->
+    <circle cx="0" cy="-47" r="3" fill="#2D5A3D"/>
+    <circle cx="44" cy="-14" r="3" fill="#2D5A3D"/>
+    <circle cx="24" cy="36" r="3" fill="#2D5A3D"/>
+    <circle cx="-24" cy="36" r="3" fill="#2D5A3D"/>
+    <circle cx="-42" cy="-14" r="3" fill="#2D5A3D"/>
+    <!-- Labels -->
+    <text x="0" y="-62" text-anchor="middle" font-size="9" fill="#44403C" font-weight="600">Walkable 85</text>
+    <text x="62" y="-10" text-anchor="start" font-size="9" fill="#44403C" font-weight="600">Buzzing 62</text>
+    <text x="40" y="56" text-anchor="start" font-size="9" fill="#44403C" font-weight="600">Settled 78</text>
+    <text x="-40" y="56" text-anchor="end" font-size="9" fill="#44403C" font-weight="600">Accessible 35</text>
+    <text x="-62" y="-10" text-anchor="end" font-size="9" fill="#44403C" font-weight="600">Diverse 71</text>
+  </g>
+
+  <!-- Annotations -->
+  <text x="215" y="462" text-anchor="middle" class="annotation">Pentagon centered, smaller radius</text>
+  <text x="215" y="474" text-anchor="middle" class="annotation">Scores inline with axis labels</text>
+
+  <!-- Spec box -->
+  <rect x="28" y="560" width="375" height="30" rx="4" fill="#FAF7F2" stroke="#E7E0D6"/>
+  <text x="44" y="578" class="label">Breakpoint: &lt;640px — single column, center-aligned pentagon, stacked traits</text>
+</svg>

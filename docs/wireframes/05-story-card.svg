@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 1120" width="540" height="1120">
+  <defs>
+    <style>
+      text { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; }
+      .title { font-size: 14px; font-weight: 700; fill: #1C1917; }
+      .label { font-size: 10px; fill: #78716C; }
+      .annotation { font-size: 10px; fill: #2D5A3D; font-style: italic; }
+      .dim { font-size: 9px; fill: #B8A68E; }
+    </style>
+  </defs>
+
+  <rect width="540" height="1120" fill="#FAFAFA"/>
+
+  <!-- Title -->
+  <text x="270" y="24" text-anchor="middle" class="title">STORY CARD — 1080 x 1920px (scaled 50%)</text>
+  <text x="270" y="40" text-anchor="middle" class="dim">Instagram Stories / TikTok / Vertical screenshot sharing</text>
+  <line x1="40" y1="50" x2="500" y2="50" stroke="#E7E0D6"/>
+
+  <!-- ==================== THE CARD (scaled 50%) ==================== -->
+  <rect x="40" y="64" width="460" height="816" rx="6" fill="#FAF7F2" stroke="#CFC2B0" stroke-width="2"/>
+
+  <!-- Branding top-left -->
+  <text x="68" y="100" font-size="16" fill="#2D5A3D" font-weight="700">◈</text>
+  <text x="88" y="100" font-size="11" fill="#78716C" letter-spacing="3" font-weight="600">LOCALE</text>
+
+  <!-- Address -->
+  <text x="68" y="132" font-size="17" fill="#1C1917" font-weight="600">350 5th Ave</text>
+  <text x="68" y="152" font-size="14" fill="#78716C">New York, NY 10118</text>
+
+  <!-- ==================== PENTAGON (centered) ==================== -->
+  <g transform="translate(270, 260)">
+    <!-- Background pentagon -->
+    <polygon points="0,-80 76,-25 47,65 -47,65 -76,-25" fill="none" stroke="#E7E0D6" stroke-width="1"/>
+    <!-- Mid ring -->
+    <polygon points="0,-40 38,-12 24,32 -24,32 -38,-12" fill="none" stroke="#F0EBE3" stroke-width="0.5"/>
+    <!-- Data pentagon -->
+    <polygon points="0,-68 65,-21 35,52 -35,52 -61,-20" fill="#2D5A3D" fill-opacity="0.15" stroke="#2D5A3D" stroke-width="2"/>
+    <!-- Dots -->
+    <circle cx="0" cy="-68" r="3.5" fill="#2D5A3D"/>
+    <circle cx="65" cy="-21" r="3.5" fill="#2D5A3D"/>
+    <circle cx="35" cy="52" r="3.5" fill="#2D5A3D"/>
+    <circle cx="-35" cy="52" r="3.5" fill="#2D5A3D"/>
+    <circle cx="-61" cy="-20" r="3.5" fill="#2D5A3D"/>
+    <!-- Labels -->
+    <text x="0" y="-90" text-anchor="middle" font-size="10" fill="#44403C" font-weight="600">Walkable</text>
+    <text x="90" y="-18" text-anchor="start" font-size="10" fill="#44403C" font-weight="600">Buzzing</text>
+    <text x="58" y="76" text-anchor="start" font-size="10" fill="#44403C" font-weight="600">Settled</text>
+    <text x="-58" y="76" text-anchor="end" font-size="10" fill="#44403C" font-weight="600">Accessible</text>
+    <text x="-90" y="-18" text-anchor="end" font-size="10" fill="#44403C" font-weight="600">Diverse</text>
+  </g>
+
+  <!-- ==================== SCORE ROWS ==================== -->
+  <g transform="translate(68, 370)">
+    <!-- Row: Walkable -->
+    <text x="0" y="14" font-size="12" fill="#5F5344">Walkable</text>
+    <!-- Dot leaders -->
+    <text x="70" y="14" font-size="10" fill="#CFC2B0">· · · · · · · · · · · · · · · · · · ·</text>
+    <text x="340" y="14" text-anchor="end" font-size="14" fill="#2D5A3D" font-weight="600">97</text>
+
+    <!-- Row: Buzzing -->
+    <text x="0" y="38" font-size="12" fill="#5F5344">Buzzing</text>
+    <text x="70" y="38" font-size="10" fill="#CFC2B0">· · · · · · · · · · · · · · · · · · ·</text>
+    <text x="340" y="38" text-anchor="end" font-size="14" fill="#2D5A3D" font-weight="600">94</text>
+
+    <!-- Row: Settled -->
+    <text x="0" y="62" font-size="12" fill="#5F5344">Settled</text>
+    <text x="70" y="62" font-size="10" fill="#CFC2B0">· · · · · · · · · · · · · · · · · · ·</text>
+    <text x="340" y="62" text-anchor="end" font-size="14" fill="#2D5A3D" font-weight="600">78</text>
+
+    <!-- Row: Accessible -->
+    <text x="0" y="86" font-size="12" fill="#5F5344">Accessible</text>
+    <text x="70" y="86" font-size="10" fill="#CFC2B0">· · · · · · · · · · · · · · · · · · ·</text>
+    <text x="340" y="86" text-anchor="end" font-size="14" fill="#2D5A3D" font-weight="600">8</text>
+
+    <!-- Row: Diverse -->
+    <text x="0" y="110" font-size="12" fill="#5F5344">Diverse</text>
+    <text x="70" y="110" font-size="10" fill="#CFC2B0">· · · · · · · · · · · · · · · · · · ·</text>
+    <text x="340" y="110" text-anchor="end" font-size="14" fill="#2D5A3D" font-weight="600">61</text>
+  </g>
+
+  <!-- ==================== ARCHETYPE BLOCK ==================== -->
+  <text x="68" y="530" font-family="Georgia, serif" font-size="28" font-weight="700" fill="#2D5A3D">THE URBAN</text>
+  <text x="68" y="562" font-family="Georgia, serif" font-size="28" font-weight="700" fill="#2D5A3D">ENGINE</text>
+
+  <!-- Tagline -->
+  <text x="68" y="592" font-size="13" fill="#44403C" font-style="italic">Sky-high density, world-class</text>
+  <text x="68" y="610" font-size="13" fill="#44403C" font-style="italic">transit, and the Empire State</text>
+  <text x="68" y="628" font-size="13" fill="#44403C" font-style="italic">Building as your neighbor.</text>
+
+  <!-- Divider -->
+  <line x1="68" y1="648" x2="430" y2="648" stroke="#E7E0D6"/>
+
+  <!-- Defining traits (stacked) -->
+  <text x="68" y="672" font-size="13" fill="#5F5344">$3,200 rent</text>
+  <text x="68" y="692" font-size="13" fill="#5F5344">92% transit commute</text>
+  <text x="68" y="712" font-size="13" fill="#5F5344">47 restaurants</text>
+
+  <!-- Divider -->
+  <line x1="68" y1="730" x2="430" y2="730" stroke="#E7E0D6"/>
+
+  <!-- CTA -->
+  <text x="68" y="768" font-size="16" fill="#1C1917" font-weight="600">What's your</text>
+  <text x="68" y="790" font-size="16" fill="#1C1917" font-weight="600">neighborhood?</text>
+  <text x="68" y="816" font-size="13" fill="#9C8B72">locale.leroi.ai</text>
+
+  <!-- ==================== ANNOTATIONS ==================== -->
+  <!-- Right-side annotations -->
+  <line x1="505" y1="260" x2="515" y2="260" stroke="#2D5A3D" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="518" y="256" class="annotation">Hero visual:</text>
+  <text x="518" y="268" class="annotation">pentagon chart</text>
+
+  <line x1="505" y1="410" x2="515" y2="410" stroke="#2D5A3D" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="518" y="406" class="annotation">Explicit scores</text>
+  <text x="518" y="418" class="annotation">with dot leaders</text>
+
+  <line x1="505" y1="550" x2="515" y2="550" stroke="#2D5A3D" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="518" y="546" class="annotation">Large serif label</text>
+  <text x="518" y="558" class="annotation">for impact</text>
+
+  <line x1="505" y1="780" x2="515" y2="780" stroke="#2D5A3D" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="518" y="776" class="annotation">Every share is</text>
+  <text x="518" y="788" class="annotation">an invitation</text>
+
+  <!-- Spec box -->
+  <rect x="40" y="900" width="460" height="80" rx="4" fill="#FAF7F2" stroke="#E7E0D6"/>
+  <text x="56" y="920" font-size="12" font-weight="600" fill="#44403C">DESIGN SPEC</text>
+  <text x="56" y="938" class="label">Dimensions: 1080 x 1920px (shown at 50% scale). Aspect ratio: 9:16</text>
+  <text x="56" y="954" class="label">Designed for screenshotting, not linking — generous whitespace, large type</text>
+  <text x="56" y="970" class="label">Downloaded via "Download Card" button as locale-{slug}.png</text>
+
+  <!-- Dimension annotation -->
+  <text x="270" y="1000" text-anchor="middle" class="dim">File: locale-350-5th-ave-new-york-ny.png</text>
+</svg>

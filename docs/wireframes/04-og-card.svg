@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 830" width="1200" height="830">
+  <defs>
+    <style>
+      text { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; }
+      .title { font-size: 18px; font-weight: 700; fill: #1C1917; }
+      .label { font-size: 12px; fill: #78716C; }
+      .annotation { font-size: 11px; fill: #2D5A3D; font-style: italic; }
+      .dim { font-size: 10px; fill: #B8A68E; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="830" fill="#FAFAFA"/>
+
+  <!-- Title -->
+  <text x="600" y="30" text-anchor="middle" class="title">OG CARD — 1200 x 630px (Open Graph / Twitter / Slack / iMessage)</text>
+  <line x1="50" y1="44" x2="1150" y2="44" stroke="#E7E0D6"/>
+
+  <!-- ==================== THE CARD ==================== -->
+  <rect x="50" y="64" width="1100" height="577" rx="4" fill="#FAF7F2" stroke="#CFC2B0" stroke-width="2"/>
+
+  <!-- Top left: Branding -->
+  <text x="90" y="106" font-size="11" fill="#78716C" letter-spacing="3" font-weight="600">LOCALE</text>
+  <text x="160" y="106" font-size="11" fill="#CFC2B0">·</text>
+  <text x="172" y="106" font-size="11" fill="#9C8B72" letter-spacing="1">NEIGHBORHOOD INTELLIGENCE</text>
+
+  <!-- Address -->
+  <text x="90" y="140" font-size="20" fill="#1C1917" font-weight="600">350 5th Ave</text>
+  <text x="90" y="164" font-size="16" fill="#78716C">New York, NY 10118</text>
+
+  <!-- LEFT: Pentagon -->
+  <g transform="translate(250, 370)">
+    <!-- Background pentagon -->
+    <polygon points="0,-100 95,-31 59,81 -59,81 -95,-31" fill="none" stroke="#E7E0D6" stroke-width="1.5"/>
+    <!-- Mid ring -->
+    <polygon points="0,-50 48,-15 29,40 -29,40 -48,-15" fill="none" stroke="#F0EBE3" stroke-width="0.5"/>
+    <!-- Data pentagon -->
+    <polygon points="0,-85 81,-26 43,65 -43,65 -76,-25" fill="#2D5A3D" fill-opacity="0.15" stroke="#2D5A3D" stroke-width="2.5"/>
+    <!-- Dots at vertices -->
+    <circle cx="0" cy="-85" r="4" fill="#2D5A3D"/>
+    <circle cx="81" cy="-26" r="4" fill="#2D5A3D"/>
+    <circle cx="43" cy="65" r="4" fill="#2D5A3D"/>
+    <circle cx="-43" cy="65" r="4" fill="#2D5A3D"/>
+    <circle cx="-76" cy="-25" r="4" fill="#2D5A3D"/>
+    <!-- Labels -->
+    <text x="0" y="-112" text-anchor="middle" font-size="13" fill="#44403C" font-weight="600">Walkable</text>
+    <text x="108" y="-26" text-anchor="start" font-size="13" fill="#44403C" font-weight="600">Buzzing</text>
+    <text x="70" y="94" text-anchor="start" font-size="13" fill="#44403C" font-weight="600">Settled</text>
+    <text x="-70" y="94" text-anchor="end" font-size="13" fill="#44403C" font-weight="600">Accessible</text>
+    <text x="-108" y="-26" text-anchor="end" font-size="13" fill="#44403C" font-weight="600">Diverse</text>
+  </g>
+
+  <!-- RIGHT: Archetype info -->
+  <text x="520" y="290" font-family="Georgia, serif" font-size="36" font-weight="700" fill="#2D5A3D">THE URBAN ENGINE</text>
+  <text x="520" y="290" class="dim" dy="-50">↑ Playfair Display Bold, 36px</text>
+
+  <!-- Tagline -->
+  <text x="520" y="326" font-size="16" fill="#44403C" font-style="italic">Sky-high density, world-class transit,</text>
+  <text x="520" y="348" font-size="16" fill="#44403C" font-style="italic">and the Empire State Building as</text>
+  <text x="520" y="370" font-size="16" fill="#44403C" font-style="italic">your neighbor.</text>
+
+  <!-- Divider -->
+  <line x1="520" y1="394" x2="920" y2="394" stroke="#E7E0D6" stroke-width="1"/>
+
+  <!-- Defining traits -->
+  <text x="520" y="424" font-size="15" fill="#5F5344">$3,200 rent</text>
+  <text x="635" y="424" font-size="15" fill="#CFC2B0">·</text>
+  <text x="650" y="424" font-size="15" fill="#5F5344">92% transit</text>
+  <text x="765" y="424" font-size="15" fill="#CFC2B0">·</text>
+  <text x="780" y="424" font-size="15" fill="#5F5344">47 restaurants</text>
+
+  <!-- Bottom right branding -->
+  <text x="1070" y="606" text-anchor="end" font-size="13" fill="#9C8B72">locale.leroi.ai</text>
+  <text x="1100" y="606" font-size="16" fill="#2D5A3D">◈</text>
+
+  <!-- ==================== ANNOTATIONS ==================== -->
+  <!-- Size label -->
+  <text x="600" y="660" text-anchor="middle" class="dim">1200 x 630px — standard Open Graph image dimensions</text>
+
+  <!-- Top dimension line -->
+  <line x1="50" y1="660" x2="50" y2="670" stroke="#B8A68E" stroke-width="0.5"/>
+  <line x1="1150" y1="660" x2="1150" y2="670" stroke="#B8A68E" stroke-width="0.5"/>
+  <line x1="50" y1="668" x2="1150" y2="668" stroke="#B8A68E" stroke-width="0.5" stroke-dasharray="3,2"/>
+
+  <!-- Spec box -->
+  <rect x="50" y="690" width="1100" height="120" rx="4" fill="#FAF7F2" stroke="#E7E0D6"/>
+  <text x="70" y="714" font-size="13" font-weight="600" fill="#44403C">DESIGN SPEC</text>
+  <text x="70" y="734" class="label">Background: cream (#FAF7F2) — matches editorial identity</text>
+  <text x="70" y="750" class="label">Pentagon: accent green (#2D5A3D) stroke, 15% opacity fill</text>
+  <text x="70" y="766" class="label">Typography: Playfair Display Bold (archetype), Inter Regular/Medium (everything else)</text>
+  <text x="70" y="782" class="label">Layout: Pentagon left (~40%), text content right (~60%). Generous padding (48px+)</text>
+  <text x="70" y="798" class="label">Cache: public, s-maxage=31536000, immutable (cards are deterministic per report)</text>
+</svg>

@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" width="960" height="480">
+  <defs>
+    <style>
+      text { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; }
+      .title { font-size: 14px; font-weight: 700; fill: #1C1917; }
+      .label { font-size: 10px; fill: #78716C; }
+      .annotation { font-size: 10px; fill: #2D5A3D; font-style: italic; }
+      .dim { font-size: 9px; fill: #B8A68E; }
+    </style>
+  </defs>
+
+  <rect width="960" height="480" fill="#FAFAFA"/>
+
+  <!-- Title -->
+  <text x="480" y="24" text-anchor="middle" class="title" font-size="16">SHARE SECTION — UPGRADED WITH CARD PREVIEW</text>
+  <line x1="60" y1="34" x2="900" y2="34" stroke="#E7E0D6"/>
+
+  <!-- ==================== DESKTOP LAYOUT ==================== -->
+  <text x="80" y="60" font-size="12" font-weight="600" fill="#44403C">DESKTOP (1024px+)</text>
+
+  <rect x="60" y="72" width="420" height="210" rx="6" fill="#E8F0EB" stroke="#2D5A3D" stroke-width="1" opacity="0.5"/>
+
+  <!-- Card preview (miniature OG card) -->
+  <rect x="80" y="88" width="190" height="100" rx="3" fill="#FAF7F2" stroke="#CFC2B0" stroke-width="1"/>
+  <!-- Mini pentagon inside -->
+  <g transform="translate(130, 138)">
+    <polygon points="0,-20 19,-6 12,16 -12,16 -19,-6" fill="#2D5A3D" fill-opacity="0.12" stroke="#2D5A3D" stroke-width="1"/>
+  </g>
+  <text x="175" y="120" text-anchor="middle" font-size="8" fill="#78716C">The Urban Engine</text>
+  <rect x="155" y="170" width="60" height="6" rx="1" fill="#CFC2B0"/>
+  <text x="175" y="200" text-anchor="middle" class="dim">OG Card Preview</text>
+
+  <!-- Buttons (right side) -->
+  <g transform="translate(296, 88)">
+    <!-- Copy Link -->
+    <rect x="0" y="0" width="160" height="38" rx="6" fill="#FFFFFF" stroke="#2D5A3D" stroke-width="1.5"/>
+    <text x="80" y="24" text-anchor="middle" font-size="12" fill="#2D5A3D" font-weight="600">Copy Link</text>
+
+    <!-- Download Card (NEW, primary CTA) -->
+    <rect x="0" y="48" width="160" height="38" rx="6" fill="#2D5A3D"/>
+    <text x="80" y="72" text-anchor="middle" font-size="12" fill="white" font-weight="600">Download Card ↓</text>
+    <!-- NEW indicator -->
+    <rect x="164" y="52" width="30" height="14" rx="3" fill="#2D5A3D"/>
+    <text x="179" y="62" text-anchor="middle" font-size="8" fill="white" font-weight="700">NEW</text>
+
+    <!-- Social share row -->
+    <rect x="0" y="96" width="76" height="34" rx="6" fill="#FFFFFF" stroke="#E7E0D6" stroke-width="1"/>
+    <text x="38" y="117" text-anchor="middle" font-size="10" fill="#5F5344">Twitter</text>
+    <rect x="84" y="96" width="76" height="34" rx="6" fill="#FFFFFF" stroke="#E7E0D6" stroke-width="1"/>
+    <text x="122" y="117" text-anchor="middle" font-size="10" fill="#5F5344">Facebook</text>
+
+    <!-- CTA text -->
+    <text x="0" y="156" font-size="12" fill="#78716C" font-style="italic">What's your neighborhood?</text>
+    <text x="0" y="172" font-size="11" fill="#9C8B72">locale.leroi.ai</text>
+  </g>
+
+  <!-- Annotation: Download flow -->
+  <line x1="462" y1="140" x2="480" y2="140" stroke="#2D5A3D" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="484" y="132" class="annotation">Downloads Story Card format</text>
+  <text x="484" y="144" class="annotation">(1080x1920) as PNG blob</text>
+
+  <!-- ==================== MOBILE LAYOUT ==================== -->
+  <text x="560" y="60" font-size="12" font-weight="600" fill="#44403C">MOBILE (&lt;640px)</text>
+
+  <rect x="540" y="72" width="375" height="260" rx="6" fill="#E8F0EB" stroke="#2D5A3D" stroke-width="1" opacity="0.5"/>
+
+  <!-- Card preview (full width) -->
+  <rect x="556" y="88" width="343" height="60" rx="3" fill="#FAF7F2" stroke="#CFC2B0" stroke-width="1"/>
+  <g transform="translate(590, 118)">
+    <polygon points="0,-14 13,-4 8,11 -8,11 -13,-4" fill="#2D5A3D" fill-opacity="0.12" stroke="#2D5A3D" stroke-width="1"/>
+  </g>
+  <text x="660" y="118" font-size="9" fill="#78716C">The Urban Engine</text>
+  <rect x="640" y="128" width="80" height="5" rx="1" fill="#CFC2B0"/>
+
+  <!-- Buttons (stacked, full width) -->
+  <rect x="556" y="160" width="343" height="36" rx="6" fill="#FFFFFF" stroke="#2D5A3D" stroke-width="1.5"/>
+  <text x="728" y="182" text-anchor="middle" font-size="11" fill="#2D5A3D" font-weight="600">Copy Link</text>
+
+  <rect x="556" y="204" width="343" height="36" rx="6" fill="#2D5A3D"/>
+  <text x="728" y="226" text-anchor="middle" font-size="11" fill="white" font-weight="600">Download Card ↓</text>
+
+  <!-- Social row -->
+  <rect x="556" y="248" width="168" height="32" rx="6" fill="#FFFFFF" stroke="#E7E0D6" stroke-width="1"/>
+  <text x="640" y="268" text-anchor="middle" font-size="10" fill="#5F5344">Twitter</text>
+  <rect x="731" y="248" width="168" height="32" rx="6" fill="#FFFFFF" stroke="#E7E0D6" stroke-width="1"/>
+  <text x="815" y="268" text-anchor="middle" font-size="10" fill="#5F5344">Facebook</text>
+
+  <!-- CTA -->
+  <text x="728" y="302" text-anchor="middle" font-size="11" fill="#78716C" font-style="italic">What's your neighborhood?</text>
+  <text x="728" y="318" text-anchor="middle" font-size="10" fill="#9C8B72">locale.leroi.ai</text>
+
+  <!-- ==================== INTERACTION SPEC ==================== -->
+  <rect x="60" y="350" width="860" height="120" rx="4" fill="#FAF7F2" stroke="#E7E0D6"/>
+  <text x="80" y="374" font-size="13" font-weight="600" fill="#44403C">INTERACTION SPEC</text>
+
+  <text x="80" y="396" class="label">Copy Link: Copies report URL to clipboard, shows "Copied!" toast for 2s (existing behavior)</text>
+  <text x="80" y="414" class="label">Download Card: fetch('/api/report/[slug]/card?format=story') as blob → createObjectURL → trigger download as locale-{slug}.png</text>
+  <text x="80" y="432" class="label">Twitter: Opens twitter intent with report URL — shared link now renders OG card automatically (no code change needed)</text>
+  <text x="80" y="450" class="label">Facebook: Opens facebook share dialog — shared link now renders OG card automatically</text>
+  <text x="80" y="468" class="label">Card preview: Non-interactive — purely visual preview of what the shared link will look like</text>
+</svg>
