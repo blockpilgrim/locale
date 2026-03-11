@@ -1,3 +1,82 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What This Is
+
+Locale: AI-powered neighborhood intelligence reports for any US address. Enter an address, get an editorial-quality report with interactive map, Census demographics, POI data, and a Claude-generated narrative ("The Vibe Check"). Reports are persisted at shareable URLs with OG previews.
+
+## Commands
+
+```bash
+npm run dev          # Start Next.js dev server
+npm run build        # Production build
+npm run lint         # ESLint (flat config, ESLint 9+)
+npm run test         # Vitest — all tests, single run
+npm run test:watch   # Vitest — watch mode
+npm run test:eval    # Generate narratives for 20 golden addresses (add --live for real AI calls)
+npm run db:generate  # Generate Drizzle migrations
+npm run db:migrate   # Apply migrations
+npm run db:push      # Push schema directly (rapid local iteration)
+npm run db:studio    # Drizzle Studio (DB browser)
+```
+
+Run a single test file: `npx vitest run src/lib/__tests__/integration.test.ts`
+
+## Environment Variables
+
+Copy `.env.example` → `.env.local`. Required: `DATABASE_URL`, `MAPBOX_ACCESS_TOKEN`, `NEXT_PUBLIC_MAPBOX_TOKEN`, `CENSUS_API_KEY`, `ANTHROPIC_API_KEY`.
+
+## Architecture
+
+**Stack:** Next.js 16 (App Router), Tailwind v4, Drizzle ORM, Neon Postgres (HTTP driver), Mapbox GL JS, Claude Sonnet via Vercel AI SDK (`ai` + `@ai-sdk/anthropic`), Framer Motion.
+
+**Request flow:**
+1. User enters address → `HomepageClient` POSTs to `/api/report/generate`
+2. Route checks DB for existing report (case-insensitive address match). Cache hit → returns slug
+3. Cache miss → orchestrator (`lib/report/generate.ts`) fires Census + isochrone + POI via `Promise.all` (each `.catch()` returns null)
+4. Writes location + report rows (status: `generating`), returns slug
+5. Client redirects to `/report/[slug]` → page renders with loading state
+6. `NarrativeTrigger` client component POSTs to `/api/report/[slug]/narrative` → generates AI narrative, updates report to `complete`
+7. `AutoRefresh` polls via `router.refresh()` until report is complete
+
+**SSR/client split:** Pages are server components. Interactive parts (`HomepageClient`, `ReportContent`, `Map`, `ShareControls`) are `"use client"` islands. Report page queries DB directly (not through API route) for SSR + `generateMetadata`.
+
+**Data flow:** External APIs → typed clients in `src/lib/` → orchestrator assembles → JSONB snapshot stored in `reports.data` → data sections render from snapshot (report always shows data as-of generation time).
+
+**Key architectural decisions** are documented in `docs/DECISIONS.md` (D1–D7). Notable: Neon HTTP driver over `@vercel/postgres`, Overpass API for POIs (free), insert-then-retry for slug uniqueness, custom walkability heuristic.
+
+## Critical Patterns
+
+- **Tailwind v4:** Design tokens live in `@theme` block in `globals.css`, NOT in a `tailwind.config.ts`
+- **DB access:** Always use `getDb()` (lazy init), never a bare `db` export — prevents build-time crashes
+- **API clients return null on failure**, never throw (except missing env vars). Orchestrator uses `Promise.all` with `.catch()` wrappers
+- **Framer Motion animations:** Import `fadeUp` from `@/lib/motion` — don't redefine per-component
+- **Formatters:** Import from `@/lib/format` — don't duplicate
+- **Map is lazy-loaded** via `next/dynamic` with `ssr: false` in `ReportContent`
+- **Error boundaries:** `SectionErrorBoundary` (class component) wraps each section independently — one failure doesn't crash the page
+- **Container owns padding** (`px-4 sm:px-6`) — don't add extra `px-*` wrappers
+- **Mapbox hex colors** must comment which design token they mirror (can't use CSS vars in GL JS paint props)
+- **Escape OSM data** before `.setHTML()` in Map popups (XSS prevention)
+- **JSONB columns:** Null-guard before `as` cast to typed interface
+- **`force-dynamic`** on report page (status transitions between requests)
+- **Anti-pattern:** Never use fire-and-forget promises or `after()` for critical work in route handlers — use client-triggered endpoints instead
+
+## Testing
+
+- Vitest with node environment (no DOM/component tests yet)
+- Tests in `src/lib/__tests__/` — mock `fetch` via `vi.spyOn(globalThis, "fetch")`, env vars via `vi.stubEnv()`
+- Integration tests cover orchestrator, prompt construction, slug generation, partial failures
+- Golden dataset: 20 diverse US addresses in `tests/golden-addresses.ts`
+
+## Key Documentation
+
+- `docs/PRODUCT.md` — Product vision, personas, features, user flows
+- `docs/BUILD-STRATEGY.md` — Tech stack rationale, architecture, testing philosophy
+- `docs/IMPLEMENTATION-PLAN.md` — Phase breakdown (all 8 phases complete)
+- `docs/DECISIONS.md` — Architectural decisions log (D1–D7)
+- `CONVENTIONS.md` — Full coding patterns and standards (the authoritative reference)
+
 ## Custom Instructions
 
 ### Think Before Coding
