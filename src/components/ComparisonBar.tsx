@@ -42,9 +42,9 @@ export function ComparisonBar({
       role="img"
       aria-label={`${label}: ${format(localValue)} (national average: ${format(nationalValue)})`}
     >
-      <div className="flex items-baseline justify-between text-sm">
-        <span className="font-medium text-ink">{label}</span>
-        <span className="text-ink-muted">{format(localValue)}</span>
+      <div className="flex items-baseline justify-between gap-2 text-sm">
+        <span className="font-medium text-ink min-w-0 truncate">{label}</span>
+        <span className="text-ink-muted shrink-0">{format(localValue)}</span>
       </div>
       {/* Local value bar */}
       <div className="h-2.5 w-full rounded-full bg-warm-100">

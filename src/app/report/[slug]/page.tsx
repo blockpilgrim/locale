@@ -150,12 +150,12 @@ export default async function ReportPage({ params }: ReportPageProps) {
   // --- Status: "generating" — report is still being built -----------------
   if (row.status === "generating") {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center px-6">
+      <div className="flex min-h-screen flex-col items-center justify-center px-4 sm:px-6">
         <Container variant="prose">
           <div className="text-center">
             <div className="mx-auto mb-6 h-8 w-8 animate-spin rounded-full border-2 border-warm-300 border-t-accent" />
             <h1 className="mb-4">Generating your report</h1>
-            <p className="text-lg text-ink-muted">
+            <p className="text-base text-ink-muted sm:text-lg">
               We&apos;re gathering data and writing your neighborhood
               intelligence report. This usually takes a few seconds.
             </p>
@@ -173,11 +173,11 @@ export default async function ReportPage({ params }: ReportPageProps) {
   // --- Status: "failed" — report generation failed ------------------------
   if (row.status === "failed") {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center px-6">
+      <div className="flex min-h-screen flex-col items-center justify-center px-4 sm:px-6">
         <Container variant="prose">
           <div className="text-center">
             <h1 className="mb-4">Report generation failed</h1>
-            <p className="text-lg text-ink-muted">
+            <p className="text-base text-ink-muted sm:text-lg">
               We weren&apos;t able to generate a report for this address. This
               can happen when our data sources are temporarily unavailable.
             </p>

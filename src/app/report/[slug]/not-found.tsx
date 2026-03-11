@@ -3,7 +3,7 @@ import { Container } from "@/components/Container";
 
 export default function ReportNotFound() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6">
+    <div className="flex min-h-screen flex-col items-center justify-center px-4 sm:px-6">
       <Container variant="prose">
         <div className="text-center">
           <p className="mb-4 text-sm font-medium tracking-widest uppercase text-accent">

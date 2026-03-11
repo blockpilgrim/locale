@@ -183,7 +183,7 @@ export function AddressInput({
           aria-activedescendant={
             activeIndex >= 0 ? `suggestion-${activeIndex}` : undefined
           }
-          className="w-full rounded-lg border border-border bg-surface px-4 py-3.5 text-base text-ink placeholder:text-ink-muted transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent-subtle disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-lg border border-border bg-surface px-4 py-3.5 text-base text-ink placeholder:text-ink-muted transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent-subtle disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
         />
 
         {/* Loading indicator */}

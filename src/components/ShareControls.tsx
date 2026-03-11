@@ -262,7 +262,7 @@ export function ShareControls({
       </div>
 
       {/* Generate your own report CTA */}
-      <div className="mt-10 rounded-xl border border-border-light bg-surface-warm p-8 text-center">
+      <div className="mt-10 rounded-xl border border-border-light bg-surface-warm p-5 text-center sm:p-8">
         <h3 className="mb-3 font-serif">Curious about your neighborhood?</h3>
         <p className="mb-6 text-base text-ink-muted">
           Enter any US address and get your own AI-powered neighborhood

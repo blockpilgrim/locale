@@ -49,7 +49,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
       {/* Hero section */}
-      <section className="flex flex-1 flex-col items-center justify-center px-6 pb-16 pt-24">
+      <section className="flex flex-1 flex-col items-center justify-center px-4 pb-16 pt-20 sm:px-6 sm:pt-24">
         <main className="w-full max-w-(--container-prose) text-center">
           <p className="mb-4 text-sm font-medium tracking-widest uppercase text-accent">
             Neighborhood Intelligence
@@ -70,7 +70,7 @@ export default function Home() {
       </section>
 
       {/* Featured report cards */}
-      <section className="border-t border-border-light bg-surface-warm px-6 py-20">
+      <section className="border-t border-border-light bg-surface-warm px-4 py-12 sm:px-6 sm:py-20">
         <div className="mx-auto max-w-(--container-content)">
           <p className="mb-2 text-center text-xs font-medium tracking-widest uppercase text-accent">
             Explore
@@ -109,7 +109,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border-light px-6 py-8">
+      <footer className="border-t border-border-light px-4 py-8 sm:px-6">
         <p className="text-center text-xs text-ink-muted">
           Locale &mdash; AI-powered neighborhood intelligence. Data from U.S.
           Census Bureau, OpenStreetMap, and Mapbox. Narratives by Claude.

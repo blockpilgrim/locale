@@ -72,7 +72,7 @@ export function ReportContent({
   return (
     <div className="min-h-screen pb-20">
       {/* Report header */}
-      <header className="border-b border-border-light bg-surface px-4 pb-10 pt-12 sm:px-6 sm:pt-16">
+      <header className="border-b border-border-light bg-surface pb-10 pt-12 sm:pt-16">
         <Container variant="content">
           <motion.div
             variants={fadeUp}
@@ -98,7 +98,7 @@ export function ReportContent({
       </header>
 
       {/* Map */}
-      <section className="px-4 pt-8 sm:px-6 sm:pt-12">
+      <section className="pt-8 sm:pt-12">
         <Container variant="content">
           <SectionErrorBoundary sectionName="Map">
             <Map
@@ -113,7 +113,7 @@ export function ReportContent({
 
       {/* Vibe Check (AI Narrative) */}
       {narrative && (
-        <section className="px-4 pt-(--spacing-section) sm:px-6">
+        <section className="pt-(--spacing-section)">
           <Container variant="prose">
             <SectionErrorBoundary sectionName="Vibe Check">
               <VibeCheck narrative={narrative} isStreaming={false} />
@@ -123,7 +123,7 @@ export function ReportContent({
       )}
 
       {/* Data sections */}
-      <div className="px-4 sm:px-6">
+      <div>
         <Container variant="content">
           <div className="divide-y divide-border-light">
             {/* Demographics */}
@@ -188,7 +188,7 @@ export function ReportContent({
       </div>
 
       {/* Share controls + Generate your own CTA */}
-      <section className="px-4 py-(--spacing-section) sm:px-6">
+      <section className="py-(--spacing-section)">
         <Container variant="prose">
           <SectionErrorBoundary sectionName="Share Controls">
             <ShareControls address={location.address} slug={slug} />

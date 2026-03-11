@@ -126,7 +126,7 @@ export function DemographicsSection({
                   const pct = pctOf(entry.value, householdTypes.totalHouseholds);
                   return (
                     <div key={entry.label} className="flex items-center gap-3">
-                      <span className="w-40 shrink-0 text-sm text-ink-light">
+                      <span className="w-28 shrink-0 text-sm text-ink-light sm:w-40">
                         {entry.label}
                       </span>
                       <div className="h-2 flex-1 rounded-full bg-warm-100">
@@ -152,26 +152,26 @@ export function DemographicsSection({
         educationalAttainment.highSchoolOrHigher !== null) && (
         <div className="mt-8">
           <h4 className="mb-4 font-serif text-lg">Educational Attainment</h4>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
             {educationalAttainment.highSchoolOrHigher !== null && (
-              <div className="rounded-lg border border-border-light bg-surface p-4">
-                <p className="text-2xl font-serif text-ink">
+              <div className="rounded-lg border border-border-light bg-surface p-3 sm:p-4">
+                <p className="text-xl font-serif text-ink sm:text-2xl">
                   {educationalAttainment.highSchoolOrHigher.toLocaleString()}
                 </p>
                 <p className="text-xs text-ink-muted mt-1">High school or higher</p>
               </div>
             )}
             {educationalAttainment.bachelorsOrHigher !== null && (
-              <div className="rounded-lg border border-border-light bg-surface p-4">
-                <p className="text-2xl font-serif text-ink">
+              <div className="rounded-lg border border-border-light bg-surface p-3 sm:p-4">
+                <p className="text-xl font-serif text-ink sm:text-2xl">
                   {educationalAttainment.bachelorsOrHigher.toLocaleString()}
                 </p>
                 <p className="text-xs text-ink-muted mt-1">Bachelor&apos;s or higher</p>
               </div>
             )}
             {educationalAttainment.graduateOrProfessional !== null && (
-              <div className="rounded-lg border border-border-light bg-surface p-4">
-                <p className="text-2xl font-serif text-ink">
+              <div className="rounded-lg border border-border-light bg-surface p-3 sm:p-4">
+                <p className="text-xl font-serif text-ink sm:text-2xl">
                   {educationalAttainment.graduateOrProfessional.toLocaleString()}
                 </p>
                 <p className="text-xs text-ink-muted mt-1">Graduate / professional</p>

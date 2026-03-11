@@ -31,12 +31,12 @@ export function StatCard({
 
   return (
     <div
-      className={`rounded-lg border border-border-light bg-surface p-5 ${className}`}
+      className={`rounded-lg border border-border-light bg-surface p-4 sm:p-5 ${className}`}
     >
       <p className="text-xs font-medium tracking-wide uppercase text-ink-muted">
         {label}
       </p>
-      <p className="mt-1 font-serif text-2xl text-ink">{value}</p>
+      <p className="mt-1 font-serif text-xl text-ink sm:text-2xl">{value}</p>
       {comparison && (
         <p className={`mt-1 text-sm ${trendColor}`}>{comparison}</p>
       )}

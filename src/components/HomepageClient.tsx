@@ -101,7 +101,7 @@ export function HomepageClient() {
 
   return (
     <div>
-      <div className="mt-12">
+      <div className="mt-8 sm:mt-12">
         <AddressInput
           onSelect={handleSelect}
           disabled={state === "generating"}
@@ -114,7 +114,7 @@ export function HomepageClient() {
         <div
           role="status"
           aria-live="polite"
-          className="mt-10 rounded-xl border border-border bg-surface p-8 shadow-sm"
+          className="mt-8 rounded-xl border border-border bg-surface p-5 shadow-sm sm:mt-10 sm:p-8"
         >
           <div className="flex items-center justify-center gap-3">
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-warm-300 border-t-accent" />
@@ -130,7 +130,7 @@ export function HomepageClient() {
         <div
           role="alert"
           aria-live="assertive"
-          className="mt-10 rounded-xl border border-data-4/30 bg-data-4/5 p-8"
+          className="mt-8 rounded-xl border border-data-4/30 bg-data-4/5 p-5 sm:mt-10 sm:p-8"
         >
           <p className="text-sm text-data-4">{error}</p>
           <button

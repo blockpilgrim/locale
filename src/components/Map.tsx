@@ -224,7 +224,7 @@ export function Map({
   return (
     <div className={`relative overflow-hidden rounded-xl ${className}`}>
       {!hasValidCoordinates ? (
-        <div className="flex items-center justify-center rounded-xl border border-border-light bg-warm-50 h-[400px] sm:h-[500px]">
+        <div className="flex items-center justify-center rounded-xl border border-border-light bg-warm-50 h-[300px] sm:h-[400px] md:h-[500px]">
           <p className="text-sm text-ink-muted">Map unavailable</p>
         </div>
       ) : (
@@ -236,7 +236,7 @@ export function Map({
           )}
           <div
             ref={mapContainer}
-            className="h-[400px] w-full sm:h-[500px]"
+            className="h-[300px] w-full sm:h-[400px] md:h-[500px]"
             aria-label="Interactive neighborhood map"
           />
         </>

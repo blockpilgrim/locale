@@ -156,7 +156,7 @@ export function EconomicSection({
               );
               return (
                 <div key={entry.label} className="flex items-center gap-3">
-                  <span className="w-32 shrink-0 text-sm text-ink-light">
+                  <span className="w-24 shrink-0 text-sm text-ink-light sm:w-32">
                     {entry.label}
                   </span>
                   <div className="h-2 flex-1 rounded-full bg-warm-100">

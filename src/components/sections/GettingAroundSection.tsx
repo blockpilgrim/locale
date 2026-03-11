@@ -119,8 +119,8 @@ export function GettingAroundSection({
 
       {/* Walkability assessment */}
       {walkability && (
-        <div className="mb-8 flex items-start gap-5 rounded-lg border border-border-light bg-surface p-6">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-accent-subtle">
+        <div className="mb-8 flex items-start gap-4 rounded-lg border border-border-light bg-surface p-4 sm:gap-5 sm:p-6">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent-subtle sm:h-14 sm:w-14">
             <span className="text-2xl font-serif font-bold text-accent">
               {walkability.score}
             </span>

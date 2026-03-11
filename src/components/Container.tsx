@@ -22,7 +22,7 @@ export function Container({
   children,
 }: ContainerProps) {
   return (
-    <div className={`mx-auto w-full px-6 ${variantClasses[variant]} ${className}`}>
+    <div className={`mx-auto w-full px-4 sm:px-6 ${variantClasses[variant]} ${className}`}>
       {children}
     </div>
   );

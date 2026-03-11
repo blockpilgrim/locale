@@ -56,13 +56,13 @@ export function WhatsNearbySection({
       {(nearestEssentials.grocery ||
         nearestEssentials.pharmacy ||
         nearestEssentials.park) && (
-        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
           {nearestEssentials.grocery && (
-            <div className="rounded-lg border border-border-light bg-surface p-5">
+            <div className="rounded-lg border border-border-light bg-surface p-4 sm:p-5">
               <p className="text-xs font-medium tracking-wide uppercase text-ink-muted">
                 Nearest Grocery
               </p>
-              <p className="mt-1 font-serif text-lg text-ink">
+              <p className="mt-1 font-serif text-base text-ink sm:text-lg truncate">
                 {nearestEssentials.grocery.name || "Unnamed"}
               </p>
               <p className="mt-1 text-sm text-accent font-medium">
@@ -71,11 +71,11 @@ export function WhatsNearbySection({
             </div>
           )}
           {nearestEssentials.pharmacy && (
-            <div className="rounded-lg border border-border-light bg-surface p-5">
+            <div className="rounded-lg border border-border-light bg-surface p-4 sm:p-5">
               <p className="text-xs font-medium tracking-wide uppercase text-ink-muted">
                 Nearest Pharmacy
               </p>
-              <p className="mt-1 font-serif text-lg text-ink">
+              <p className="mt-1 font-serif text-base text-ink sm:text-lg truncate">
                 {nearestEssentials.pharmacy.name || "Unnamed"}
               </p>
               <p className="mt-1 text-sm text-accent font-medium">
@@ -84,11 +84,11 @@ export function WhatsNearbySection({
             </div>
           )}
           {nearestEssentials.park && (
-            <div className="rounded-lg border border-border-light bg-surface p-5">
+            <div className="rounded-lg border border-border-light bg-surface p-4 sm:p-5">
               <p className="text-xs font-medium tracking-wide uppercase text-ink-muted">
                 Nearest Park
               </p>
-              <p className="mt-1 font-serif text-lg text-ink">
+              <p className="mt-1 font-serif text-base text-ink sm:text-lg truncate">
                 {nearestEssentials.park.name || "Unnamed"}
               </p>
               <p className="mt-1 text-sm text-accent font-medium">
@@ -109,7 +109,7 @@ export function WhatsNearbySection({
               return (
                 <div
                   key={cat.category}
-                  className="rounded-lg border border-border-light bg-surface p-4"
+                  className="rounded-lg border border-border-light bg-surface p-3 sm:p-4"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-ink">
