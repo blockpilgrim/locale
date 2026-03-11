@@ -68,3 +68,27 @@ Record of significant architectural decisions that deviate from or extend the or
 **Decision:** Use a custom heuristic in `GettingAroundSection.tsx` based on POI count and category diversity to derive a qualitative walkability label (A: Very Walkable, B: Walkable, C: Somewhat Walkable, D: Car-Dependent).
 **Rationale:** The POI data from Overpass already captures what's within walking distance. A simple threshold (e.g., 40+ POIs across 6+ categories = "Very Walkable") provides a meaningful signal without adding another paid API dependency. The thresholds were chosen to roughly correspond to urban, suburban, and rural patterns.
 **Trade-off:** Less sophisticated than Walk Score's proprietary algorithm. May not capture transit infrastructure quality or street connectivity. Can be replaced with a third-party API post-MVP if the heuristic proves insufficient.
+
+## D8. Separate AI call for archetype classification vs. embedding in narrative
+
+**Date:** 2026-03-11
+**Context:** The neighborhood archetype could be generated in two ways: (a) as part of the narrative prompt, requesting both prose and structured JSON; (b) as a separate AI call with its own system prompt.
+**Decision:** Use a separate AI call (`generateText` with temperature 0.3, 500 max tokens) in `src/lib/report/archetype.ts`.
+**Rationale:** Different temperature (0.3 for consistency vs. 0.7 for narrative creativity), different output format (strict JSON vs. free-form prose), independent failure handling (archetype is non-fatal), and easier eval testing. The user prompt is reused from `narrative.ts` to avoid maintaining two data serialization functions.
+**Trade-off:** Two AI calls per report instead of one. Adds ~1-2s to generation time. Mitigated by sequencing archetype before narrative (archetype informs narrative context) and 5s timeout fallback.
+
+## D9. Non-fatal archetype classification with null fallback
+
+**Date:** 2026-03-11
+**Context:** Archetype classification could fail (API errors, malformed JSON, validation failures). The question is whether this should block report generation.
+**Decision:** Archetype failure returns `null` and does not change report status. Components null-guard and skip rendering.
+**Rationale:** The report is valuable without archetype data. Blocking report generation on an enrichment feature degrades the core experience. Pre-feature reports also lack archetype data and must render correctly.
+**Trade-off:** Reports may have inconsistent presentation (some with archetype, some without). This is acceptable as graceful degradation.
+
+## D10. Satori with TTF fonts for social card generation
+
+**Date:** 2026-03-11
+**Context:** OG images were previously Mapbox Static Images URLs. The archetype feature requires richer, branded social cards.
+**Decision:** Use `@vercel/og` (Satori + Resvg) with TTF font files in `public/fonts/`. Card route at `GET /api/report/[slug]/card`.
+**Rationale:** Server-side PNG generation that matches the editorial design system. Deterministic output enables aggressive caching (`immutable`). Satori supports JSX layout and basic SVG, sufficient for the pentagon chart and typography.
+**Trade-off:** ~330KB of font files added to `public/`. Satori doesn't support all CSS — card components must use inline styles. Font files must be kept in sync with the Google Fonts used by the app.

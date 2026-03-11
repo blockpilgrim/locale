@@ -106,6 +106,10 @@ tests/              → Golden dataset addresses + eval scripts (not part of app
 - **Anti-pattern: fire-and-forget promises in route handlers.** Do NOT use detached `promise.catch()` or `after()` for critical background work in Next.js route handlers. Both are unreliable: fire-and-forget promises can be dropped after the response is sent, and `after()` may not execute callbacks in dev mode. Instead, use a dedicated endpoint triggered by the client.
 - **API route caching:** The POST generate route checks for an existing report via case-insensitive address match (`sql\`lower(...) = lower(...)\``) in the `locations` table. If found, returns the slug immediately without re-generating.
 - **Raw SQL in Drizzle:** Use the `sql` tagged template from `drizzle-orm` for operations not expressible through the type-safe query builder (e.g., `lower()` for case-insensitive comparisons). Import as `import { sql } from "drizzle-orm"`.
+- **Archetype classification:** Separate AI call from narrative — different temperature (0.3 vs 0.7), different output format (JSON vs prose), different max tokens (500 vs 2000). Uses `generateText` (not `streamText`) since we need complete JSON. Module: `src/lib/report/archetype.ts`.
+- **Non-fatal AI features:** Archetype classification is optional — failure returns `null`, does not mark report as failed. Components null-guard and skip rendering. This pattern applies to any future enrichment feature.
+- **Generation orchestration:** `GenerationOrchestrator` sequences archetype -> narrative with a 5s timeout fallback. Encapsulates `ArchetypeTrigger` + `NarrativeTrigger` + `AutoRefresh`. The report page renders a single `<GenerationOrchestrator>` instead of managing triggers directly.
+- **JSONB field extension:** New fields added to `ReportData` interface use `| null` and don't require schema migrations (they live inside the existing JSONB column). All consumers must null-guard.
 
 ## Frontend Components (`src/components/`)
 
@@ -160,6 +164,15 @@ tests/              → Golden dataset addresses + eval scripts (not part of app
 - **Dynamic imports for heavy dependencies:** Use `next/dynamic` with `ssr: false` for components that depend on large client-only libraries (e.g., Mapbox GL JS ~200KB). Provide a loading skeleton that matches the component's dimensions.
 - **Edge caching for completed reports:** The GET report API route sets `Cache-Control: public, s-maxage=3600, stale-while-revalidate=86400` for completed reports. Non-complete reports get `no-cache, no-store` to allow status polling.
 - **Parallel API fetching:** The orchestrator (`generateReport`) fires Census, isochrone, and POI calls via `Promise.all` with individual `.catch()` wrappers. Never fetch sequentially.
+
+## Social Card / OG Image Generation
+
+- **Library:** `@vercel/og` (Satori + Resvg) for server-side PNG generation.
+- **Font files:** TTF fonts in `public/fonts/` loaded via `fetch(new URL(...))` at runtime. Satori cannot use Google Fonts or CSS font-face.
+- **Satori JSX constraints:** Use inline `style={{ }}` props (not Tailwind classes). Basic SVG elements only. No Framer Motion. Components shared between page and Satori (e.g., VibeSpectrum) must use inline styles and basic SVG.
+- **Card caching:** `Cache-Control: public, s-maxage=31536000, immutable` — cards are deterministic for a given report.
+- **OG image selection:** `generateMetadata` prefers the archetype card route URL (absolute, via `NEXT_PUBLIC_BASE_URL`) when archetype data exists, falling back to Mapbox Static Images for reports without archetype.
+- **Card route:** `GET /api/report/[slug]/card` with `format=og` (1200x630, default) or `format=story` (1080x1920).
 
 ## Custom Hooks (`src/hooks/`)
 
