@@ -21,7 +21,7 @@ Phase 7 adds two major testing deliverables: a golden dataset prompt evaluation 
 - `CONVENTIONS.md` -- testing convention additions
 - `docs/IMPLEMENTATION-PLAN.md` -- T7.1/T7.2 marked complete
 
-**Test counts:** 150 tests passing across 12 test files (up from ~100 across 11 files before Phase 7).
+**Test counts:** 153 tests passing across 12 test files (up from ~100 across 11 files before Phase 7).
 
 ---
 
@@ -102,11 +102,9 @@ The prompt construction tests verify section content (demographics, housing, wal
 
 The `--live` mode fires 20 sequential API calls to the Anthropic API with no delay between them. While sequential execution provides implicit rate limiting (each waits for the prior response), this could hit rate limits on accounts with low quotas. Consider adding a brief delay (e.g., 1 second) between calls, or at minimum documenting the expected API cost (~20 calls at ~1500 tokens each).
 
-### S3. `Math.random()` in eval script POI builder produces non-deterministic prompts
+### S3. ~~`Math.random()` in eval script POI builder produces non-deterministic prompts~~ (RESOLVED)
 
-**File:** `/Users/personal/work-projects/locale/tests/eval-narratives.ts`, line 542
-
-The `addPoi` function uses `Math.random()` to jitter POI coordinates, which means the same golden address produces slightly different prompt text on each run. For a golden dataset intended for comparative evaluation, consider seeding the random or using fixed offsets so that prompts are deterministic across runs.
+POI coordinates now use deterministic offsets based on `nextId` — no `Math.random()` calls remain.
 
 ### S4. Integration tests could verify that `console.error` is called on API failure
 
