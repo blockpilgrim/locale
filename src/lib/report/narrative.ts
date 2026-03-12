@@ -326,6 +326,7 @@ export async function generateNarrative(
     prompt: buildUserPrompt(data),
     maxOutputTokens: 2000,
     temperature: 0.7,
+    maxRetries: 5, // 6 total attempts — handles transient 529 "Overloaded" with backoff
   });
 
   // Await full stream consumption and DB persistence. The caller (route

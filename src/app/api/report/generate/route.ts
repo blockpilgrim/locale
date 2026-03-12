@@ -108,6 +108,7 @@ export async function POST(request: Request): Promise<Response> {
     if (existingLocations.length > 0) {
       const existingReport = await db
         .select({
+          id: reports.id,
           slug: reports.slug,
           status: reports.status,
         })
@@ -116,6 +117,24 @@ export async function POST(request: Request): Promise<Response> {
         .limit(1);
 
       if (existingReport.length > 0) {
+        // If previous attempt failed, reset to "generating" so the
+        // client-side orchestrator re-triggers the AI calls.
+        if (existingReport[0].status === "failed") {
+          await db
+            .update(reports)
+            .set({ status: "generating", narrative: null })
+            .where(eq(reports.id, existingReport[0].id));
+
+          return NextResponse.json(
+            {
+              slug: existingReport[0].slug,
+              status: "generating",
+              cached: false,
+            },
+            { headers: rateLimit.headers(rl) },
+          );
+        }
+
         return NextResponse.json(
           {
             slug: existingReport[0].slug,

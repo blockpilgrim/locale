@@ -16,6 +16,7 @@ import { ReportContent } from "@/components/ReportContent";
 import { GenerationOrchestrator } from "@/components/GenerationOrchestrator";
 import { GeneratingReport } from "@/components/GeneratingReport";
 import { Container } from "@/components/Container";
+import { RetryButton } from "@/components/RetryButton";
 import type { ReportData } from "@/lib/report/generate";
 
 // Prevent Next.js from caching this page — report status changes dynamically.
@@ -195,7 +196,8 @@ export default async function ReportPage({ params }: ReportPageProps) {
               We weren&apos;t able to generate a report for this address. This
               can happen when our data sources are temporarily unavailable.
             </p>
-            <div className="mt-8 flex items-center justify-center gap-4">
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+              <RetryButton slug={row.slug} />
               <Link
                 href="/"
                 className="inline-block rounded-xl bg-accent px-8 py-3.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-accent-light hover:shadow-md"

@@ -161,7 +161,8 @@ export async function classifyArchetype(
       prompt: buildUserPrompt(data),
       maxOutputTokens: 500,
       temperature: 0.3,
-      abortSignal: AbortSignal.timeout(10_000), // 10s timeout per convention
+      maxRetries: 3, // 4 total attempts — handles transient 529 "Overloaded"
+      abortSignal: AbortSignal.timeout(30_000), // 30s timeout to allow retries with backoff
     });
 
     const text = result.text.trim();
