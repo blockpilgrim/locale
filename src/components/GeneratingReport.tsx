@@ -9,11 +9,15 @@ import { Container } from "@/components/Container";
 
 const loadingSteps = [
   "Scouting local coffee shops\u2026",
+  "Sourcing intel from OpenStreetMap\u2026",
   "Crunching the census data\u2026",
   "Comparing housing prices\u2026",
+  "Reading between the transit lines\u2026",
   "Measuring the commute times\u2026",
   "Analyzing walkability scores\u2026",
+  "Estimating the weekend brunch wait times\u2026",
   "Checking the neighborhood\u2019s vibe\u2026",
+  "Lollygagging\u2026",
 ];
 
 export function GeneratingReport() {
