@@ -93,6 +93,8 @@ tests/              → Golden dataset addresses + eval scripts (not part of app
 - **Fixture builders:** Use `makeRealistic<Type>()` factory functions for complex test data (e.g., `makeRealisticCensusResult()`). For overrides of nested null-safe fields, mutate the returned object directly rather than using `??` (which treats `null` as nullish and falls through to the default).
 - **Integration tests:** `src/lib/__tests__/integration.test.ts` covers cross-module orchestration (partial failures, timeouts, slug collisions, prompt construction). Keep unit tests in per-module files.
 - **Golden dataset evaluation:** `tests/golden-addresses.ts` (20 diverse US addresses) + `tests/eval-narratives.ts` (prompt generation script). Run with `npm run test:eval`. Add `--live` for actual AI generation (requires `ANTHROPIC_API_KEY`). Output goes to `tests/output/` (gitignored).
+- **Shared mock data for eval scripts:** `tests/mock-data.ts` exports `buildReportData`, `buildMockCensus`, `buildMockIsochrone`, `buildMockPoi` for building synthetic `ReportData` from golden addresses. All eval scripts import from this shared module rather than defining mock data inline.
+- **Archetype consistency evaluation:** `tests/eval-archetype-consistency.ts` runs 5 classifications per address for 5 selected golden addresses (25 API calls) and reports label stability and spectrum score deviation. Run with `npm run test:eval:consistency`. Requires `ANTHROPIC_API_KEY` in `.env.local`.
 
 ## Report Generation (`src/lib/report/`)
 
