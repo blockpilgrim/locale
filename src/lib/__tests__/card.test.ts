@@ -76,6 +76,9 @@ vi.mock("drizzle-orm", () => ({
 // --- Mock font loading (fetch calls for TTF files) --------------------------
 // The card route calls fetch() to load TTF fonts. We mock fetch globally so
 // it returns fake ArrayBuffer data for font URLs.
+// NOTE: The card route's module-level fontCache persists across tests (it is
+// populated on the first test run and reused thereafter). This mirrors
+// production behavior but means only the first test exercises font loading.
 
 const originalFetch = globalThis.fetch;
 
@@ -96,8 +99,9 @@ function setupFontFetchMock() {
 // --- Imports (after mocks) --------------------------------------------------
 
 import { GET } from "@/app/api/report/[slug]/card/route";
-import { polarToCartesian, toPointsString, PENTAGON_AXES } from "@/lib/pentagon";
 import type { ArchetypeResult } from "@/lib/report/generate";
+
+// Pentagon geometry tests are consolidated in src/lib/__tests__/pentagon.test.ts
 
 // --- Fixtures ---------------------------------------------------------------
 
@@ -297,6 +301,8 @@ describe("GET /api/report/[slug]/card", () => {
     );
 
     expect(mockImageResponse).toHaveBeenCalledTimes(1);
+    const [element] = mockImageResponse.mock.calls[0] as [{ props: { cityState: string } }];
+    expect(element.props.cityState).toBe("San Francisco, CA");
   });
 
   it("handles missing city gracefully in cityState", async () => {
@@ -310,8 +316,9 @@ describe("GET /api/report/[slug]/card", () => {
       makeParams("test-slug"),
     );
 
-    // Should not crash — cityState should be "NY" only
     expect(mockImageResponse).toHaveBeenCalledTimes(1);
+    const [element] = mockImageResponse.mock.calls[0] as [{ props: { cityState: string } }];
+    expect(element.props.cityState).toBe("NY");
   });
 
   it("handles null report data as missing archetype", async () => {
@@ -357,159 +364,5 @@ describe("GET /api/report/[slug]/card", () => {
   });
 });
 
-// =============================================================================
-// Pentagon geometry — polarToCartesian vertex calculations
-// =============================================================================
-// More detailed coordinate verification than archetype.test.ts, specifically
-// testing exact coordinates at known angles for card rendering accuracy.
-
-describe("Pentagon geometry for card rendering", () => {
-  const cx = 120;
-  const cy = 120;
-  const radius = 76.8; // 240 * 0.32
-
-  it("index 1 (72 degrees clockwise from top) computes correct coordinates", () => {
-    // At -90 + 72 = -18 degrees
-    // cos(-18) = 0.9511, sin(-18) = -0.3090
-    const pt = polarToCartesian(cx, cy, radius, 1);
-
-    const expectedX = cx + radius * Math.cos((-18 * Math.PI) / 180);
-    const expectedY = cy + radius * Math.sin((-18 * Math.PI) / 180);
-
-    expect(pt.x).toBeCloseTo(expectedX, 10);
-    expect(pt.y).toBeCloseTo(expectedY, 10);
-  });
-
-  it("index 2 (144 degrees clockwise from top) computes correct coordinates", () => {
-    // At -90 + 144 = 54 degrees
-    const pt = polarToCartesian(cx, cy, radius, 2);
-
-    const expectedX = cx + radius * Math.cos((54 * Math.PI) / 180);
-    const expectedY = cy + radius * Math.sin((54 * Math.PI) / 180);
-
-    expect(pt.x).toBeCloseTo(expectedX, 10);
-    expect(pt.y).toBeCloseTo(expectedY, 10);
-  });
-
-  it("index 3 (216 degrees clockwise from top) computes correct coordinates", () => {
-    // At -90 + 216 = 126 degrees
-    const pt = polarToCartesian(cx, cy, radius, 3);
-
-    const expectedX = cx + radius * Math.cos((126 * Math.PI) / 180);
-    const expectedY = cy + radius * Math.sin((126 * Math.PI) / 180);
-
-    expect(pt.x).toBeCloseTo(expectedX, 10);
-    expect(pt.y).toBeCloseTo(expectedY, 10);
-  });
-
-  it("index 4 (288 degrees clockwise from top) computes correct coordinates", () => {
-    // At -90 + 288 = 198 degrees
-    const pt = polarToCartesian(cx, cy, radius, 4);
-
-    const expectedX = cx + radius * Math.cos((198 * Math.PI) / 180);
-    const expectedY = cy + radius * Math.sin((198 * Math.PI) / 180);
-
-    expect(pt.x).toBeCloseTo(expectedX, 10);
-    expect(pt.y).toBeCloseTo(expectedY, 10);
-  });
-
-  it("different center coordinates translate correctly", () => {
-    const pt = polarToCartesian(200, 300, 50, 0);
-
-    // Index 0 at -90 degrees: cos(-90)=0, sin(-90)=-1
-    expect(pt.x).toBeCloseTo(200, 5);
-    expect(pt.y).toBeCloseTo(250, 5); // 300 - 50
-  });
-
-  it("radius 0 always returns center regardless of index", () => {
-    for (let i = 0; i < 5; i++) {
-      const pt = polarToCartesian(100, 100, 0, i);
-      expect(pt.x).toBeCloseTo(100, 10);
-      expect(pt.y).toBeCloseTo(100, 10);
-    }
-  });
-
-  it("card-sized pentagon (size=240) has correct vertex positions", () => {
-    // Matches SatoriPentagon: cx=120, cy=120, radius=240*0.38=91.2
-    const cardCx = 120;
-    const cardCy = 120;
-    const cardRadius = 240 * 0.38;
-
-    // Verify top vertex (index 0)
-    const top = polarToCartesian(cardCx, cardCy, cardRadius, 0);
-    expect(top.x).toBeCloseTo(cardCx, 5);
-    expect(top.y).toBeCloseTo(cardCy - cardRadius, 5);
-
-    // All vertices equidistant
-    for (let i = 0; i < 5; i++) {
-      const pt = polarToCartesian(cardCx, cardCy, cardRadius, i);
-      const dist = Math.sqrt((pt.x - cardCx) ** 2 + (pt.y - cardCy) ** 2);
-      expect(dist).toBeCloseTo(cardRadius, 5);
-    }
-  });
-
-  it("story-sized pentagon (size=360) has correct vertex positions", () => {
-    // Matches SatoriPentagon in StoryCard: size=360
-    const storyCx = 180;
-    const storyCy = 180;
-    const storyRadius = 360 * 0.38;
-
-    const top = polarToCartesian(storyCx, storyCy, storyRadius, 0);
-    expect(top.x).toBeCloseTo(storyCx, 5);
-    expect(top.y).toBeCloseTo(storyCy - storyRadius, 5);
-  });
-});
-
-// =============================================================================
-// toPointsString — SVG polygon points serialization
-// =============================================================================
-
-describe("toPointsString", () => {
-  it("serializes points to SVG polygon points format", () => {
-    const points = [
-      { x: 10, y: 20 },
-      { x: 30, y: 40 },
-      { x: 50, y: 60 },
-    ];
-
-    expect(toPointsString(points)).toBe("10,20 30,40 50,60");
-  });
-
-  it("handles empty array", () => {
-    expect(toPointsString([])).toBe("");
-  });
-
-  it("handles single point", () => {
-    expect(toPointsString([{ x: 100, y: 200 }])).toBe("100,200");
-  });
-
-  it("preserves decimal precision", () => {
-    const points = [
-      { x: 10.123456, y: 20.789012 },
-    ];
-
-    expect(toPointsString(points)).toBe("10.123456,20.789012");
-  });
-});
-
-// =============================================================================
-// PENTAGON_AXES — axis configuration
-// =============================================================================
-
-describe("PENTAGON_AXES", () => {
-  it("has exactly 5 axes", () => {
-    expect(PENTAGON_AXES).toHaveLength(5);
-  });
-
-  it("has the correct axis keys in order", () => {
-    const keys = PENTAGON_AXES.map((a) => a.key);
-    expect(keys).toEqual(["walkable", "buzzing", "settled", "accessible", "diverse"]);
-  });
-
-  it("has human-readable labels for each axis", () => {
-    for (const axis of PENTAGON_AXES) {
-      expect(axis.label).toBeTruthy();
-      expect(typeof axis.label).toBe("string");
-    }
-  });
-});
+// Pentagon geometry, toPointsString, and PENTAGON_AXES tests are consolidated
+// in src/lib/__tests__/pentagon.test.ts
