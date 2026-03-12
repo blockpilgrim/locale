@@ -15,7 +15,7 @@
 
 import { generateText } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { reports } from "@/lib/db/schema";
 import type { ReportData, ArchetypeResult } from "./generate";
@@ -100,10 +100,10 @@ function validateArchetypeResult(
 
   const obj = parsed as Record<string, unknown>;
 
-  // Required string fields
-  if (typeof obj.archetype !== "string" || obj.archetype.length === 0) return null;
-  if (typeof obj.tagline !== "string" || obj.tagline.length === 0) return null;
-  if (typeof obj.reasoning !== "string") return null;
+  // Required string fields with length limits to prevent runaway AI output
+  if (typeof obj.archetype !== "string" || obj.archetype.length === 0 || obj.archetype.length > 100) return null;
+  if (typeof obj.tagline !== "string" || obj.tagline.length === 0 || obj.tagline.length > 300) return null;
+  if (typeof obj.reasoning !== "string" || obj.reasoning.length > 500) return null;
 
   // vibeSpectrum must be an object with 5 numeric fields
   if (!obj.vibeSpectrum || typeof obj.vibeSpectrum !== "object") return null;
@@ -122,7 +122,7 @@ function validateArchetypeResult(
   if (!Array.isArray(obj.definingTraits)) return null;
   if (obj.definingTraits.length !== 3) return null;
   for (const trait of obj.definingTraits) {
-    if (typeof trait !== "string" || trait.length === 0) return null;
+    if (typeof trait !== "string" || trait.length === 0 || trait.length > 200) return null;
   }
 
   return {
@@ -161,6 +161,7 @@ export async function classifyArchetype(
       prompt: buildUserPrompt(data),
       maxOutputTokens: 500,
       temperature: 0.3,
+      abortSignal: AbortSignal.timeout(10_000), // 10s timeout per convention
     });
 
     const text = result.text.trim();
@@ -187,23 +188,15 @@ export async function classifyArchetype(
       return null;
     }
 
-    // Merge archetype into the report's existing JSONB data.
+    // Atomic JSONB merge — uses Postgres `||` operator to avoid read-modify-write
+    // race condition with concurrent narrative generation.
     const db = getDb();
-    const [report] = await db
-      .select({ data: reports.data })
-      .from(reports)
-      .where(eq(reports.id, reportId))
-      .limit(1);
-
-    if (report?.data) {
-      const existingData = report.data as ReportData;
-      await db
-        .update(reports)
-        .set({
-          data: { ...existingData, archetype },
-        })
-        .where(eq(reports.id, reportId));
-    }
+    await db
+      .update(reports)
+      .set({
+        data: sql`${reports.data} || ${JSON.stringify({ archetype })}::jsonb`,
+      })
+      .where(eq(reports.id, reportId));
 
     return archetype;
   } catch (error) {

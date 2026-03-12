@@ -14,17 +14,25 @@ import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { reports } from "@/lib/db/schema";
 import { classifyArchetype } from "@/lib/report/archetype";
+import { createRateLimiter } from "@/lib/rate-limit";
 import type { ReportData } from "@/lib/report/generate";
+
+// Rate limit: same as report generation (10 req/hour per IP).
+const limiter = createRateLimiter({ limit: 10 });
 
 interface RouteParams {
   params: Promise<{ slug: string }>;
 }
 
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: RouteParams,
 ): Promise<Response> {
   const { slug } = await params;
+
+  // Rate limit check — archetype calls the paid Anthropic API.
+  const rl = limiter.check(request);
+  if (!rl.success) return limiter.createLimitResponse(rl);
 
   const db = getDb();
   const [report] = await db
@@ -60,6 +68,19 @@ export async function POST(
     return NextResponse.json({ status: "skipped" });
   } catch (err) {
     console.error("[archetype] Route handler failed:", err);
+
+    // Distinguish configuration errors (missing API key) from runtime failures.
+    // Config errors get 500 so they surface in monitoring. Runtime failures
+    // are non-fatal and return 200 with "skipped" status.
+    const isConfigError =
+      err instanceof Error && err.message.includes("ANTHROPIC_API_KEY");
+    if (isConfigError) {
+      return NextResponse.json(
+        { error: "Server configuration error" },
+        { status: 500 },
+      );
+    }
+
     // Do NOT mark report as failed — archetype is optional.
     return NextResponse.json({ status: "skipped" }, { status: 200 });
   }

@@ -37,14 +37,16 @@ Copy `.env.example` → `.env.local`. Required: `DATABASE_URL`, `MAPBOX_ACCESS_T
 3. Cache miss → orchestrator (`lib/report/generate.ts`) fires Census + isochrone + POI via `Promise.all` (each `.catch()` returns null)
 4. Writes location + report rows (status: `generating`), returns slug
 5. Client redirects to `/report/[slug]` → page renders with loading state
-6. `NarrativeTrigger` client component POSTs to `/api/report/[slug]/narrative` → generates AI narrative, updates report to `complete`
+6. `GenerationOrchestrator` sequences two client-triggered AI calls:
+   a. `ArchetypeTrigger` POSTs to `/api/report/[slug]/archetype` → classifies neighborhood archetype (non-fatal, 5s timeout fallback)
+   b. `NarrativeTrigger` POSTs to `/api/report/[slug]/narrative` → generates AI narrative, updates report to `complete`
 7. `AutoRefresh` polls via `router.refresh()` until report is complete
 
 **SSR/client split:** Pages are server components. Interactive parts (`HomepageClient`, `ReportContent`, `Map`, `ShareControls`) are `"use client"` islands. Report page queries DB directly (not through API route) for SSR + `generateMetadata`.
 
 **Data flow:** External APIs → typed clients in `src/lib/` → orchestrator assembles → JSONB snapshot stored in `reports.data` → data sections render from snapshot (report always shows data as-of generation time).
 
-**Key architectural decisions** are documented in `docs/DECISIONS.md` (D1–D7). Notable: Neon HTTP driver over `@vercel/postgres`, Overpass API for POIs (free), insert-then-retry for slug uniqueness, custom walkability heuristic.
+**Key architectural decisions** are documented in `docs/DECISIONS.md` (D1–D10). Notable: Neon HTTP driver over `@vercel/postgres`, Overpass API for POIs (free), insert-then-retry for slug uniqueness, custom walkability heuristic. D8–D10 cover the archetype feature: separate AI call, non-fatal classification, Satori with TTF fonts.
 
 ## Critical Patterns
 
@@ -74,7 +76,7 @@ Copy `.env.example` → `.env.local`. Required: `DATABASE_URL`, `MAPBOX_ACCESS_T
 - `docs/PRODUCT.md` — Product vision, personas, features, user flows
 - `docs/BUILD-STRATEGY.md` — Tech stack rationale, architecture, testing philosophy
 - `docs/IMPLEMENTATION-PLAN.md` — Phase breakdown (all 8 phases complete)
-- `docs/DECISIONS.md` — Architectural decisions log (D1–D7)
+- `docs/DECISIONS.md` — Architectural decisions log (D1–D10)
 - `CONVENTIONS.md` — Full coding patterns and standards (the authoritative reference)
 
 ## Custom Instructions

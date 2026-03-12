@@ -15,6 +15,11 @@ import { ImageResponse } from "@vercel/og";
 import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { reports, locations } from "@/lib/db/schema";
+import {
+  PENTAGON_AXES as AXES,
+  polarToCartesian,
+  toPointsString,
+} from "@/lib/pentagon";
 import type { ReportData, ArchetypeResult } from "@/lib/report/generate";
 
 // --- Route config ------------------------------------------------------------
@@ -25,34 +30,6 @@ export const runtime = "nodejs";
 
 interface RouteParams {
   params: Promise<{ slug: string }>;
-}
-
-// --- Pentagon geometry (shared with VibeSpectrum.tsx) -------------------------
-
-const AXES: { key: keyof ArchetypeResult["vibeSpectrum"]; label: string }[] = [
-  { key: "walkable", label: "Walkable" },
-  { key: "buzzing", label: "Buzzing" },
-  { key: "settled", label: "Settled" },
-  { key: "accessible", label: "Accessible" },
-  { key: "diverse", label: "Diverse" },
-];
-
-function polarToCartesian(
-  cx: number,
-  cy: number,
-  radius: number,
-  index: number,
-): { x: number; y: number } {
-  const angleDeg = -90 + index * 72;
-  const angleRad = (angleDeg * Math.PI) / 180;
-  return {
-    x: cx + radius * Math.cos(angleRad),
-    y: cy + radius * Math.sin(angleRad),
-  };
-}
-
-function toPointsString(points: { x: number; y: number }[]): string {
-  return points.map((p) => `${p.x},${p.y}`).join(" ");
 }
 
 // --- Satori Pentagon component -----------------------------------------------
@@ -565,9 +542,15 @@ function FallbackOgCard({
   );
 }
 
-// --- Font loading ------------------------------------------------------------
+// --- Font loading (cached per server instance) --------------------------------
 
-async function loadFonts() {
+type FontList = { name: string; data: ArrayBuffer; weight: 700 | 400 | 500; style: "normal" }[];
+
+let fontCache: FontList | null = null;
+
+async function loadFonts(): Promise<FontList> {
+  if (fontCache) return fontCache;
+
   const [playfairBold, interRegular, interMedium] = await Promise.all([
     fetch(new URL("/fonts/PlayfairDisplay-Bold.ttf", getBaseUrl())).then(
       (res) => res.arrayBuffer(),
@@ -580,11 +563,13 @@ async function loadFonts() {
     ),
   ]);
 
-  return [
+  fontCache = [
     { name: "Playfair Display", data: playfairBold, weight: 700 as const, style: "normal" as const },
     { name: "Inter", data: interRegular, weight: 400 as const, style: "normal" as const },
     { name: "Inter", data: interMedium, weight: 500 as const, style: "normal" as const },
   ];
+
+  return fontCache;
 }
 
 function getBaseUrl(): string {
@@ -626,8 +611,11 @@ export async function GET(
   const archetype = reportData?.archetype ?? null;
   const cityState = [row.city, row.state].filter(Boolean).join(", ");
 
+  // When archetype is missing, always use OG dimensions (the fallback is a
+  // landscape layout). Story format without archetype would produce a misshapen card.
+  const effectiveFormat = archetype ? format : "og";
   const dimensions =
-    format === "story"
+    effectiveFormat === "story"
       ? { width: 1080, height: 1920 }
       : { width: 1200, height: 630 };
 
@@ -641,7 +629,7 @@ export async function GET(
 
   // Choose the appropriate card layout
   let element: React.ReactElement;
-  if (archetype && format === "story") {
+  if (archetype && effectiveFormat === "story") {
     element = (
       <StoryCard
         archetype={archetype}
@@ -658,7 +646,7 @@ export async function GET(
       />
     );
   } else {
-    // Fallback for reports without archetype data
+    // Fallback for reports without archetype data — always OG dimensions.
     element = (
       <FallbackOgCard address={row.address} cityState={cityState} />
     );

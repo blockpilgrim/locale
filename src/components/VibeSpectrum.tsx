@@ -10,6 +10,12 @@
 // Axis order (clockwise from top): Walkable, Buzzing, Settled, Accessible, Diverse
 // ---------------------------------------------------------------------------
 
+import {
+  PENTAGON_AXES as AXES,
+  polarToCartesian,
+  toPointsString,
+} from "@/lib/pentagon";
+
 interface VibeSpectrumProps {
   scores: {
     walkable: number;
@@ -26,41 +32,6 @@ interface VibeSpectrumProps {
   showScores?: boolean;
   /** Additional CSS class on the wrapper. */
   className?: string;
-}
-
-// --- Geometry helpers --------------------------------------------------------
-
-/** Axes in clockwise order starting from top (12 o'clock). */
-const AXES: { key: keyof VibeSpectrumProps["scores"]; label: string }[] = [
-  { key: "walkable", label: "Walkable" },
-  { key: "buzzing", label: "Buzzing" },
-  { key: "settled", label: "Settled" },
-  { key: "accessible", label: "Accessible" },
-  { key: "diverse", label: "Diverse" },
-];
-
-/**
- * Convert an axis index (0-4) and a normalized radius (0-1) to SVG (x, y).
- * Index 0 points straight up (12 o'clock), subsequent indices go clockwise.
- */
-function polarToCartesian(
-  cx: number,
-  cy: number,
-  radius: number,
-  index: number,
-): { x: number; y: number } {
-  // -90° offset so index 0 starts at top; 72° per axis (360/5)
-  const angleDeg = -90 + index * 72;
-  const angleRad = (angleDeg * Math.PI) / 180;
-  return {
-    x: cx + radius * Math.cos(angleRad),
-    y: cy + radius * Math.sin(angleRad),
-  };
-}
-
-/** Build an SVG polygon points string from an array of {x, y}. */
-function toPointsString(points: { x: number; y: number }[]): string {
-  return points.map((p) => `${p.x},${p.y}`).join(" ");
 }
 
 // --- Component ---------------------------------------------------------------

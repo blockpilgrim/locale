@@ -36,7 +36,8 @@ export function ArchetypeTrigger({ slug, onComplete }: ArchetypeTriggerProps) {
         // Archetype is non-fatal; notify parent to proceed regardless.
         onComplete?.();
       });
-  }, [slug, onComplete]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- firedRef guard ensures single execution; onComplete is captured at mount time
+  }, [slug]);
 
   return null;
 }

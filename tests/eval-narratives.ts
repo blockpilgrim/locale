@@ -55,10 +55,10 @@ function buildMockCensus(addr: GoldenAddress): CensusResult {
   let medianAge = 37.5;
   let totalHouseholds = 1700;
   let marriedCouple = 750;
-  let singleMale = 120;
-  let singleFemale = 280;
+  const singleMale = 120;
+  const singleFemale = 280;
   let nonFamily = 550;
-  let hsOrHigher = 3200;
+  const hsOrHigher = 3200;
   let bachelorsOrHigher = 1400;
   let gradOrProf = 350;
   let white = 2800;
@@ -71,22 +71,22 @@ function buildMockCensus(addr: GoldenAddress): CensusResult {
   let medianRent = 1200;
   let ownerOccupied = 1000;
   let renterOccupied = 700;
-  let totalHousingUnits = 1850;
+  const totalHousingUnits = 1850;
   let before1950 = 200;
   let from1950to1979 = 400;
   let from1980to1999 = 500;
   let from2000to2009 = 400;
   let from2010orLater = 350;
   let medianIncome = 72000;
-  let inLaborForce = 2800;
-  let employed = 2650;
+  const inLaborForce = 2800;
+  const employed = 2650;
   let unemployed = 150;
   let droveAlone = 1500;
-  let carpooled = 200;
+  const carpooled = 200;
   let publicTransit = 300;
   let walked = 150;
   let workedFromHome = 400;
-  let commuteOther = 50;
+  const commuteOther = 50;
   let medianCommute = 28;
 
   // --- Customize per archetype ---
