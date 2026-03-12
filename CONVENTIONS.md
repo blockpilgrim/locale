@@ -185,4 +185,3 @@ tests/              → Golden dataset addresses + eval scripts (not part of app
 ## Documentation
 
 - Architectural deviations from BUILD-STRATEGY.md are recorded in `docs/DECISIONS.md`
-- Code reviews are stored in `docs/reviews/` with resolution status tracked in the file header

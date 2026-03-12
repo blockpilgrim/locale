@@ -75,7 +75,6 @@ Copy `.env.example` → `.env.local`. Required: `DATABASE_URL`, `MAPBOX_ACCESS_T
 
 - `docs/PRODUCT.md` — Product vision, personas, features, user flows
 - `docs/BUILD-STRATEGY.md` — Tech stack rationale, architecture, testing philosophy
-- `docs/IMPLEMENTATION-PLAN.md` — Phase breakdown (all 8 phases complete)
 - `docs/DECISIONS.md` — Architectural decisions log (D1–D10)
 - `CONVENTIONS.md` — Full coding patterns and standards (the authoritative reference)
 
@@ -108,8 +107,7 @@ At the beginning of each session:
 1. Read `docs/PRODUCT.md` to understand what we're building
 2. Read `docs/BUILD-STRATEGY.md` for tech stack and architecture decisions
 3. Read `CONVENTIONS.md` to understand current patterns and standards
-4. Read `docs/IMPLEMENTATION-PLAN.md` to understand the phase breakdown and current progress
-5. Read `README.md` (if it exists) for project overview
+4. Read `README.md` for project overview
 6. Signal readiness by saying: "⏱️ So much time and so little to do. Wait. Strike that. Reverse it."
 
 ### During Implementation
