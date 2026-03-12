@@ -20,6 +20,8 @@ import type { ReportData } from "@/lib/report/generate";
 // Rate limit: same as report generation (10 req/hour per IP).
 const limiter = createRateLimiter({ limit: 10 });
 
+const SLUG_RE = /^[a-z0-9-]{1,80}$/;
+
 interface RouteParams {
   params: Promise<{ slug: string }>;
 }
@@ -28,11 +30,15 @@ export async function POST(
   request: Request,
   { params }: RouteParams,
 ): Promise<Response> {
-  const { slug } = await params;
-
   // Rate limit check — archetype calls the paid Anthropic API.
   const rl = limiter.check(request);
   if (!rl.success) return limiter.createLimitResponse(rl);
+
+  const { slug } = await params;
+
+  if (!SLUG_RE.test(slug)) {
+    return NextResponse.json({ error: "Invalid report slug." }, { status: 400 });
+  }
 
   const db = getDb();
   const [report] = await db

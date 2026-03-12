@@ -8,11 +8,39 @@
 // ---------------------------------------------------------------------------
 
 import { NextResponse } from "next/server";
-import { eq, sql } from "drizzle-orm";
+import { count, eq, gte, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { locations, reports } from "@/lib/db/schema";
 import { rateLimit } from "@/lib/rate-limit";
 import { generateReport } from "@/lib/report/generate";
+
+// ---------------------------------------------------------------------------
+// US geographic bounds
+// ---------------------------------------------------------------------------
+// Multiple zones to cover all 50 states + inhabited territories.
+// Each zone: [minLat, maxLat, minLng, maxLng]
+const US_BOUNDS: [number, number, number, number][] = [
+  // Contiguous US + Alaska + Hawaii + Puerto Rico + USVI
+  [17.5, 72.0, -180.0, -60.0],
+  // Guam + Northern Mariana Islands (positive longitude)
+  [13.0, 21.5, 144.0, 147.0],
+  // American Samoa (southern hemisphere)
+  [-15.0, -10.5, -171.5, -168.0],
+];
+
+function isWithinUSBounds(lat: number, lng: number): boolean {
+  return US_BOUNDS.some(
+    ([minLat, maxLat, minLng, maxLng]) =>
+      lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng,
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Daily report cap
+// ---------------------------------------------------------------------------
+// Hard ceiling on new report generations per calendar day (UTC).
+// Override with MAX_DAILY_REPORTS env var. 0 = disabled.
+const MAX_DAILY_REPORTS = parseInt(process.env.MAX_DAILY_REPORTS ?? "100", 10);
 
 /** Shape of the POST request body. */
 interface GenerateRequestBody {
@@ -52,16 +80,22 @@ function validateBody(body: unknown): string | null {
   if (b.longitude < -180 || b.longitude > 180) {
     return "longitude must be between -180 and 180.";
   }
+  if (!isWithinUSBounds(b.latitude as number, b.longitude as number)) {
+    return "Coordinates must be within the United States or its territories.";
+  }
 
-  // Optional fields — validate types if present.
-  if (b.city !== undefined && typeof b.city !== "string") {
-    return "city must be a string.";
+  // Optional fields — validate types and lengths if present.
+  if (b.city !== undefined) {
+    if (typeof b.city !== "string") return "city must be a string.";
+    if (b.city.length > 100) return "city must be at most 100 characters.";
   }
-  if (b.state !== undefined && typeof b.state !== "string") {
-    return "state must be a string.";
+  if (b.state !== undefined) {
+    if (typeof b.state !== "string") return "state must be a string.";
+    if (b.state.length > 50) return "state must be at most 50 characters.";
   }
-  if (b.zip !== undefined && typeof b.zip !== "string") {
-    return "zip must be a string.";
+  if (b.zip !== undefined) {
+    if (typeof b.zip !== "string") return "zip must be a string.";
+    if (b.zip.length > 10) return "zip must be at most 10 characters.";
   }
 
   return null;
@@ -148,6 +182,29 @@ export async function POST(request: Request): Promise<Response> {
   } catch (error) {
     // DB lookup failure is not fatal — proceed to generate a fresh report.
     console.error("[report/generate] Cache check failed:", error);
+  }
+
+  // --- Daily report cap ---
+  if (MAX_DAILY_REPORTS > 0) {
+    try {
+      const db = getDb();
+      const startOfDay = new Date();
+      startOfDay.setUTCHours(0, 0, 0, 0);
+      const [row] = await db
+        .select({ total: count() })
+        .from(reports)
+        .where(gte(reports.createdAt, startOfDay));
+      if (row && row.total >= MAX_DAILY_REPORTS) {
+        return NextResponse.json(
+          { error: "Daily report limit reached. Please try again tomorrow." },
+          { status: 429 },
+        );
+      }
+    } catch (error) {
+      // Cap check failure is non-fatal — allow the request through rather
+      // than blocking legitimate users on a DB hiccup.
+      console.error("[report/generate] Daily cap check failed:", error);
+    }
   }
 
   // --- Generate report (data only, no narrative) ---

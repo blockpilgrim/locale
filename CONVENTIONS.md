@@ -79,6 +79,15 @@ tests/              → Golden dataset addresses + eval scripts (not part of app
 - **In-memory for MVP:** `src/lib/rate-limit.ts` uses a `Map` with periodic cleanup. Replace with Redis-backed limiter (e.g., `@upstash/ratelimit`) for multi-instance production.
 - **Factory pattern:** Use `createRateLimiter(config)` for custom limits; import the `rateLimit` singleton for the default 10 req/hour.
 - **IP extraction:** Uses `x-forwarded-for` header (standard behind Vercel / proxies).
+- **Every AI-calling route must have a rate limiter** — no exceptions. The check should be the first thing in the handler before any DB work.
+
+## Input Guardrails
+
+- **Slug validation in consuming routes:** Any route that reads a `[slug]` param must validate it with `/^[a-z0-9-]{1,80}$/` before hitting the DB. Reject immediately with 400.
+- **US geographic bounds:** The generate route validates that coordinates fall within one of three bounding box zones: main US zone (lat 17.5–72.0, lng -180 to -60), Pacific territories (Guam/CNMI: lat 13–21.5, lng 144–147), American Samoa (lat -15 to -10.5, lng -171.5 to -168). This covers all 50 states and inhabited territories.
+- **Optional field lengths:** `city` ≤ 100 chars, `state` ≤ 50 chars, `zip` ≤ 10 chars — validated at the route boundary before DB write.
+- **Prompt sanitization:** Call `sanitizeForPrompt()` (in `src/lib/report/narrative.ts`) on any user-supplied string before embedding in an AI prompt. It strips null bytes and non-printable control characters while preserving printable Unicode and common whitespace.
+- **Daily report cap:** `MAX_DAILY_REPORTS` env var (default: 100, set 0 to disable) enforces a global UTC-day ceiling on new report generations. Check runs after cache-hit lookup (cache hits don't count) and before `generateReport()`. Cap check failure is non-fatal — request proceeds rather than blocking users on a DB hiccup.
 
 ## Testing
 

@@ -12,17 +12,30 @@ import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { reports } from "@/lib/db/schema";
 import { generateNarrative } from "@/lib/report/narrative";
+import { createRateLimiter } from "@/lib/rate-limit";
 import type { ReportData } from "@/lib/report/generate";
+
+// Rate limit: 10 req/hour per IP — matches other AI-calling routes.
+const narrativeLimiter = createRateLimiter({ limit: 10 });
+
+const SLUG_RE = /^[a-z0-9-]{1,80}$/;
 
 interface RouteParams {
   params: Promise<{ slug: string }>;
 }
 
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: RouteParams,
 ): Promise<Response> {
+  const rl = narrativeLimiter.check(request);
+  if (!rl.success) return narrativeLimiter.createLimitResponse(rl);
+
   const { slug } = await params;
+
+  if (!SLUG_RE.test(slug)) {
+    return NextResponse.json({ error: "Invalid report slug." }, { status: 400 });
+  }
 
   const db = getDb();
   const [report] = await db

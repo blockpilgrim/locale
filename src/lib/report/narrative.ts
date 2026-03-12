@@ -28,6 +28,19 @@ function getApiKey(): string {
   return key;
 }
 
+// --- Input sanitization ------------------------------------------------------
+
+/**
+ * Strip null bytes and non-printable control characters from user-supplied
+ * strings before embedding them in AI prompts.
+ * Preserves printable ASCII, Unicode, and common whitespace (tab, LF, CR).
+ */
+function sanitizeForPrompt(str: string): string {
+  // \x00-\x08: NUL through BS  |  \x0B-\x0C: VT, FF
+  // \x0E-\x1F: SO through US   |  \x7F: DEL
+  return str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
+}
+
 // --- Prompt construction -----------------------------------------------------
 
 /**
@@ -82,13 +95,14 @@ HANDLING MISSING DATA:
 function buildUserPrompt(data: ReportData): string {
   const parts: string[] = [];
 
-  // Location header
+  // Location header — sanitize user-supplied fields before embedding in prompt.
   parts.push(
-    `Write a neighborhood profile for: ${data.address.full}`,
+    `Write a neighborhood profile for: ${sanitizeForPrompt(data.address.full)}`,
   );
   if (data.address.city || data.address.state) {
     const location = [data.address.city, data.address.state]
       .filter(Boolean)
+      .map((s) => sanitizeForPrompt(s!))
       .join(", ");
     parts.push(`Location: ${location}`);
   }
