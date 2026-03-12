@@ -537,7 +537,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
 > Golden dataset validation, consistency testing, edge cases, prompt tuning.
 
-- [ ] **T6.1 — Extend eval script for archetype classification**
+- [x] **T6.1 — Extend eval script for archetype classification**
 
   **Files to modify:**
   - `tests/eval-narratives.ts` — Add archetype classification alongside narrative generation. For each golden address, output:
