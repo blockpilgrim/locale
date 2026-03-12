@@ -4,6 +4,8 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
 **Prerequisite state:** All 8 phases of the original plan are complete. 153 tests passing. MVP is feature-complete.
 
+**Status: COMPLETE** — 16/18 tasks done, 1 deferred (stretch goal), 1 skipped (not needed). 223 tests passing.
+
 ---
 
 ## Step 1: Types + Classification Backend
@@ -515,7 +517,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
   ---
 
-- [ ] **T5.4 — Homepage featured cards: archetype badge overlay** *(stretch goal)*
+- [ ] **T5.4 — Homepage featured cards: archetype badge overlay** *(deferred — stretch goal)*
 
   **Files to modify:**
   - `src/components/FeaturedCard.tsx` — After a report is generated and has archetype data, show the archetype label as a badge overlay on the card.
@@ -556,7 +558,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
   ---
 
-- [ ] **T6.2 — Consistency test script**
+- [x] **T6.2 — Consistency test script**
 
   **Files to create:**
   - `tests/eval-archetype-consistency.ts`
@@ -598,7 +600,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
   ---
 
-- [ ] **T6.4 — Prompt tuning based on eval results**
+- [ ] **T6.4 — Prompt tuning based on eval results** *(skipped — not needed based on eval results)*
 
   **Files to modify:**
   - `src/lib/report/archetype.ts` — Tune the system prompt based on golden dataset and consistency test results.
@@ -610,6 +612,8 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
   - Tagline quality — add negative examples of generic taglines to avoid
 
   **Verify:** Re-run eval after tuning. Quality improves on previously weak results.
+
+  **Why skipped:** T6.1 showed 18/20 valid classifications with strong quality. T6.2 showed 100% label consistency (5/5 on all 5 addresses) with max spectrum variance of ±8 — well within the ±10 target. The 3 arguable misclassifications (SoMa, Portland, Ohio) had coherent reasoning and were based on synthetic mock data that lacks the distinguishing signals real Census/POI data would provide. Tuning the prompt to fix mock data edge cases risks overfitting. Revisit if real-world reports show classification issues.
 
 ---
 
@@ -709,6 +713,70 @@ T6.1 + T6.2 ──→ T6.4
 | A6 | Aggressive card caching (`immutable`) | Card image is deterministic for a given report. CDN caches indefinitely. |
 | A7 | Skip homepage featured card archetype badge | Low ROI for initial release. Featured cards work fine without it. |
 | A8 | Inline styles in Satori components | Satori doesn't process Tailwind classes. Shared components must use JSX `style={}`. |
+
+---
+
+## Eval Results Summary (2026-03-12)
+
+**T6.1 — Golden dataset (20 addresses, synthetic data):**
+- 20/20 narratives generated successfully
+- 18/20 archetypes validated (2 failed due to reasoning length limit, since fixed)
+- 15/18 classifications matched expected archetype; 3 arguable (SoMa → Flux District instead of Neon Mile, Portland → Flux District instead of Loft Conversion, Ohio → Main Street Time Capsule instead of Cul-de-Sac Country)
+- "Flux District" overused — assigned to 3 addresses where only 1 (Logan Square) was a clear fit
+
+**T6.2 — Consistency (5 addresses, 5 runs each):**
+- 100% label consistency (25/25 runs matched expected archetype)
+- Max spectrum variance: ±8 (Hermosa Beach), well within ±10 target
+- Temperature 0.3 produces highly deterministic results
+
+**Fix applied during eval:** `reasoning` field validation limit bumped from 500 → 1000 chars. The field is internal-only (never displayed to users) and the model writes ~520-550 chars for complex neighborhoods.
+
+---
+
+## Deferred & Skipped Items
+
+| Task | Status | Rationale | When to revisit |
+|------|--------|-----------|-----------------|
+| T5.4 | Deferred | Low ROI — featured cards POST-and-redirect, so archetype data isn't available at render time | When/if reports are pre-generated or featured cards are redesigned |
+| T6.4 | Skipped | Eval results are strong — 100% consistency, 83% classification accuracy on mock data | When real-world reports show classification issues (wrong archetypes, generic taglines, miscalibrated spectrum) |
+
+## Future Prompt Tuning Guideposts
+
+If classification quality issues emerge with real data, here's the playbook:
+
+1. **Run eval with real data first.** Mock data lacks distinguishing signals. Before tuning, generate 5-10 real reports and check if the issues persist. The Flux District overuse seen in eval may not occur with real POI counts and housing age distributions.
+
+2. **Sharpen seed archetype differentiators.** If the model confuses similar archetypes (e.g., Flux District vs. Neon Mile vs. Loft Conversion), add more explicit decision criteria to each seed description — e.g., "Neon Mile: nightlife+dining POI count is the primary signal, NOT housing age mix."
+
+3. **Lower temperature** from 0.3 → 0.2 only if consistency drops. Current results show 100% consistency, so temperature is fine.
+
+4. **Add negative examples** to the system prompt if taglines become generic. E.g., "Do NOT write: 'A vibrant neighborhood with lots to offer' or 'Where community meets convenience.'"
+
+5. **Spectrum calibration notes.** If rural areas get high walkability or suburbs get high "buzzing", add explicit calibration guidance: "walkable: 0 = car-required for all errands, 50 = some walkable amenities, 100 = everything within 10 min walk."
+
+6. **Workflow for prompt changes:**
+   ```bash
+   # 1. Edit the system prompt
+   vim src/lib/report/archetype.ts
+
+   # 2. Re-run golden dataset eval
+   npm run test:eval -- --live
+
+   # 3. Check for regressions
+   diff tests/output/archetypes/  # compare with previous run
+
+   # 4. Re-run consistency check
+   npm run test:eval:consistency
+
+   # 5. Verify >90% label consistency and ±10 spectrum variance
+   ```
+
+## Additional Files Created During Eval
+
+| File | Type | Purpose |
+|------|------|---------|
+| `tests/mock-data.ts` | Module | Shared synthetic data builders (extracted from eval-narratives.ts) |
+| `tests/eval-archetype-consistency.ts` | Script | Consistency evaluation (5 addresses × 5 runs) |
 
 ---
 
