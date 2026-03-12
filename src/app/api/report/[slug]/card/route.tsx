@@ -12,6 +12,8 @@
 // ---------------------------------------------------------------------------
 
 import { ImageResponse } from "@vercel/og";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { reports, locations } from "@/lib/db/schema";
@@ -546,36 +548,33 @@ function FallbackOgCard({
 
 type FontList = { name: string; data: ArrayBuffer; weight: 700 | 400 | 500; style: "normal" }[];
 
+/** Convert a Node.js Buffer to a clean ArrayBuffer (avoids Buffer pool aliasing). */
+function toArrayBuffer(buf: Buffer): ArrayBuffer {
+  return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+}
+
 let fontCache: FontList | null = null;
 
 async function loadFonts(): Promise<FontList> {
   if (fontCache) return fontCache;
 
+  // Read fonts from disk instead of self-fetching over HTTP.
+  // A loopback fetch (localhost → localhost) can deadlock the dev server.
+  const fontsDir = join(process.cwd(), "public", "fonts");
+
   const [playfairBold, interRegular, interMedium] = await Promise.all([
-    fetch(new URL("/fonts/PlayfairDisplay-Bold.ttf", getBaseUrl())).then(
-      (res) => res.arrayBuffer(),
-    ),
-    fetch(new URL("/fonts/Inter-Regular.ttf", getBaseUrl())).then((res) =>
-      res.arrayBuffer(),
-    ),
-    fetch(new URL("/fonts/Inter-Medium.ttf", getBaseUrl())).then((res) =>
-      res.arrayBuffer(),
-    ),
+    readFile(join(fontsDir, "PlayfairDisplay-Bold.woff")),
+    readFile(join(fontsDir, "Inter-Regular.woff")),
+    readFile(join(fontsDir, "Inter-Medium.woff")),
   ]);
 
   fontCache = [
-    { name: "Playfair Display", data: playfairBold, weight: 700 as const, style: "normal" as const },
-    { name: "Inter", data: interRegular, weight: 400 as const, style: "normal" as const },
-    { name: "Inter", data: interMedium, weight: 500 as const, style: "normal" as const },
+    { name: "Playfair Display", data: toArrayBuffer(playfairBold), weight: 700 as const, style: "normal" as const },
+    { name: "Inter", data: toArrayBuffer(interRegular), weight: 400 as const, style: "normal" as const },
+    { name: "Inter", data: toArrayBuffer(interMedium), weight: 500 as const, style: "normal" as const },
   ];
 
   return fontCache;
-}
-
-function getBaseUrl(): string {
-  if (process.env.NEXT_PUBLIC_BASE_URL) return process.env.NEXT_PUBLIC_BASE_URL;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return "http://localhost:3000";
 }
 
 // --- Route handler -----------------------------------------------------------

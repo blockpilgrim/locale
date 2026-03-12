@@ -73,28 +73,16 @@ vi.mock("drizzle-orm", () => ({
   eq: (col: string, val: unknown) => ({ col, val }),
 }));
 
-// --- Mock font loading (fetch calls for TTF files) --------------------------
-// The card route calls fetch() to load TTF fonts. We mock fetch globally so
-// it returns fake ArrayBuffer data for font URLs.
+// --- Mock font loading (fs.readFile for woff files) -------------------------
+// The card route reads font files from disk via node:fs/promises. We mock
+// readFile to return fake ArrayBuffer data for font paths.
 // NOTE: The card route's module-level fontCache persists across tests (it is
 // populated on the first test run and reused thereafter). This mirrors
 // production behavior but means only the first test exercises font loading.
 
-const originalFetch = globalThis.fetch;
-
-function setupFontFetchMock() {
-  vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
-    const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : (input as Request).url;
-    if (url.includes("/fonts/")) {
-      return new Response(new ArrayBuffer(100), {
-        status: 200,
-        headers: { "Content-Type": "font/ttf" },
-      });
-    }
-    // Fallback for unexpected fetch calls
-    return originalFetch(input);
-  });
-}
+vi.mock("node:fs/promises", () => ({
+  readFile: vi.fn(async () => Buffer.alloc(100)),
+}));
 
 // --- Imports (after mocks) --------------------------------------------------
 
@@ -163,11 +151,6 @@ describe("GET /api/report/[slug]/card", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockDbResults.length = 0;
-    setupFontFetchMock();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
   });
 
   it("returns 404 for non-existent slug", async () => {
