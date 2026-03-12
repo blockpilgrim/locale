@@ -550,7 +550,7 @@ type FontList = { name: string; data: ArrayBuffer; weight: 700 | 400 | 500; styl
 
 /** Convert a Node.js Buffer to a clean ArrayBuffer (avoids Buffer pool aliasing). */
 function toArrayBuffer(buf: Buffer): ArrayBuffer {
-  return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+  return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
 }
 
 let fontCache: FontList | null = null;
