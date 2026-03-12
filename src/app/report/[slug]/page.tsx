@@ -14,6 +14,7 @@ import { getDb } from "@/lib/db";
 import { locations, reports } from "@/lib/db/schema";
 import { ReportContent } from "@/components/ReportContent";
 import { GenerationOrchestrator } from "@/components/GenerationOrchestrator";
+import { GeneratingReport } from "@/components/GeneratingReport";
 import { Container } from "@/components/Container";
 import type { ReportData } from "@/lib/report/generate";
 
@@ -169,23 +170,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
   if (row.status === "generating") {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center px-4">
-        <Container variant="prose">
-          <div className="text-center">
-            <div className="mx-auto mb-8 flex items-center justify-center gap-2">
-              <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-accent" />
-              <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-accent [animation-delay:150ms]" />
-              <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-accent [animation-delay:300ms]" />
-            </div>
-            <h1 className="mb-4">Generating your report</h1>
-            <p className="text-base text-ink-muted sm:text-lg leading-relaxed">
-              We&apos;re gathering data and writing your neighborhood
-              intelligence report. This usually takes a few seconds.
-            </p>
-            <p className="mt-8 text-xs text-ink-muted">
-              This page will refresh automatically.
-            </p>
-          </div>
-        </Container>
+        <GeneratingReport />
         {/* Orchestrate archetype → narrative generation sequence. */}
         <GenerationOrchestrator slug={row.slug} />
       </div>
