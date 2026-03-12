@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display, Fraunces } from "next/font/google";
+import { Inter, Playfair_Display, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -14,10 +14,11 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
   subsets: ["latin"],
   display: "swap",
+  weight: "400",
   style: "italic",
 });
 
@@ -34,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${playfair.variable} ${fraunces.variable} antialiased`}>
+      <body className={`${inter.variable} ${playfair.variable} ${instrumentSerif.variable} antialiased`}>
         {children}
       </body>
     </html>

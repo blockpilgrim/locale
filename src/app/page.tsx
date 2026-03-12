@@ -78,7 +78,7 @@ export default function Home() {
         <main className="relative z-10 w-full max-w-xl text-center">
           {/* Brand mark */}
           <div className="mb-10 animate-fade-up">
-            <p className="logotype text-3xl text-accent">
+            <p className="logotype text-5xl tracking-wide text-accent">
               Locale
             </p>
             <p className="mt-1.5 text-xs font-semibold tracking-[0.25em] uppercase text-ink-muted">
@@ -140,7 +140,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-border-light px-4 py-10 sm:px-6">
         <div className="mx-auto max-w-(--container-content) flex flex-col items-center gap-3">
-          <p className="logotype text-2xl text-accent">
+          <p className="logotype text-3xl text-accent">
             Locale
           </p>
           <p className="text-center text-xs text-ink-muted leading-relaxed">

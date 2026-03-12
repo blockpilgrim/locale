@@ -114,7 +114,7 @@ export function ReportContent({
                 <line x1="19" y1="12" x2="5" y2="12" />
                 <polyline points="12 19 5 12 12 5" />
               </svg>
-              Back to <span className="logotype">Locale</span>
+              Try another address
             </Link>
 
             <div className="flex items-center gap-3 mb-3">
