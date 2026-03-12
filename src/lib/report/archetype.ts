@@ -103,7 +103,7 @@ function validateArchetypeResult(
   // Required string fields with length limits to prevent runaway AI output
   if (typeof obj.archetype !== "string" || obj.archetype.length === 0 || obj.archetype.length > 100) return null;
   if (typeof obj.tagline !== "string" || obj.tagline.length === 0 || obj.tagline.length > 300) return null;
-  if (typeof obj.reasoning !== "string" || obj.reasoning.length > 500) return null;
+  if (typeof obj.reasoning !== "string" || obj.reasoning.length > 1000) return null;
 
   // vibeSpectrum must be an object with 5 numeric fields
   if (!obj.vibeSpectrum || typeof obj.vibeSpectrum !== "object") return null;
