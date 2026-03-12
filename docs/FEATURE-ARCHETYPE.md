@@ -106,7 +106,7 @@ Used as the Open Graph image for report URLs. When someone shares a Locale link 
 
 Design notes:
 - Cream background (`#FAF7F2`) with subtle warm tint — matches editorial identity
-- Pentagon chart filled with accent green (`#2D5A3D`) at 20% opacity, stroke at full
+- Pentagon chart filled with accent green (`#2D5A3D`) at 15% opacity, stroke at full
 - Playfair Display for the archetype label, Inter for everything else
 - Three defining traits as a single line, separated by middots
 - Locale branding bottom-right, understated
@@ -380,7 +380,7 @@ This is pure SVG math — no charting library needed. Works in both Satori (for 
 
 ### Font loading
 
-Satori requires font files to be loaded explicitly (it doesn't have access to Google Fonts at runtime). Bundle Playfair Display Bold and Inter Regular/Medium as static `.woff` files in `public/fonts/`. These are already used by the app — we just need the raw files for Satori.
+Satori requires font files to be loaded explicitly (it doesn't have access to Google Fonts at runtime). Bundle Playfair Display Bold and Inter Regular/Medium as static `.ttf` files in `public/fonts/`. These are already used by the app — we just need the raw files for Satori.
 
 ---
 

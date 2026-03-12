@@ -10,7 +10,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
 > New TypeScript types, classification prompt, API route, and DB integration. No frontend changes. Independently demoable via API.
 
-- [ ] **T1.1 — ArchetypeResult type + ReportData extension**
+- [x] **T1.1 — ArchetypeResult type + ReportData extension**
 
   Add `ArchetypeResult` interface and extend the existing `ReportData` interface.
 
@@ -42,7 +42,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
   ---
 
-- [ ] **T1.2 — Archetype classification prompt + AI call**
+- [x] **T1.2 — Archetype classification prompt + AI call**
 
   Create the archetype classification module with system/user prompt construction and the `classifyArchetype()` function.
 
@@ -84,7 +84,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
   ---
 
-- [ ] **T1.3 — POST /api/report/[slug]/archetype route**
+- [x] **T1.3 — POST /api/report/[slug]/archetype route**
 
   New API route that triggers archetype classification for a report in `generating` status.
 
@@ -104,7 +104,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
   ---
 
-- [ ] **T1.4 — Unit tests for archetype classification**
+- [x] **T1.4 — Unit tests for archetype classification**
 
   **Files to create:**
   - `src/lib/__tests__/archetype.test.ts`
@@ -128,7 +128,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
 > Wire archetype into the generation flow. ArchetypeTrigger fires before NarrativeTrigger. No visual changes yet.
 
-- [ ] **T2.1 — ArchetypeTrigger client component**
+- [x] **T2.1 — ArchetypeTrigger client component**
 
   **Files to create:**
   - `src/components/ArchetypeTrigger.tsx`
@@ -153,7 +153,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
   ---
 
-- [ ] **T2.2 — GenerationOrchestrator client component**
+- [x] **T2.2 — GenerationOrchestrator client component**
 
   **Files to create:**
   - `src/components/GenerationOrchestrator.tsx`
@@ -190,7 +190,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
   ---
 
-- [ ] **T2.3 — Update report page to use GenerationOrchestrator**
+- [x] **T2.3 — Update report page to use GenerationOrchestrator**
 
   **Files to modify:**
   - `src/app/report/[slug]/page.tsx` — Replace the `generating` status block's `<NarrativeTrigger>` + `<AutoRefresh>` with `<GenerationOrchestrator>`.
@@ -216,7 +216,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
 > Pentagon chart + archetype display on the report page. The visual centerpiece.
 
-- [ ] **T3.1 — VibeSpectrum pentagon SVG component**
+- [x] **T3.1 — VibeSpectrum pentagon SVG component**
 
   **Files to create:**
   - `src/components/VibeSpectrum.tsx`
@@ -263,7 +263,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
   ---
 
-- [ ] **T3.2 — ArchetypeBanner component**
+- [x] **T3.2 — ArchetypeBanner component**
 
   **Files to create:**
   - `src/components/ArchetypeBanner.tsx`
@@ -295,7 +295,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
   ---
 
-- [ ] **T3.3 — Integrate ArchetypeBanner into ReportContent**
+- [x] **T3.3 — Integrate ArchetypeBanner into ReportContent**
 
   **Files to modify:**
   - `src/components/ReportContent.tsx`
@@ -330,7 +330,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
 > Server-side image generation with Satori / @vercel/og. New API route for OG and Story card formats.
 
-- [ ] **T4.1 — Install @vercel/og + bundle font files**
+- [x] **T4.1 — Install @vercel/og + bundle font files**
 
   **Commands:**
   ```bash
@@ -338,17 +338,17 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
   ```
 
   **Font files:** Satori requires raw font data (ArrayBuffer) at runtime — it can't use Google Fonts or CSS font-face. Download and place:
-  - `public/fonts/PlayfairDisplay-Bold.woff` (for archetype label)
-  - `public/fonts/Inter-Regular.woff` (for body text)
-  - `public/fonts/Inter-Medium.woff` (for labels/traits)
+  - `public/fonts/PlayfairDisplay-Bold.ttf` (for archetype label)
+  - `public/fonts/Inter-Regular.ttf` (for body text)
+  - `public/fonts/Inter-Medium.ttf` (for labels/traits)
 
-  These fonts are already used by the app via `next/font/google` in `layout.tsx`. The `.woff` files are separate assets needed only for Satori image generation.
+  These fonts are already used by the app via `next/font/google` in `layout.tsx`. The `.ttf` files are separate assets needed only for Satori image generation.
 
   **Verify:** Font files exist in `public/fonts/` and are loadable via `fetch` in a server context.
 
   ---
 
-- [ ] **T4.2 — Pentagon chart renderer for Satori**
+- [x] **T4.2 — Pentagon chart renderer for Satori**
 
   The `VibeSpectrum` component from T3.1 should already work in Satori since it uses basic SVG. However, Satori has JSX rendering constraints — verify and create a Satori-compatible variant if needed.
 
@@ -361,7 +361,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
   ---
 
-- [ ] **T4.3 — GET /api/report/[slug]/card route**
+- [x] **T4.3 — GET /api/report/[slug]/card route**
 
   **Files to create:**
   - `src/app/api/report/[slug]/card/route.tsx`
@@ -437,7 +437,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
   ---
 
-- [ ] **T4.4 — Unit tests for card generation**
+- [x] **T4.4 — Unit tests for card generation**
 
   **Files to create:**
   - `src/lib/__tests__/card.test.ts`
@@ -458,7 +458,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
 > OG image update, story card download, homepage featured card enhancement. The highest-leverage changes.
 
-- [ ] **T5.1 — Update generateMetadata to use card route for OG image**
+- [x] **T5.1 — Update generateMetadata to use card route for OG image**
 
   **Files to modify:**
   - `src/app/report/[slug]/page.tsx` — In `generateMetadata()`, replace the Mapbox Static Images URL with the card route URL when archetype data is available.
@@ -483,7 +483,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
   ---
 
-- [ ] **T5.2 — Add "Download Card" button to ShareControls**
+- [x] **T5.2 — Add "Download Card" button to ShareControls**
 
   **Files to modify:**
   - `src/components/ShareControls.tsx` — Add a "Download Card" button alongside existing share buttons.
@@ -506,7 +506,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
   ---
 
-- [ ] **T5.3 — Update ReportContent to pass hasArchetype to ShareControls**
+- [x] **T5.3 — Update ReportContent to pass hasArchetype to ShareControls**
 
   **Files to modify:**
   - `src/components/ReportContent.tsx` — Pass `hasArchetype={!!data.archetype}` to `<ShareControls>`.
@@ -583,7 +583,7 @@ Implementation plan for the Neighborhood Archetype & Social Card feature describ
 
   ---
 
-- [ ] **T6.3 — Edge case testing for partial data**
+- [x] **T6.3 — Edge case testing for partial data**
 
   **Files to modify:**
   - `src/lib/__tests__/archetype.test.ts` — Add test cases for partial data scenarios.
@@ -682,9 +682,9 @@ T6.1 + T6.2 ──→ T6.4
 | `src/lib/__tests__/archetype.test.ts` | Tests | Archetype classification tests |
 | `src/lib/__tests__/card.test.ts` | Tests | Card generation tests |
 | `tests/eval-archetype-consistency.ts` | Script | Consistency evaluation |
-| `public/fonts/PlayfairDisplay-Bold.woff` | Asset | Font for Satori |
-| `public/fonts/Inter-Regular.woff` | Asset | Font for Satori |
-| `public/fonts/Inter-Medium.woff` | Asset | Font for Satori |
+| `public/fonts/PlayfairDisplay-Bold.ttf` | Asset | Font for Satori |
+| `public/fonts/Inter-Regular.ttf` | Asset | Font for Satori |
+| `public/fonts/Inter-Medium.ttf` | Asset | Font for Satori |
 
 ## Modified Files Summary
 
