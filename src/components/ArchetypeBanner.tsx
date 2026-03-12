@@ -66,8 +66,9 @@ export function ArchetypeBanner({
           </div>
         </div>
 
-        {/* Right: Pentagon chart */}
-        <div className="flex-shrink-0 self-center sm:self-auto">
+        {/* Right: Pentagon chart — px/py padding gives SVG labels room to render
+           outside the viewBox (overflow: visible) without clipping */}
+        <div className="flex-shrink-0 self-center sm:self-auto px-8 py-2">
           <VibeSpectrum
             scores={archetype.vibeSpectrum}
             size={200}

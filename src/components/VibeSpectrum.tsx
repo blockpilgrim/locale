@@ -61,8 +61,8 @@ export function VibeSpectrum({
   // Axis lines from center to each vertex
   const axisLines = bgPoints.map((pt) => ({ x1: cx, y1: cy, x2: pt.x, y2: pt.y }));
 
-  // Label positions — pushed further out from the pentagon
-  const labelRadius = radius + (showScores ? size * 0.16 : size * 0.12);
+  // Label positions — just outside the pentagon vertices
+  const labelRadius = radius + (showScores ? size * 0.08 : size * 0.06);
   const labelPoints = AXES.map((_, i) =>
     polarToCartesian(cx, cy, labelRadius, i),
   );
@@ -80,6 +80,7 @@ export function VibeSpectrum({
       className={className}
       role="img"
       aria-label={`Vibe Spectrum: ${ariaLabel}`}
+      overflow="visible"
       style={{ display: "block" }}
     >
       {/* Axis lines — subtle guides from center to vertices */}
